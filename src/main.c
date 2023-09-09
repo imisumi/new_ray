@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/09/09 15:42:17 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/09 17:11:49 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,51 +23,52 @@ int32_t ft_pixel(int32_t r, int32_t g, int32_t b, int32_t a)
 }
 int next = 0;
 
+uint32_t vec4_to_color(t_vec4 c)
+{
+	uint8_t r = (uint8_t)(c.x * 255.0);
+	uint8_t g = (uint8_t)(c.y * 255.0);
+	uint8_t b = (uint8_t)(c.z * 255.0);
+	uint8_t a = (uint8_t)(c.w * 255.0);
+	return (ft_pixel(r, g, b, a));
+}
+
 void ft_randomize(void* param)
 {
 	uint32_t color;
+	// for (int y = 0; y < HEIGHT; y++)
 	for (int y = HEIGHT - 1; y >= 0; y--)
 	{
 		// usleep(5000);
 		for (int x = 0; x < WIDTH; x++)
 		{
-			color = ft_pixel(
-						rand() % 0xFF, // R
-						rand() % 0xFF, // G
-						rand() % 0xFF, // B
-						rand() % 0xFF  // A
-					);
-				
-
-
 			t_vec2 coord = {(float)x / (float)(WIDTH), (float)y / (float)(HEIGHT)};
-			coord = vec2_subf(vec2_mulf(coord, 2.0), 1.0f);
+			// coord = vec2_subf(vec2_mulf(coord, 2.0), 1.0f);
 
 			t_vec2 numPixels = vec2_new((float)WIDTH, (float)HEIGHT);
+			// t_vec2 numPixels = vec2_new((float)x, (float)y);
 			t_vec2 pixelCoord = vec2_mul(coord, numPixels);
-			uint32_t pixelIndex = (pixelCoord.x * pixelCoord.y) + numPixels.x;
+			uint32_t pixelIndex = pixelCoord.y * pixelCoord.x + pixelCoord.x;
+			// printf("%d\n", pixelIndex);
 			// uint32_t rngState = pixelIndex + total_frames * 719393;
 			
+			// printf("%f\n", pixelIndex);
+			// float c = (float)pixelIndex / (float)(WIDTH * HEIGHT);
+			float c = pixelIndex / pixelCoord.x * pixelCoord.y;
+			uint32_t color = vec4_to_color(vec4_new(c, c, c, 1.0f));
+			// color = vec4_to_color(vec4_new(coord.x, coord.x, coord.x, 1.0f));
 			for (int i = 0; i < PIXEL_SIZE; i++)
 			{
 				for (int j = 0; j < PIXEL_SIZE; j++)
 				{
-					// usleep(5);
-					// put_pixel(d->img, (x * PIXEL_SIZE) + i, \
-					// 	((HEIGHT - y - 1) * PIXEL_SIZE) + j, \
-					// 	vec4_to_color(accumulated_color));
-					// mlx_put_pixel(image, (x * PIXEL_SIZE) + i, \
-					// 	((HEIGHT - y - 1) * PIXEL_SIZE) + j, \
-					// 	color);
 					mlx_put_pixel(image, (x * PIXEL_SIZE) + i, \
 						((HEIGHT - y - 1) * PIXEL_SIZE) + j, \
-						pixelIndex);
+						color);
 				}
 			}
 		}
 		// exit(0);
 	}
-
+	// exit(0);
 }
 
 void ft_hook(void* param)
@@ -158,7 +159,7 @@ int32_t main(int32_t argc, const char* argv[])
 	
 	mlx_loop_hook(mlx, ft_randomize, mlx);
 	mlx_loop_hook(mlx, ft_hook, mlx);
-	mlx_loop_hook(mlx, ft_loop_hook, mlx);
+	// mlx_loop_hook(mlx, ft_loop_hook, mlx);
 
 	mlx_loop(mlx);
 	mlx_terminate(mlx);
