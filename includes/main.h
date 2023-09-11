@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.h                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/09/09 16:48:24 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/11 13:13:20 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,15 +14,20 @@
 # include <stdlib.h>
 # include <stdbool.h>
 # include <GLFW/glfw3.h>
+# include <float.h>
 
 # include "MLX42.h"
 # include "libft.h"
 # include "array.h"
 # include "lib3d.h"
 
-#define WIDTH 32
-#define HEIGHT 32
-#define PIXEL_SIZE 16
+#define WIDTH 160
+#define HEIGHT 160
+#define PIXEL_SIZE 10
+
+// #define WIDTH 1600
+// #define HEIGHT 1600
+// #define PIXEL_SIZE 1
 
 
 // float4 frag (v2f i) : SV_Target

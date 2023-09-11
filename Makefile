@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+         #
+#    By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/28 00:51:40 by ichiro            #+#    #+#              #
-#    Updated: 2023/09/09 15:29:55 by imisumi-wsl      ###   ########.fr        #
+#    Updated: 2023/09/11 15:18:36 by imisumi          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -51,22 +51,24 @@ SRCS =	src/main.c						\
 		src/darray.c						
 
 
-all: $(LIBFT) $(MLX) $(NAME)
+all: $(LIBFT) $(LIB3D) $(MLX) $(NAME)
 	@echo "$(GREEN)[Completed minirt]$(NC)"
 
 $(LIBFT):
 	@$(MAKE) -C lib/libft
 
 $(LIB3D):
+	git submodule update --init --recursive lib/lib3d
 	@$(MAKE) -C lib/lib3d
 
 $(MLX):
+	git submodule update --init --recursive lib/MLX42
 	@echo "$(BLUE)[Compiling MLX]$(NC)"
-	@cd ./lib/MLX42 && cmake -DBUILD_TESTS=ON -B build && cmake --build build --parallel
+	@cd ./lib/MLX42 && cmake -B build && cmake --build build --parallel
 	@echo "$(GREEN)[Completed MLX]$(NC)"
 
-$(NAME): $(MLX) $(LIBFT) $(LIB3D) $(OBJS)
-	$(cc) $(CFLAGS) $(SRCS) $(MLX) $(LIBFT) $(LIB3D) $(LFLAGS) -o $(NAME)
+$(NAME): $(LIBFT) $(LIB3D) $(MLX) $(OBJS)
+	$(cc) $(CFLAGS) $(SRCS) $(LIBFT) $(LIB3D) $(MLX) $(LFLAGS) -o $(NAME)
 
 run: re
 	./$(NAME)
