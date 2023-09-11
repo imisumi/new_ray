@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/09/11 20:12:39 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/11 20:21:24 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,8 @@ typedef struct {
 
 typedef struct s_data
 {
-	mlx_image_t	*mlx;
-	mlx_t		*img;
+	mlx_t			*mlx;
+	mlx_image_t		*img;
 }				t_data;
 
 // #define WIDTH 1600

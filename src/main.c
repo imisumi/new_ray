@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/09/11 20:16:07 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/11 20:20:41 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -306,6 +306,7 @@ int32_t main(int32_t argc, const char* argv[])
 {
 	mlx_t* mlx;
 
+	t_data	data;
 	// Gotta error check this stuff
 	int width = WIDTH;
 	int height = HEIGHT;
@@ -314,49 +315,49 @@ int32_t main(int32_t argc, const char* argv[])
 		width *= PIXEL_SIZE;
 		height *= PIXEL_SIZE;
 	}
-	mlx = mlx_init(width, height, "Ray Tracer", false);
-	if (mlx == NULL)
+	data.mlx = mlx_init(width, height, "Ray Tracer", false);
+	if (data.mlx == NULL)
 	{
 		puts(mlx_strerror(mlx_errno));
 		return(EXIT_FAILURE);
 	}
-	image = mlx_new_image(mlx, width, height);
+	image = mlx_new_image(data.mlx, width, height);
 	if (image == NULL)
 	{
-		mlx_close_window(mlx);
+		mlx_close_window(data.mlx);
 		puts(mlx_strerror(mlx_errno));
 		return(EXIT_FAILURE);
 	}
-	if (mlx_image_to_window(mlx, image, 0, 0) == -1)
+	if (mlx_image_to_window(data.mlx, image, 0, 0) == -1)
 	{
-		mlx_close_window(mlx);
+		mlx_close_window(data.mlx);
 		exit(EXIT_FAILURE);
 	}
-	// if (!(mlx = mlx_init(width, height, "MLX42", true)))
+	// if (!(data.mlx = mlx_init(width, height, "MLX42", true)))
 	// {
 	// 	puts(mlx_strerror(mlx_errno));
 	// 	return(EXIT_FAILURE);
 	// }
-	// if (!(image = mlx_new_image(mlx, width, height)))
+	// if (!(image = mlx_new_image(data.mlx, width, height)))
 	// {
-	// 	mlx_close_window(mlx);
+	// 	mlx_close_window(data.mlx);
 	// 	puts(mlx_strerror(mlx_errno));
 	// 	return(EXIT_FAILURE);
 	// }
-	// if (mlx_image_to_window(mlx, image, 0, 0) == -1)
+	// if (mlx_image_to_window(data.mlx, image, 0, 0) == -1)
 	// {
-	// 	mlx_close_window(mlx);
+	// 	mlx_close_window(data.mlx);
 	// 	puts(mlx_strerror(mlx_errno));
 	// 	return(EXIT_FAILURE);
 	// }
 	
-	// mlx_loop_hook(mlx, ft_randomize, mlx);
-	mlx_loop_hook(mlx, ft_hook, mlx);
-	mlx_loop_hook(mlx, ft_multi_thread, mlx);
-	mlx_loop_hook(mlx, frame_times, mlx);
+	// mlx_loop_hook(data.mlx, ft_randomize, data.mlx);
+	mlx_loop_hook(data.mlx, ft_hook, data.mlx);
+	mlx_loop_hook(data.mlx, ft_multi_thread, data.mlx);
+	mlx_loop_hook(data.mlx, frame_times, data.mlx);
 
-	mlx_loop(mlx);
-	mlx_terminate(mlx);
+	mlx_loop(data.mlx);
+	mlx_terminate(data.mlx);
 	return (EXIT_SUCCESS);
 }
 
