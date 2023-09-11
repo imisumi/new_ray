@@ -3,14 +3,17 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/09/11 13:18:28 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/09/11 20:16:07 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "main.h"
+#include "../includes/main.h"
+// #include "main.h"
+#include <float.h>
+#include <pthread.h>
 static mlx_image_t* image;
 int	total_frames = 0;
 double previousTime = 0.0;
@@ -28,6 +31,15 @@ void put_pixel(mlx_image_t* image, uint32_t x, uint32_t y, uint32_t color)
 		mlx_put_pixel(image, x, y, color);
 }
 
+bool	sphere_intersect(t_ray ray, t_vec3 center, float radius)
+{
+	t_vec3 oc = vec3_sub(ray.origin, center);
+	float a = vec3_dot(ray.direction, ray.direction);
+	float b = 2.0 * vec3_dot(oc, ray.direction);
+	float c = vec3_dot(oc, oc) - radius * radius;
+	float discriminant = b * b - 4 * a * c;
+	return (discriminant > 0);
+}
 
 int next = 0;
 
@@ -45,17 +57,9 @@ float	random_value(uint32_t *state)
 	*state = *state * 747796405 + 2891336453;
 	uint32_t resuls = ((*state >> ((*state >> 28) + 4)) ^ *state) * 277803737;
 	resuls = (resuls >> 22) ^ resuls;
-	return (resuls / FLT_MAX);
-}
-
-bool	sphere_intersect(t_ray ray, t_vec3 center, float radius)
-{
-	t_vec3 oc = vec3_sub(ray.origin, center);
-	float a = vec3_dot(ray.direction, ray.direction);
-	float b = 2.0 * vec3_dot(oc, ray.direction);
-	float c = vec3_dot(oc, oc) - radius * radius;
-	float discriminant = b * b - 4 * a * c;
-	return (discriminant > 0);
+	// printf("%u\n", resuls);
+	// printf("float max = %f\n", FLT_MAX);
+	return ((float)resuls / UINT32_MAX);
 }
 
 void ft_randomize(void* param)
@@ -74,19 +78,23 @@ void ft_randomize(void* param)
 			// t_vec2 numPixels = vec2_new((float)x, (float)y);
 			t_vec2 pixelCoord = vec2_mul(coord, numPixels);
 			uint32_t pixelIndex = pixelCoord.x + pixelCoord.y * numPixels.x;
-			// uint32_t rngState = pixelIndex + total_frames * 719393;
+			uint32_t rngState = pixelIndex + total_frames * 719393;
+			// printf("%d\n", rngState);
 			
 			float c = (float)pixelIndex / (float)(WIDTH * HEIGHT);
 			// c = c * 2.0f - 1.0f;
 			uint32_t color = vec4_to_color(vec4_new(c, c, c, 1.0f));
-
+			// color = vec4_to_color(vec4_new(random_value(&rngState), random_value(&rngState), random_value(&rngState), 1.0f));
 
 			// uint32_t rngState = pixelIndex;
-			// float	r = random_value(&rngState);
-			// float	g = random_value(&rngState);
-			// float	b = random_value(&rngState);
-			// color = vec4_to_color(vec4_new(r, g, b, 1.0f));
-
+			float	r = random_value(&rngState);
+			float	g = random_value(&rngState);
+			float	b = random_value(&rngState);
+			// printf("%f\n", r);
+			// printf("%f\n", g);
+			// printf("%f\n", b);
+			// exit(0);
+			color = vec4_to_color(vec4_new(r, g, b, 1.0f));
 
 			// t_ray ray;
 			// ray.origin = vec3_new(0.0f, 0.0f, -2.0f);
@@ -96,6 +104,106 @@ void ft_randomize(void* param)
 			// else
 			// 	color = vec4_to_color(vec4_new(0.0f, 0.0f, 1.0f, 1.0f));
 
+			for (int i = 0; i < PIXEL_SIZE; i++)
+			{
+				for (int j = 0; j < PIXEL_SIZE; j++)
+				{
+					put_pixel(image, (x * PIXEL_SIZE) + i, \
+						((HEIGHT - y - 1) * PIXEL_SIZE) + j, \
+						color);
+				}
+			}
+		}
+		// exit(0);
+	}
+	// exit(0);
+	total_frames++;
+}
+
+// uint32_t rngState;
+
+void *ft_multi(void* param)
+{
+	RenderBlock *block = (RenderBlock *)param;
+	// uint32_t color = ft_pixel(
+	// 			rand() % 0xFF, // R
+	// 			rand() % 0xFF, // G
+	// 			rand() % 0xFF, // B
+	// 			rand() % 0xFF  // A
+	// 		);
+	uint32_t color;
+	uint32_t rngState;
+	for (int y = block->y_start; y < block->y_end; y++)
+	{
+		for (int x = block->x_start; x < block->x_end; x++)
+		{
+			// for (int k = 0; k < 50; k++)
+			// {
+			// 	vec3_dot(vec3_new(1.0f, 2.0f, 3.0f), vec3_new(1.0f, 2.0f, 3.0f));
+			// }
+
+			t_vec2 coord = {(float)x / (float)(WIDTH), (float)y / (float)(HEIGHT)};
+			t_vec2 numPixels = vec2_new((float)WIDTH, (float)HEIGHT);
+			t_vec2 pixelCoord = vec2_mul(coord, numPixels);
+			uint32_t pixelIndex = pixelCoord.x + pixelCoord.y * numPixels.x;
+			rngState = pixelIndex + total_frames * 719393;
+			for (int i = 0; i < 5; i++)
+			{
+				float	r = random_value(&rngState);
+				float	g = random_value(&rngState);
+				float	b = random_value(&rngState);
+				color = vec4_to_color(vec4_new(r, g, b, 1.0f));
+			}
+
+			
+			for (int i = 0; i < PIXEL_SIZE; i++)
+			{
+				for (int j = 0; j < PIXEL_SIZE; j++)
+				{
+					put_pixel(image, (x * PIXEL_SIZE) + i, \
+						((HEIGHT - y - 1) * PIXEL_SIZE) + j, \
+						color);
+				}
+			}
+		}
+		// exit(0);
+	}
+	// exit(0);
+}
+
+void  ft_single(void* param)
+{
+	// uint32_t color = ft_pixel(
+	// 			rand() % 0xFF, // R
+	// 			rand() % 0xFF, // G
+	// 			rand() % 0xFF, // B
+	// 			rand() % 0xFF  // A
+	// 		);
+	uint32_t color;
+	for (int y = 0; y < HEIGHT; y++)
+	{
+		for (int x = 0; x < WIDTH; x++)
+		{
+			// for (int k = 0; k < 10; k++)
+			// {
+			// 	vec3_dot(vec3_new(1.0f, 2.0f, 3.0f), vec3_new(1.0f, 2.0f, 3.0f));
+			// }
+			
+
+			t_vec2 coord = {(float)x / (float)(WIDTH), (float)y / (float)(HEIGHT)};
+			t_vec2 numPixels = vec2_new((float)WIDTH, (float)HEIGHT);
+			t_vec2 pixelCoord = vec2_mul(coord, numPixels);
+			uint32_t pixelIndex = pixelCoord.x + pixelCoord.y * numPixels.x;
+			uint32_t rngState = pixelIndex + total_frames * 719393;
+			for (int i = 0; i < 5; i++)
+			{
+				float	r = random_value(&rngState);
+				float	g = random_value(&rngState);
+				float	b = random_value(&rngState);
+				color = vec4_to_color(vec4_new(r, g, b, 1.0f));
+			}
+			
+			
 			for (int i = 0; i < PIXEL_SIZE; i++)
 			{
 				for (int j = 0; j < PIXEL_SIZE; j++)
@@ -127,9 +235,8 @@ void ft_hook(void* param)
 		image->instances[0].x += 5;
 }
 
-void	ft_loop_hook(void *param)
+void	frame_times(void *arg)
 {
-
 	double currentTime = glfwGetTime();
 	double deltaTime = currentTime - previousTime;
 	double frameTimeMs = deltaTime * 1000.0;
@@ -143,8 +250,54 @@ void	ft_loop_hook(void *param)
 	fflush(stdout);
 	previousTime = currentTime;
 
-	// sky(data);
 	total_frames++;
+}
+
+void	ft_multi_thread(void *param)
+{
+	// return ;
+	if (MT)
+	{
+		pthread_t threads[THREADS];
+		RenderBlock blocks[THREADS];
+	
+		for (int i = 0; i < THREADS; i++)
+		{
+			//! Vertical lines
+			int block_width = WIDTH / THREADS;
+			int x_start = i * block_width;
+			int x_end = (i + 1) * block_width;
+	
+			blocks[i].x_start = x_start;
+			blocks[i].x_end = x_end;
+			blocks[i].y_start = 0;
+			blocks[i].y_end = HEIGHT;
+
+			//! Horizontal lines
+			// int block_height = HEIGHT / THREADS;
+			// int y_start = i * block_height;
+			// int y_end = (i + 1) * block_height;
+
+			// blocks[i].x_start = 0;
+			// blocks[i].x_end = WIDTH;
+			// blocks[i].y_start = y_start;
+			// blocks[i].y_end = y_end;
+	
+			pthread_create(&threads[i], NULL, ft_multi, &blocks[i]);
+		}
+	
+		for (int i = 0; i < THREADS; i++)
+		{
+			pthread_join(threads[i], NULL);
+		}
+	}
+	else
+		ft_single(NULL);
+	
+
+
+
+	// ft_multi(param);
 }
 
 // -----------------------------------------------------------------------------
@@ -197,9 +350,10 @@ int32_t main(int32_t argc, const char* argv[])
 	// 	return(EXIT_FAILURE);
 	// }
 	
-	mlx_loop_hook(mlx, ft_randomize, mlx);
+	// mlx_loop_hook(mlx, ft_randomize, mlx);
 	mlx_loop_hook(mlx, ft_hook, mlx);
-	mlx_loop_hook(mlx, ft_loop_hook, mlx);
+	mlx_loop_hook(mlx, ft_multi_thread, mlx);
+	mlx_loop_hook(mlx, frame_times, mlx);
 
 	mlx_loop(mlx);
 	mlx_terminate(mlx);
