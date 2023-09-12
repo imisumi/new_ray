@@ -6,7 +6,7 @@
 #    By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/28 00:51:40 by ichiro            #+#    #+#              #
-#    Updated: 2023/09/11 18:48:53 by imisumi-wsl      ###   ########.fr        #
+#    Updated: 2023/09/12 17:55:57 by imisumi-wsl      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -48,7 +48,8 @@ NC := \033[0m
 
 SRCS =	src/main.c						\
 		src/array.c						\
-		src/darray.c						
+		src/darray.c					\
+		src/camera.c
 
 
 all: $(LIBFT) $(LIB3D) $(MLX) $(NAME)

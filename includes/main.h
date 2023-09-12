@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/09/11 20:21:24 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/12 18:50:52 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@
 #define MT 1
 #define THREADS 10
 
+#define _USE_MATH_DEFINES
+
 typedef struct {
 	int	x_start;
 	int	x_end;
@@ -36,9 +38,43 @@ typedef struct {
 	int	y_end;
 }	RenderBlock;
 
+typedef struct s_camera
+{
+	t_mat4	projection;
+	t_mat4	inv_projection;
+	t_mat4	view;
+	t_mat4	inv_view;
+
+	float	vertical_fov;
+	float	aspectRatio;
+	float	zNear;
+	float	zFar;
+
+	t_vec3	position;
+	t_vec3	direction;
+
+	t_vec2	mouse_delta;
+	t_vec2	mouse_pos;
+	bool	mouse_lock;
+	t_vec2	prev_mouse_pos;
+
+	t_vec3	*ray_dir;
+}	t_camera;
+
+typedef struct s_scene
+{
+	t_camera	camera;
+}				t_scene;
+
+typedef struct s_utils
+{
+	pthread_t	threads[THREADS];
+	RenderBlock	blocks[THREADS];
+}				t_utils;
 
 typedef struct s_data
 {
+	t_scene			scene;
 	mlx_t			*mlx;
 	mlx_image_t		*img;
 }				t_data;
@@ -79,3 +115,9 @@ typedef struct s_data
 
 
 
+// camera.c
+void	recalculat_ray_directions(t_data *d);
+void	init_camera(t_camera *cam);
+void	recalculate_view(t_data *d);
+void	recalculated_projection(t_data *d);
+void	movement(t_data *d);

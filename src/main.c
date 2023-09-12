@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/09/11 20:20:41 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/12 18:47:51 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -302,6 +302,12 @@ void	ft_multi_thread(void *param)
 
 // -----------------------------------------------------------------------------
 
+void init_scene(t_scene *s)
+{
+	init_camera(&s->camera);
+	return ;
+}
+
 int32_t main(int32_t argc, const char* argv[])
 {
 	mlx_t* mlx;
@@ -350,6 +356,8 @@ int32_t main(int32_t argc, const char* argv[])
 	// 	puts(mlx_strerror(mlx_errno));
 	// 	return(EXIT_FAILURE);
 	// }
+
+	init_scene(&data.scene);
 	
 	// mlx_loop_hook(data.mlx, ft_randomize, data.mlx);
 	mlx_loop_hook(data.mlx, ft_hook, data.mlx);
