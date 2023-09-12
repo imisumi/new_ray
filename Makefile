@@ -6,7 +6,7 @@
 #    By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/28 00:51:40 by ichiro            #+#    #+#              #
-#    Updated: 2023/09/12 17:55:57 by imisumi-wsl      ###   ########.fr        #
+#    Updated: 2023/09/13 00:22:43 by imisumi-wsl      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,7 +17,6 @@ NAME = minirt
 CFLAGS = 
 
 INCLUDES =	includes/main.h			\
-			includes/array.h		\
 			includes/darray.h		\
 			lib/MLX42/include/MLX42/MLX42.h \
 			lib/libft/includes/libft.h \
@@ -47,9 +46,10 @@ NC := \033[0m
 
 
 SRCS =	src/main.c						\
-		src/array.c						\
 		src/darray.c					\
-		src/camera.c
+		src/camera.c					\
+		src/intersection.c				\
+		src/scene.c						
 
 
 all: $(LIBFT) $(LIB3D) $(MLX) $(NAME)
@@ -59,7 +59,8 @@ $(LIBFT):
 	@$(MAKE) -C lib/libft
 
 $(LIB3D):
-	git submodule update --init --recursive lib/lib3d
+	git clone --recursive git@github.com:imisumi/lib3d.git lib/lib3d
+	git submodule update --init --recursive lib/MLX42
 	@$(MAKE) -C lib/lib3d
 
 $(MLX):

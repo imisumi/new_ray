@@ -6,14 +6,12 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/18 00:44:47 by ichiro            #+#    #+#             */
-/*   Updated: 2023/09/08 19:53:03 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/12 23:29:10 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdint.h>
+// #include "darray.h"
+#include "../includes/darray.h"
 
 typedef struct s_array
 {
@@ -114,21 +112,23 @@ void	array_push(void *refvec, void *value)
 
 // 	// whole_numbers[0] = 0;
 // 	vec_init(&array, 5, sizeof(float));
-// 	i = 0;
+// 	// i = 0;
 // 	while (i < 11)
 // 	{
 // 		num = i + 0.5;
 // 		array_push(&array, &num);
 // 		i++;
 // 	}
-// 	array_clear(&array);
+// 	// array_clear(&array);
 // 	i = 0;
 // 	while (i < array_length(&array))
 // 	{
 // 		printf("%f\n", array[i]);
 // 		i++;
 // 	}
-// 	array_free(&array);
-// 	array_free(&array);
+// 	// array_free(&array);
+// 	// array_free(&array);
+
+// 	printf("array_length: %d\n", array_length(&array));
 // 	return (0);
 // }

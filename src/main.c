@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/09/12 18:47:51 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/12 23:39:30 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ double previousTime = 0.0;
 
 // -----------------------------------------------------------------------------
 
+
 int32_t ft_pixel(int32_t r, int32_t g, int32_t b, int32_t a)
 {
 	return (r << 24 | g << 16 | b << 8 | a);
@@ -31,17 +32,8 @@ void put_pixel(mlx_image_t* image, uint32_t x, uint32_t y, uint32_t color)
 		mlx_put_pixel(image, x, y, color);
 }
 
-bool	sphere_intersect(t_ray ray, t_vec3 center, float radius)
-{
-	t_vec3 oc = vec3_sub(ray.origin, center);
-	float a = vec3_dot(ray.direction, ray.direction);
-	float b = 2.0 * vec3_dot(oc, ray.direction);
-	float c = vec3_dot(oc, oc) - radius * radius;
-	float discriminant = b * b - 4 * a * c;
-	return (discriminant > 0);
-}
 
-int next = 0;
+// int next = 0;
 
 uint32_t vec4_to_color(t_vec4 c)
 {
@@ -60,163 +52,6 @@ float	random_value(uint32_t *state)
 	// printf("%u\n", resuls);
 	// printf("float max = %f\n", FLT_MAX);
 	return ((float)resuls / UINT32_MAX);
-}
-
-void ft_randomize(void* param)
-{
-	uint32_t color;
-	// for (int y = 0; y < HEIGHT; y++)
-	for (int y = HEIGHT - 1; y >= 0; y--)
-	{
-		// usleep(5000);
-		for (int x = 0; x < WIDTH; x++)
-		{
-			t_vec2 coord = {(float)x / (float)(WIDTH), (float)y / (float)(HEIGHT)};
-			// coord = vec2_subf(vec2_mulf(coord, 2.0), 1.0f);
-
-			t_vec2 numPixels = vec2_new((float)WIDTH, (float)HEIGHT);
-			// t_vec2 numPixels = vec2_new((float)x, (float)y);
-			t_vec2 pixelCoord = vec2_mul(coord, numPixels);
-			uint32_t pixelIndex = pixelCoord.x + pixelCoord.y * numPixels.x;
-			uint32_t rngState = pixelIndex + total_frames * 719393;
-			// printf("%d\n", rngState);
-			
-			float c = (float)pixelIndex / (float)(WIDTH * HEIGHT);
-			// c = c * 2.0f - 1.0f;
-			uint32_t color = vec4_to_color(vec4_new(c, c, c, 1.0f));
-			// color = vec4_to_color(vec4_new(random_value(&rngState), random_value(&rngState), random_value(&rngState), 1.0f));
-
-			// uint32_t rngState = pixelIndex;
-			float	r = random_value(&rngState);
-			float	g = random_value(&rngState);
-			float	b = random_value(&rngState);
-			// printf("%f\n", r);
-			// printf("%f\n", g);
-			// printf("%f\n", b);
-			// exit(0);
-			color = vec4_to_color(vec4_new(r, g, b, 1.0f));
-
-			// t_ray ray;
-			// ray.origin = vec3_new(0.0f, 0.0f, -2.0f);
-			// ray.direction = vec3_new(coord.x, coord.y, 1.0f);
-			// if (sphere_intersect(ray, vec3_new(0.0f, 0.0f, 1.0f), 0.5f))
-			// 	color = vec4_to_color(vec4_new(1.0f, 0.0f, 0.0f, 1.0f));
-			// else
-			// 	color = vec4_to_color(vec4_new(0.0f, 0.0f, 1.0f, 1.0f));
-
-			for (int i = 0; i < PIXEL_SIZE; i++)
-			{
-				for (int j = 0; j < PIXEL_SIZE; j++)
-				{
-					put_pixel(image, (x * PIXEL_SIZE) + i, \
-						((HEIGHT - y - 1) * PIXEL_SIZE) + j, \
-						color);
-				}
-			}
-		}
-		// exit(0);
-	}
-	// exit(0);
-	total_frames++;
-}
-
-// uint32_t rngState;
-
-void *ft_multi(void* param)
-{
-	RenderBlock *block = (RenderBlock *)param;
-	// uint32_t color = ft_pixel(
-	// 			rand() % 0xFF, // R
-	// 			rand() % 0xFF, // G
-	// 			rand() % 0xFF, // B
-	// 			rand() % 0xFF  // A
-	// 		);
-	uint32_t color;
-	uint32_t rngState;
-	for (int y = block->y_start; y < block->y_end; y++)
-	{
-		for (int x = block->x_start; x < block->x_end; x++)
-		{
-			// for (int k = 0; k < 50; k++)
-			// {
-			// 	vec3_dot(vec3_new(1.0f, 2.0f, 3.0f), vec3_new(1.0f, 2.0f, 3.0f));
-			// }
-
-			t_vec2 coord = {(float)x / (float)(WIDTH), (float)y / (float)(HEIGHT)};
-			t_vec2 numPixels = vec2_new((float)WIDTH, (float)HEIGHT);
-			t_vec2 pixelCoord = vec2_mul(coord, numPixels);
-			uint32_t pixelIndex = pixelCoord.x + pixelCoord.y * numPixels.x;
-			rngState = pixelIndex + total_frames * 719393;
-			for (int i = 0; i < 5; i++)
-			{
-				float	r = random_value(&rngState);
-				float	g = random_value(&rngState);
-				float	b = random_value(&rngState);
-				color = vec4_to_color(vec4_new(r, g, b, 1.0f));
-			}
-
-			
-			for (int i = 0; i < PIXEL_SIZE; i++)
-			{
-				for (int j = 0; j < PIXEL_SIZE; j++)
-				{
-					put_pixel(image, (x * PIXEL_SIZE) + i, \
-						((HEIGHT - y - 1) * PIXEL_SIZE) + j, \
-						color);
-				}
-			}
-		}
-		// exit(0);
-	}
-	// exit(0);
-}
-
-void  ft_single(void* param)
-{
-	// uint32_t color = ft_pixel(
-	// 			rand() % 0xFF, // R
-	// 			rand() % 0xFF, // G
-	// 			rand() % 0xFF, // B
-	// 			rand() % 0xFF  // A
-	// 		);
-	uint32_t color;
-	for (int y = 0; y < HEIGHT; y++)
-	{
-		for (int x = 0; x < WIDTH; x++)
-		{
-			// for (int k = 0; k < 10; k++)
-			// {
-			// 	vec3_dot(vec3_new(1.0f, 2.0f, 3.0f), vec3_new(1.0f, 2.0f, 3.0f));
-			// }
-			
-
-			t_vec2 coord = {(float)x / (float)(WIDTH), (float)y / (float)(HEIGHT)};
-			t_vec2 numPixels = vec2_new((float)WIDTH, (float)HEIGHT);
-			t_vec2 pixelCoord = vec2_mul(coord, numPixels);
-			uint32_t pixelIndex = pixelCoord.x + pixelCoord.y * numPixels.x;
-			uint32_t rngState = pixelIndex + total_frames * 719393;
-			for (int i = 0; i < 5; i++)
-			{
-				float	r = random_value(&rngState);
-				float	g = random_value(&rngState);
-				float	b = random_value(&rngState);
-				color = vec4_to_color(vec4_new(r, g, b, 1.0f));
-			}
-			
-			
-			for (int i = 0; i < PIXEL_SIZE; i++)
-			{
-				for (int j = 0; j < PIXEL_SIZE; j++)
-				{
-					put_pixel(image, (x * PIXEL_SIZE) + i, \
-						((HEIGHT - y - 1) * PIXEL_SIZE) + j, \
-						color);
-				}
-			}
-		}
-		// exit(0);
-	}
-	// exit(0);
 }
 
 void ft_hook(void* param)
@@ -253,14 +88,10 @@ void	frame_times(void *arg)
 	total_frames++;
 }
 
-void	ft_multi_thread(void *param)
+void	set_render_zones(t_utils *utils)
 {
-	// return ;
 	if (MT)
 	{
-		pthread_t threads[THREADS];
-		RenderBlock blocks[THREADS];
-	
 		for (int i = 0; i < THREADS; i++)
 		{
 			//! Vertical lines
@@ -268,10 +99,10 @@ void	ft_multi_thread(void *param)
 			int x_start = i * block_width;
 			int x_end = (i + 1) * block_width;
 	
-			blocks[i].x_start = x_start;
-			blocks[i].x_end = x_end;
-			blocks[i].y_start = 0;
-			blocks[i].y_end = HEIGHT;
+			utils->blocks[i].x_start = x_start;
+			utils->blocks[i].x_end = x_end;
+			utils->blocks[i].y_start = 0;
+			utils->blocks[i].y_end = HEIGHT;
 
 			//! Horizontal lines
 			// int block_height = HEIGHT / THREADS;
@@ -282,22 +113,155 @@ void	ft_multi_thread(void *param)
 			// blocks[i].x_end = WIDTH;
 			// blocks[i].y_start = y_start;
 			// blocks[i].y_end = y_end;
-	
-			pthread_create(&threads[i], NULL, ft_multi, &blocks[i]);
-		}
-	
-		for (int i = 0; i < THREADS; i++)
-		{
-			pthread_join(threads[i], NULL);
 		}
 	}
 	else
-		ft_single(NULL);
+	{
+		utils->blocks[0].x_start = 0;
+		utils->blocks[0].x_end = WIDTH;
+		utils->blocks[0].y_start = 0;
+		utils->blocks[0].y_end = HEIGHT;
+	}
+}
+
+t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coord)
+{
+
+
+	t_hitinfo closest_hit = {0};
+
+	closest_hit.distance = FLT_MAX;
+
+	int	num_spheres = 1;
+	int	i = 0;
+
+	float *f;
+
+	// printf("num_spheres:\n");
+	// vec_init(&f, 50, sizeof(float));
+	// printf("float = %d\n", array_length(&f));
+	// // vec_init(&s.spheres, 4, sizeof(t_sphere));
+	// printf("%d\n", array_length(&s.spheres));
+	// exit(0);
+	while (i < array_length(&s.spheres))
+	{
+		t_sphere sphere = s.spheres[i];
+		t_hitinfo hitinfo = sphere_intersection(ray, sphere);
+		if (hitinfo.hit && hitinfo.distance < closest_hit.distance)
+		{
+			closest_hit = hitinfo;
+			closest_hit.material = sphere.material;
+			// closest_hit.material.color = vec4_new(1.0f, 0.0f, 0.0f, 1.0f);
+		}
+		i++;
+	}
+	return (closest_hit.material.color);
+
 	
 
 
 
-	// ft_multi(param);
+
+
+
+
+
+
+	//print ray direction
+	// printf("%f, %f, %f\n", ray.direction.x, ray.direction.y, ray.direction.z);
+	// t_hitinfo hitinfo = sphere_intersection(ray, vec3_new(0.0f, 0.0f, 0.0f), 0.5f);
+	// if (hitinfo.hit)
+	// 	return (vec4_new(1.0f, 0.0f, 0.0f, 1.0f));
+	// else
+	// 	return (vec4_new(0.0f, 1.0f, 0.0f, 1.0f));
+	// return (vec4_new(rr, g, b, 1.0f));
+	// return (vec4_new(1.0f, 0.0f, 0.0f, 1.0f));
+	return (vec4_new(1.0f, 0.0f, 0.0f, 1.0f));
+}
+
+void	*render(void *param)
+{
+	t_thread_data threadData = *(t_thread_data *)param;
+	t_data *data = threadData.data;
+	int	index = threadData.threadIndex;
+	uint32_t color;
+	uint32_t rngState;
+
+	t_ray	ray;
+	ray.origin = data->scene.camera.position;
+	// printf("pos x: %f\n", data->scene.camera.position.x);
+
+	for (int y = data->utils.blocks[index].y_start; y <data->utils.blocks[index].y_end; y++)
+	{
+		for (int x = data->utils.blocks[index].x_start; x < data->utils.blocks[index].x_end; x++)
+		{
+			t_vec2 coord = {(float)x / (float)(WIDTH), (float)y / (float)(HEIGHT)};
+			t_vec2 numPixels = vec2_new((float)WIDTH, (float)HEIGHT);
+			t_vec2 pixelCoord = vec2_mul(coord, numPixels);
+			uint32_t pixelIndex = pixelCoord.x + pixelCoord.y * numPixels.x;
+			rngState = pixelIndex + total_frames * 719393;
+			// for (int i = 0; i < 5; i++)
+			// {
+			// 	float	r = random_value(&rngState);
+			// 	float	g = random_value(&rngState);
+			// 	float	b = random_value(&rngState);
+			// 	color = vec4_to_color(vec4_new(r, g, b, 1.0f));
+			// }
+
+			ray.direction = data->scene.camera.ray_dir[x + y * WIDTH];
+			// printf("%f, %f, %f\n", ray.direction.x, ray.direction.y, ray.direction.z);
+
+			t_vec4 col = per_pixel(ray, data->scene, vec2_new(x, y), &rngState, coord);
+
+			color = vec4_to_color(col);
+			for (int i = 0; i < PIXEL_SIZE; i++)
+			{
+				for (int j = 0; j < PIXEL_SIZE; j++)
+				{
+					put_pixel(image, (x * PIXEL_SIZE) + i, \
+						((HEIGHT - y - 1) * PIXEL_SIZE) + j, \
+						color);
+				}
+			}
+		}
+		// exit(0);
+	}
+	// exit(0);
+}
+
+void	render_loop(void *param)
+{
+	t_thread_data threadData[THREADS];
+	t_data *data = param;
+	movement(data);
+	int	i;
+	// t_scene scene = data->scene;
+	// t_ray	ray;
+	// ray.origin = scene.camera.position;
+	set_render_zones(&data->utils);
+	i = 0;
+	if (MT)
+	{
+		while (i < THREADS)
+		{
+			threadData[i].data = data; // Store a pointer to the t_data structure
+			threadData[i].threadIndex = i; // Store the thread index
+			pthread_create(&data->utils.threads[i], NULL, render, &threadData[i]);
+			i++;
+		}
+		i = 0;
+		while (i < THREADS)
+		{
+			pthread_join(data->utils.threads[i], NULL);
+			i++;
+		}
+	}
+	else
+	{
+		threadData[0].data = data; // Store a pointer to the t_data structure
+		threadData[0].threadIndex = 0;
+		render(&threadData[0]);
+	}
 }
 
 // -----------------------------------------------------------------------------
@@ -305,6 +269,7 @@ void	ft_multi_thread(void *param)
 void init_scene(t_scene *s)
 {
 	init_camera(&s->camera);
+	init_scene_one(s);
 	return ;
 }
 
@@ -358,10 +323,18 @@ int32_t main(int32_t argc, const char* argv[])
 	// }
 
 	init_scene(&data.scene);
+
+	recalculate_view(&data);
+	recalculated_projection(&data);
+	recalculat_ray_directions(&data);
 	
 	// mlx_loop_hook(data.mlx, ft_randomize, data.mlx);
+
+	mlx_loop_hook(data.mlx, render_loop, &data);
+
 	mlx_loop_hook(data.mlx, ft_hook, data.mlx);
-	mlx_loop_hook(data.mlx, ft_multi_thread, data.mlx);
+	// mlx_loop_hook(data.mlx, ft_multi_thread, data.mlx);
+	
 	mlx_loop_hook(data.mlx, frame_times, data.mlx);
 
 	mlx_loop(data.mlx);

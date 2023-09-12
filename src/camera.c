@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 02:06:12 by ichiro            #+#    #+#             */
-/*   Updated: 2023/09/12 18:39:25 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/12 21:48:01 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -195,3 +195,8 @@ void	movement(t_data *d)
 		}
 	}
 }
+
+// float4 frag (v2f i) : SV_Target
+// {
+// 	return i.uv.x;
+// }
