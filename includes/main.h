@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/09/12 23:43:42 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/14 18:35:28 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,11 +23,12 @@
 # include "darray.h"
 # include "lib3d.h"
 
-#define WIDTH 1050
-#define HEIGHT 1050
-#define PIXEL_SIZE 1
+#define WIDTH 800
+#define HEIGHT 600
+#define PIXEL_SIZE 2
 #define MT 1
-#define THREADS 14
+#define THREADS 10
+#define ANTIALIASING 1
 
 #define _USE_MATH_DEFINES
 
@@ -48,7 +49,13 @@ typedef struct {
 
 typedef struct s_material
 {
-	t_vec4	color;
+	t_vec3	color;
+
+	float	roughness;
+	float	specular;
+	t_vec3	specular_color;
+	t_vec3	emission_color;
+	float	emission_strength;
 }	t_material;
 
 typedef struct s_sphere
@@ -57,6 +64,15 @@ typedef struct s_sphere
 	float		radius;
 	t_material	material;
 }	t_sphere;
+
+typedef struct s_plane
+{
+	t_vec3		position;
+	t_vec3		normal;
+	float		width;
+	float		height;
+	t_material	material;
+}	t_plane;
 
 
 typedef struct s_camera
@@ -85,6 +101,7 @@ typedef struct s_camera
 typedef struct s_scene
 {
 	t_sphere	*spheres;
+	t_plane		*planes;
 	t_camera	camera;
 }				t_scene;
 
@@ -92,6 +109,8 @@ typedef struct s_utils
 {
 	pthread_t			threads[THREADS];
 	t_render_block		blocks[THREADS];
+	uint32_t			accumulated_frames;
+	t_vec4				*accumulated_data;
 }				t_utils;
 
 typedef struct s_data
@@ -119,7 +138,7 @@ typedef struct s_hitinfo
 }	t_hitinfo;
 
 
-
+// t_vec4 *accumulated_data;
 
 
 // t_hitinfo	sphere_intersection(t_ray ray, t_vec3 center, float radius);
@@ -170,8 +189,12 @@ void	movement(t_data *d);
 
 // intersection.c
 
-t_hitinfo	sphere_intersection(t_ray ray, t_sphere sphere);
+// t_hitinfo	sphere_intersection(t_ray ray, t_sphere sphere);
+// t_hitinfo	sphere_intersection(t_ray ray, t_sphere *spheres);
+t_hitinfo	sphere_intersection(t_ray ray, t_sphere *spheres, t_hitinfo hitinfo);
+t_hitinfo	plane_intersection(t_ray ray, t_plane *planes, t_hitinfo obj_hit);
 
 // scene.c
 t_sphere	create_sphere(t_vec3 center, float radius);
 void		init_scene_one(t_scene *scene);
+void		init_scene_two(t_scene *scene);

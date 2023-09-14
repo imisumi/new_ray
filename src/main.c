@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/09/12 23:39:30 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/14 18:31:46 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,52 @@
 static mlx_image_t* image;
 int	total_frames = 0;
 double previousTime = 0.0;
-
+// uint32_t accumulated_frames = 1;
 // -----------------------------------------------------------------------------
+
+float my_sign(float num) {
+    if (num > 0.0f) {
+        return 1.0f;
+    } else if (num < 0.0f) {
+        return -1.0f;
+    } else {
+        return 0.0f;
+    }
+}
+
+
+float randomFloat(uint32_t *state)
+{
+	*state = *state * 747796405 + 2891336453;
+	uint32_t result = ((*state >> ((*state >> 28) + 4)) ^ *state) * 277803737;
+	result = (result >> 22) ^ result;
+	return (float)result / 4294967295.0f;
+}
+
+float random_value_normal_distribution(uint32_t *state)
+{
+	float theta = 2 * 3.1415926 * randomFloat(state);
+	float rho = sqrtf(-2 * logf(randomFloat(state)));
+	return rho * cosf(theta);
+}
+
+t_vec3 random_direction(uint32_t *state)
+{
+	float x = random_value_normal_distribution(state);
+	float y = random_value_normal_distribution(state);
+	float z = random_value_normal_distribution(state);
+	return vec3_normalize(vec3_new(x, y, z));
+	
+}
+
+t_vec3 random_himisphere_dir(t_vec3 normal, uint32_t *state)
+{
+
+	t_vec3 dir;
+	dir = random_direction(state);
+
+	return vec3_mulf(dir, my_sign(vec3_dot(normal, dir)));
+}
 
 
 int32_t ft_pixel(int32_t r, int32_t g, int32_t b, int32_t a)
@@ -86,6 +130,8 @@ void	frame_times(void *arg)
 	previousTime = currentTime;
 
 	total_frames++;
+	t_data *data = arg;
+	data->utils.accumulated_frames++;
 }
 
 void	set_render_zones(t_utils *utils)
@@ -124,59 +170,86 @@ void	set_render_zones(t_utils *utils)
 	}
 }
 
+t_vec3 vec3_reflect(t_vec3 incident, t_vec3 normal)
+{
+	return (vec3_sub(incident, vec3_mulf(normal, 2.0f * vec3_dot(incident, normal))));
+}
+
+t_vec3 lerp(t_vec3 vec1, t_vec3 vec2, float t)
+{
+	// if (t == 1.0f)
+	// 	return vec1;
+	t_vec3 result;
+	result.x = vec1.x + (t * (vec2.x - vec1.x));
+	result.y = vec1.y + (t * (vec2.y - vec1.y));
+	result.z = vec1.z + (t * (vec2.z - vec1.z));
+	return result;
+}
+
 t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coord)
 {
-
-
-	t_hitinfo closest_hit = {0};
-
-	closest_hit.distance = FLT_MAX;
-
 	int	num_spheres = 1;
 	int	i = 0;
-
 	float *f;
+	int	bounces = 0;
+	int	max_bounces = 5;
 
-	// printf("num_spheres:\n");
-	// vec_init(&f, 50, sizeof(float));
-	// printf("float = %d\n", array_length(&f));
-	// // vec_init(&s.spheres, 4, sizeof(t_sphere));
-	// printf("%d\n", array_length(&s.spheres));
-	// exit(0);
-	while (i < array_length(&s.spheres))
+	t_hitinfo closest_hit;
+	t_vec3	incomming_light = vec3_new(0.0f, 0.0f, 0.0f);
+	t_vec3 ray_color = vec3_new(1.0f, 1.0f, 1.0f);
+	float is_specular = 0.0f;
+	while (bounces <= max_bounces)
 	{
-		t_sphere sphere = s.spheres[i];
-		t_hitinfo hitinfo = sphere_intersection(ray, sphere);
-		if (hitinfo.hit && hitinfo.distance < closest_hit.distance)
+		closest_hit.hit = false;
+		closest_hit.distance = FLT_MAX;
+		closest_hit = sphere_intersection(ray, s.spheres, closest_hit);
+		closest_hit = plane_intersection(ray, s.planes, closest_hit);
+
+		
+		if (closest_hit.hit)
 		{
-			closest_hit = hitinfo;
-			closest_hit.material = sphere.material;
-			// closest_hit.material.color = vec4_new(1.0f, 0.0f, 0.0f, 1.0f);
+			ray.origin = vec3_add(closest_hit.position, vec3_mulf(closest_hit.normal, 0.001f));
+			
+			// ray.direction = vec3_normalize(vec3_add(closest_hit.normal, random_direction(rngState)));
+			t_vec3 diffuse_dir = vec3_normalize(vec3_add(closest_hit.normal, random_direction(rngState)));
+			t_vec3 specular_dir = vec3_reflect(ray.direction, closest_hit.normal);
+			// if (closest_hit.material.specular >= randomFloat(rngState))
+			// 	is_specular = 1.0f;
+			// else
+			// 	is_specular = 0.0f;
+			is_specular = closest_hit.material.specular >= randomFloat(rngState);
+			
+			// ray.direction =  lerp(diffuse_dir, specular_dir, \
+			// 						closest_hit.material.roughness * closest_hit.material.roughness);
+			ray.direction =  lerp(diffuse_dir, specular_dir, \
+									closest_hit.material.roughness * is_specular);
+			
+			t_material material = closest_hit.material;
+			t_vec3 emitted_light = vec3_mulf(material.emission_color, material.emission_strength);
+			// float	light_strength = vec3_dot(ray.direction, closest_hit.normal);
+			incomming_light = vec3_add(incomming_light, vec3_mul(ray_color, emitted_light));
+			// ray_color = vec3_mul(ray_color, vec3_mulf(material.color, light_strength * 2.0f));
+			ray_color = vec3_mul(ray_color, lerp(material.color, material.specular_color, is_specular));
+			// ray_color = vec3_mul(ray_color, material.color);
 		}
-		i++;
+		else
+		{
+			t_vec3 unit_direction = vec3_normalize(ray.direction);
+			float t = 0.5f * (unit_direction.y + 1.0f);
+			t_vec3 sky = vec3_add(vec3_mulf(vec3_new(1.0f, 1.0f, 1.0f), 1.0f - t), vec3_mulf(vec3_new(0.5f, 0.7f, 1.0f), t));
+			incomming_light = vec3_add(incomming_light, vec3_mul(ray_color, sky));
+			break ;
+		}
+		bounces++;
 	}
-	return (closest_hit.material.color);
-
+	// printf("check\n");
 	
-
-
-
-
-
-
-
-
-
-	//print ray direction
-	// printf("%f, %f, %f\n", ray.direction.x, ray.direction.y, ray.direction.z);
-	// t_hitinfo hitinfo = sphere_intersection(ray, vec3_new(0.0f, 0.0f, 0.0f), 0.5f);
-	// if (hitinfo.hit)
-	// 	return (vec4_new(1.0f, 0.0f, 0.0f, 1.0f));
-	// else
-	// 	return (vec4_new(0.0f, 1.0f, 0.0f, 1.0f));
-	// return (vec4_new(rr, g, b, 1.0f));
-	// return (vec4_new(1.0f, 0.0f, 0.0f, 1.0f));
-	return (vec4_new(1.0f, 0.0f, 0.0f, 1.0f));
+	t_vec4 c;
+	c.x = incomming_light.x;
+	c.y = incomming_light.y;
+	c.z = incomming_light.z;
+	c.w = 1.0f;
+	return (c);
 }
 
 void	*render(void *param)
@@ -190,7 +263,8 @@ void	*render(void *param)
 	t_ray	ray;
 	ray.origin = data->scene.camera.position;
 	// printf("pos x: %f\n", data->scene.camera.position.x);
-
+	if (data->utils.accumulated_frames == 1)
+		memset(data->utils.accumulated_data, 0, WIDTH * HEIGHT * sizeof(t_vec4));
 	for (int y = data->utils.blocks[index].y_start; y <data->utils.blocks[index].y_end; y++)
 	{
 		for (int x = data->utils.blocks[index].x_start; x < data->utils.blocks[index].x_end; x++)
@@ -200,20 +274,17 @@ void	*render(void *param)
 			t_vec2 pixelCoord = vec2_mul(coord, numPixels);
 			uint32_t pixelIndex = pixelCoord.x + pixelCoord.y * numPixels.x;
 			rngState = pixelIndex + total_frames * 719393;
-			// for (int i = 0; i < 5; i++)
-			// {
-			// 	float	r = random_value(&rngState);
-			// 	float	g = random_value(&rngState);
-			// 	float	b = random_value(&rngState);
-			// 	color = vec4_to_color(vec4_new(r, g, b, 1.0f));
-			// }
 
 			ray.direction = data->scene.camera.ray_dir[x + y * WIDTH];
-			// printf("%f, %f, %f\n", ray.direction.x, ray.direction.y, ray.direction.z);
 
 			t_vec4 col = per_pixel(ray, data->scene, vec2_new(x, y), &rngState, coord);
 
-			color = vec4_to_color(col);
+			data->utils.accumulated_data[x + y * WIDTH] = vec4_add(data->utils.accumulated_data[x + y * WIDTH], col);
+			t_vec4 accumulated_color = data->utils.accumulated_data[x + y * WIDTH];
+			accumulated_color = vec4_divf(accumulated_color, data->utils.accumulated_frames);
+			accumulated_color = vec4_clamp(accumulated_color, 0.0, 1.0);
+			
+			color = vec4_to_color(accumulated_color);
 			for (int i = 0; i < PIXEL_SIZE; i++)
 			{
 				for (int j = 0; j < PIXEL_SIZE; j++)
@@ -224,9 +295,11 @@ void	*render(void *param)
 				}
 			}
 		}
+		// printf("check %d\n", y);
 		// exit(0);
 	}
 	// exit(0);
+	// printf("check\n");
 }
 
 void	render_loop(void *param)
@@ -269,7 +342,8 @@ void	render_loop(void *param)
 void init_scene(t_scene *s)
 {
 	init_camera(&s->camera);
-	init_scene_one(s);
+	// init_scene_one(s);
+	init_scene_two(s);
 	return ;
 }
 
@@ -321,6 +395,8 @@ int32_t main(int32_t argc, const char* argv[])
 	// 	puts(mlx_strerror(mlx_errno));
 	// 	return(EXIT_FAILURE);
 	// }
+	data.utils.accumulated_frames = 1;
+	data.utils.accumulated_data = malloc(sizeof(t_vec4) * WIDTH * HEIGHT);
 
 	init_scene(&data.scene);
 
@@ -335,7 +411,7 @@ int32_t main(int32_t argc, const char* argv[])
 	mlx_loop_hook(data.mlx, ft_hook, data.mlx);
 	// mlx_loop_hook(data.mlx, ft_multi_thread, data.mlx);
 	
-	mlx_loop_hook(data.mlx, frame_times, data.mlx);
+	mlx_loop_hook(data.mlx, frame_times, &data);
 
 	mlx_loop(data.mlx);
 	mlx_terminate(data.mlx);

@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 02:06:12 by ichiro            #+#    #+#             */
-/*   Updated: 2023/09/12 21:48:01 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/14 18:34:19 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,10 @@
 # include <unistd.h>
 # include <string.h>
 
+// extern uint32_t accumulated_frames;
+
 void recalculat_ray_directions(t_data *d)
 {
-	// for (uint32_t y = 0; y < d->img->height; y++)
 	for (uint32_t y = 0; y < HEIGHT; y++)
 	{
 		for (uint32_t x = 0; x < WIDTH; x++)
@@ -66,7 +67,7 @@ void init_camera(t_camera *cam)
 	cam->view = mat4_identity();
 	cam->inv_view = mat4_identity();
 
-	cam->vertical_fov = 70.0f;
+	cam->vertical_fov = 40.0f;
 	cam->aspectRatio = (float)WIDTH / (float)HEIGHT;
 	cam->zNear = 0.1f;
 	cam->zFar = 100.0f;
@@ -189,6 +190,7 @@ void	movement(t_data *d)
 	
 	if (moved) {
 		// accumulated_frames = 1;
+		d->utils.accumulated_frames = 1;
 		recalculate_view(d);
 		if (rotated) {
 			recalculat_ray_directions(d);
