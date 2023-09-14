@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/09/14 20:21:59 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/14 23:41:12 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,9 @@
 # include "darray.h"
 # include "lib3d.h"
 
-#define WIDTH 1600
-#define HEIGHT 1200
-#define PIXEL_SIZE 1
+#define WIDTH 800
+#define HEIGHT 600
+#define PIXEL_SIZE 2
 #define MT 1
 #define THREADS 10
 #define ANTIALIASING 1

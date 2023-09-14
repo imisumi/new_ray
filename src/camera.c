@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 02:06:12 by ichiro            #+#    #+#             */
-/*   Updated: 2023/09/14 20:22:38 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/14 20:27:42 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,84 +41,23 @@ t_vec2	random_point_in_circle(uint32_t *state)
 int global_frame = 0;
 void recalculat_ray_directions(t_data *d)
 {
-	uint32_t rngState;
-	float diverge = 0.5f;
 	for (uint32_t y = 0; y < HEIGHT; y++)
 	{
 		for (uint32_t x = 0; x < WIDTH; x++)
 		{
 			t_vec2 coord = {(float)x / (float)(WIDTH), (float)y / (float)(HEIGHT)};
 			coord = vec2_subf(vec2_mulf(coord, 2.0), 1.0f);
-
 			t_vec4 target = mat4_mul_vec4(d->scene.camera.inv_projection, vec4_new(coord.x, coord.y, 1, 1));
 			t_vec3 t = vec3_divf(vec3_new(target.x, target.y, target.z), target.w);
 			target = vec4_normalize(vec4_new(-t.x, t.y, -t.z, 0.0f));
-			// target = vec4_normalize(vec4_new(-t.x, t.y, -t.z, 0.0f));
 			target = mat4_mul_vec4(d->scene.camera.inv_view, target);
-
 			d->scene.camera.ray_target[x + y * WIDTH] = target;
-			if (ANTIALIASING)
-			{
-				t_vec2 numPixels = vec2_new((float)WIDTH, (float)HEIGHT);
-				t_vec2 pixelCoord = vec2_mul(coord, numPixels);
-				uint32_t pixelIndex = pixelCoord.x + pixelCoord.y * numPixels.x;
-				rngState = pixelIndex + global_frame * 719393;
+			t_vec3 rayDirection = vec3_new(target.x, target.y, target.z);
+			d->scene.camera.ray_dir[x + y * WIDTH] = rayDirection;
 
-				t_vec3	cam_right = vec3_new(
-					d->scene.camera.view.m[0][0],
-					d->scene.camera.view.m[1][0],
-					d->scene.camera.view.m[2][0]
-				);
-				t_vec3	cam_up = vec3_new(
-					d->scene.camera.view.m[0][1],
-					d->scene.camera.view.m[1][1],
-					d->scene.camera.view.m[2][1]
-				);
-				t_vec2 jitter = vec2_divf(vec2_mulf(random_point_in_circle(&rngState), diverge), numPixels.x);
-				// printf("jitter: %f, %f\n", jitter.x, jitter.y);
-				t_vec3 jittered = vec3_add(vec3_new(target.x, target.y, target.z) ,vec3_add(vec3_mulf(cam_right, jitter.x), vec3_mulf(cam_up, jitter.y)));
-				d->scene.camera.ray_dir[x + y * WIDTH] = vec3_normalize(jittered);
-				global_frame++;
-			}
-			else
-			{
-				// printf("rayDirection: %f, %f, %f\n", d->scene.camera.inv_view.m[0][1], d->scene.camera.inv_view.m[1][1], d->scene.camera.inv_view.m[2][2]);
-				t_vec3 rayDirection = vec3_new(target.x, target.y, target.z);
-				d->scene.camera.ray_dir[x + y * WIDTH] = rayDirection;
-				// printf("rayDirection: %f, %f, %f\n", target.x, target.y, target.z);
-	
-				// glm::vec4 target = m_InverseProjection * glm::vec4(coord.x, coord.y, 1, 1);
-				// glm::vec3 rayDirection = glm::vec3(m_InverseView * glm::vec4(glm::normalize(glm::vec3(target) / target.w), 0)); // World space
-				// m_ray_dir[x + y * m_ViewportWidth] = rayDirection;
-			}
 		}
-		// exit(0);
 	}
 }
-
-// void recalculat_ray_directions(t_data *d)
-// {
-// 	for (uint32_t y = 0; y < HEIGHT; y++)
-// 	{
-// 		for (uint32_t x = 0; x < WIDTH; x++)
-// 		{
-// 			t_vec2 coord = {(float)x / (float)(WIDTH), (float)y / (float)(HEIGHT)};
-// 			coord = vec2_subf(vec2_mulf(coord, 2.0), 1.0f);
-
-// 			t_vec4 target = mat4_mul_vec4(d->scene.camera.inv_projection, vec4_new(coord.x, coord.y, 1, 1));
-// 			t_vec3 t = vec3_divf(vec3_new(target.x, target.y, target.z), target.w);
-// 			target = vec4_normalize(vec4_new(-t.x, t.y, -t.z, 0.0f));
-// 			// target = vec4_normalize(vec4_new(-t.x, t.y, -t.z, 0.0f));
-// 			target = mat4_mul_vec4(d->scene.camera.inv_view, target);
-
-// 			d->scene.camera.ray_target[x + y * WIDTH] = target;
-// 			t_vec3 rayDirection = vec3_new(target.x, target.y, target.z);
-// 			d->scene.camera.ray_dir[x + y * WIDTH] = rayDirection;
-
-// 		}
-// 		// exit(0);
-// 	}
-// }
 
 void anti_aliasing(t_data *d)
 {
@@ -130,8 +69,6 @@ void anti_aliasing(t_data *d)
 		{
 			t_vec2 coord = {(float)x / (float)(WIDTH), (float)y / (float)(HEIGHT)};
 			t_vec4 target = d->scene.camera.ray_target[x + y * WIDTH];
-
-			d->scene.camera.ray_target[x + y * WIDTH] = target;
 
 			t_vec2 numPixels = vec2_new((float)WIDTH, (float)HEIGHT);
 			t_vec2 pixelCoord = vec2_mul(coord, numPixels);

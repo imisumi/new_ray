@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/09/14 20:22:24 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/14 20:25:21 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -338,8 +338,7 @@ void	render_loop(void *param)
 		render(&threadData[0]);
 	}
 	if (ANTIALIASING)
-		recalculat_ray_directions(data);
-	// anti_aliasing
+		anti_aliasing(data);
 }
 
 // -----------------------------------------------------------------------------
@@ -348,8 +347,8 @@ void init_scene(t_scene *s)
 {
 	init_camera(&s->camera);
 	// init_scene_one(s);
-	// init_scene_two(s);
-	init_scene_three(s);
+	init_scene_two(s);
+	// init_scene_three(s);
 	return ;
 }
 
