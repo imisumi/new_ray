@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/09/14 18:31:46 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/14 20:22:24 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -276,6 +276,7 @@ void	*render(void *param)
 			rngState = pixelIndex + total_frames * 719393;
 
 			ray.direction = data->scene.camera.ray_dir[x + y * WIDTH];
+			//! anti-aliasing
 
 			t_vec4 col = per_pixel(ray, data->scene, vec2_new(x, y), &rngState, coord);
 
@@ -301,6 +302,7 @@ void	*render(void *param)
 	// exit(0);
 	// printf("check\n");
 }
+
 
 void	render_loop(void *param)
 {
@@ -335,6 +337,9 @@ void	render_loop(void *param)
 		threadData[0].threadIndex = 0;
 		render(&threadData[0]);
 	}
+	if (ANTIALIASING)
+		recalculat_ray_directions(data);
+	// anti_aliasing
 }
 
 // -----------------------------------------------------------------------------
@@ -343,7 +348,8 @@ void init_scene(t_scene *s)
 {
 	init_camera(&s->camera);
 	// init_scene_one(s);
-	init_scene_two(s);
+	// init_scene_two(s);
+	init_scene_three(s);
 	return ;
 }
 
@@ -397,6 +403,7 @@ int32_t main(int32_t argc, const char* argv[])
 	// }
 	data.utils.accumulated_frames = 1;
 	data.utils.accumulated_data = malloc(sizeof(t_vec4) * WIDTH * HEIGHT);
+	data.scene.camera.ray_target = malloc(sizeof(t_vec4) * WIDTH * HEIGHT);
 
 	init_scene(&data.scene);
 

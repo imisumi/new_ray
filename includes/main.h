@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/09/14 18:35:28 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/14 20:21:59 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,9 @@
 # include "darray.h"
 # include "lib3d.h"
 
-#define WIDTH 800
-#define HEIGHT 600
-#define PIXEL_SIZE 2
+#define WIDTH 1600
+#define HEIGHT 1200
+#define PIXEL_SIZE 1
 #define MT 1
 #define THREADS 10
 #define ANTIALIASING 1
@@ -96,6 +96,7 @@ typedef struct s_camera
 	t_vec2	prev_mouse_pos;
 
 	t_vec3	*ray_dir;
+	t_vec4	*ray_target;
 }	t_camera;
 
 typedef struct s_scene
@@ -186,6 +187,8 @@ void	recalculate_view(t_data *d);
 void	recalculated_projection(t_data *d);
 void	movement(t_data *d);
 
+void anti_aliasing(t_data *d);
+
 
 // intersection.c
 
@@ -198,3 +201,4 @@ t_hitinfo	plane_intersection(t_ray ray, t_plane *planes, t_hitinfo obj_hit);
 t_sphere	create_sphere(t_vec3 center, float radius);
 void		init_scene_one(t_scene *scene);
 void		init_scene_two(t_scene *scene);
+void		init_scene_three(t_scene *scene);

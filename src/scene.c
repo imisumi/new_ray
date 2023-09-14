@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 02:06:12 by ichiro            #+#    #+#             */
-/*   Updated: 2023/09/14 18:27:35 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/14 19:59:42 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,4 +180,18 @@ void	init_scene_two(t_scene *scene)
 	// scene->spheres[0].material.emission_color = vec3_new(1.0f, 1.0f, 1.0f);
 	// scene->spheres[0].material.emission_strength = 102.1f;
 	// exit(0);
+}
+
+void	init_scene_three(t_scene *scene)
+{
+	t_sphere	sphere;
+
+	vec_init(&scene->spheres, 16, sizeof(t_sphere));
+	vec_init(&scene->planes, 32, sizeof(t_plane));
+
+	sphere = create_sphere(vec3_new(0.0f, 1.3f, 0.0f), 1.0f);
+	sphere.material = new_diffuse(vec3_new(1.0f, 0.0f, 0.0f));
+	array_push(&scene->spheres, &sphere);
+	
+
 }
