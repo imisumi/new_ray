@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/09/14 20:25:21 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/26 14:13:24 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 #include <float.h>
 #include <pthread.h>
 static mlx_image_t* image;
+static mlx_texture_t* uv_tex;
 int	total_frames = 0;
 double previousTime = 0.0;
 // uint32_t accumulated_frames = 1;
@@ -75,6 +76,122 @@ void put_pixel(mlx_image_t* image, uint32_t x, uint32_t y, uint32_t color)
 	if (x >= 0 && x < image->width && y >= 0 && y < image->height)
 		mlx_put_pixel(image, x, y, color);
 }
+
+
+
+void cartesian_to_spherical(t_vec3 point, float* theta, float* phi) {
+    // *theta = acos(point.y); // Polar angle (theta)
+	*theta = atan2(sqrt(point.x * point.x + point.z * point.z), point.y);
+
+    *phi = atan2(point.x, point.z); // Azimuthal angle (phi)
+	
+}
+#define CHECKER_SIZE 20
+#define CHECKER 0
+// Function to sample the texture and apply it as albedo
+t_vec3 sample_sphere_texture(t_vec3 intersection_point, t_vec3 sphere_center, float sphere_radius)
+{
+	int width = uv_tex->width;
+	int height = uv_tex->height;
+	// return vec3_new(1.0f, 1.0f, 1.0f);
+	// return ;
+    // Calculate the direction vector from the sphere's center to the intersection point
+    t_vec3 dir = {
+        intersection_point.x - sphere_center.x,
+        intersection_point.y - sphere_center.y,
+        intersection_point.z - sphere_center.z
+    };
+
+    // Calculate the spherical coordinates of the intersection point
+    float theta, phi;
+    cartesian_to_spherical(dir, &theta, &phi);
+	// phi += M_PI / 2.0;
+    // Map the spherical coordinates to texture coordinates (u, v)
+    float u = (phi + M_PI) / (2.0 * M_PI); // Normalize to [0, 1]
+	float v = theta / M_PI;       // Invert and normalize to [0, 1] by subtracting from 1.0
+
+	// u *= 0.5f;
+	// v *= 0.5f;
+	// u *= 2.0f;
+	// v *= 2.0f;
+	if (u > 1.0f)
+		u -= 1.0f;
+	if (v > 1.0f)
+		v -= 1.0f;
+
+    // Calculate the pixel coordinates in the texture
+    int tex_x = (int)(u * (width - 1));
+    int tex_y = (int)(v * (height - 1));
+
+    // Calculate the index of the texel in the texture image data
+    int texel_index = (tex_y * width + tex_x) * 4; // Each texel has 3 channels (RGB)
+
+    // Extract the RGB values from the texture
+    uint8_t r = uv_tex->pixels[texel_index];
+    uint8_t g = uv_tex->pixels[texel_index + 1];
+    uint8_t b = uv_tex->pixels[texel_index + 2];
+
+    // Normalize the RGB values to the range [0, 1]
+    float albedo_r = r / 255.0;
+    float albedo_g = g / 255.0;
+    float albedo_b = b / 255.0;
+
+    // Create a t_vec3 representing the albedo/color
+    t_vec3 albedo = {albedo_r, albedo_g, albedo_b};
+
+	if (CHECKER)
+	{
+		int checker_x = (int)(u * CHECKER_SIZE);
+    	int checker_y = (int)(v * CHECKER_SIZE);
+		if ((checker_x + checker_y) % 2 == 0)
+		    albedo = vec3_new(0.8f, 0.2f, 0.2f);
+		else
+		    albedo = vec3_new(0.2f, 0.2f, 0.8f);
+	}
+
+    return albedo;
+}
+
+
+// Function to sample the texture and apply it as albedo
+// t_vec3 sample_sphere_texture(t_vec3 intersection_point, t_vec3 sphere_center, float sphere_radius)
+// {
+//     // Calculate the direction vector from the sphere's center to the intersection point
+//     t_vec3 dir = {
+//         intersection_point.x - sphere_center.x,
+//         intersection_point.y - sphere_center.y,
+//         intersection_point.z - sphere_center.z
+//     };
+
+//     // Calculate the spherical coordinates of the intersection point
+//     float theta, phi;
+//     cartesian_to_spherical(dir, &theta, &phi);
+
+//     // Calculate the normalized texture coordinates (u, v)
+//     float u = (phi + M_PI) / (2.0 * M_PI);  // Normalize phi to [0, 1]
+// 	float v = (M_PI - theta) / M_PI;        // Normalize theta to [0, 1]
+
+//     // Apply the checker pattern
+//     int checker_x = (int)(u * CHECKER_SIZE);
+//     int checker_y = (int)(v * CHECKER_SIZE);
+
+//     // Use the checker pattern to alternate between two colors
+//     t_vec3 albedo;
+// 	if ((checker_x + checker_y) % 2 == 0) {
+// 	    // Use a softer red color for even cells
+// 	    albedo = vec3_new(0.8f, 0.2f, 0.2f);
+// 	} else {
+// 	    // Use a softer blue color for odd cells
+// 	    albedo = vec3_new(0.2f, 0.2f, 0.8f);
+// 	}
+
+//     return albedo;
+// }
+
+
+
+
+
 
 
 // int next = 0;
@@ -229,8 +346,20 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 			// float	light_strength = vec3_dot(ray.direction, closest_hit.normal);
 			incomming_light = vec3_add(incomming_light, vec3_mul(ray_color, emitted_light));
 			// ray_color = vec3_mul(ray_color, vec3_mulf(material.color, light_strength * 2.0f));
+
+			
+
 			ray_color = vec3_mul(ray_color, lerp(material.color, material.specular_color, is_specular));
 			// ray_color = vec3_mul(ray_color, material.color);
+
+			//!russian roullet
+			float p = fmaxf(ray_color.x, fmaxf(ray_color.y, ray_color.z));
+			if (bounces > 3)
+			{
+				if (randomFloat(rngState) > p)
+					break ;
+				ray_color = vec3_divf(ray_color, p);
+			}
 		}
 		else
 		{
@@ -347,7 +476,9 @@ void init_scene(t_scene *s)
 {
 	init_camera(&s->camera);
 	// init_scene_one(s);
-	init_scene_two(s);
+	// init_scene_two(s);
+	// init_scene_five(s);
+	init_scene_six(s);
 	// init_scene_three(s);
 	return ;
 }
@@ -403,6 +534,8 @@ int32_t main(int32_t argc, const char* argv[])
 	data.utils.accumulated_frames = 1;
 	data.utils.accumulated_data = malloc(sizeof(t_vec4) * WIDTH * HEIGHT);
 	data.scene.camera.ray_target = malloc(sizeof(t_vec4) * WIDTH * HEIGHT);
+
+	uv_tex = mlx_load_png("./assets/uv.png");
 
 	init_scene(&data.scene);
 

@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 02:06:12 by ichiro            #+#    #+#             */
-/*   Updated: 2023/09/14 20:27:42 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/26 02:13:18 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,8 @@ void anti_aliasing(t_data *d)
 
 void init_camera(t_camera *cam)
 {
-	cam->position = vec3_new(0.0, 1.5, 5.0f);
+	cam->position = vec3_new(0.0, 2.0, 10.0f);
+	// cam->position = vec3_new(0.0, 0.0, 1.0f  tan(90.0 * 0.5f * M_PI / 180.0f));
 	cam->direction = vec3_new(0.0, 0.0, -1.0);
 
 	cam->ray_dir = malloc(sizeof(t_vec3) * WIDTH * HEIGHT);
@@ -110,7 +111,7 @@ void init_camera(t_camera *cam)
 	cam->view = mat4_identity();
 	cam->inv_view = mat4_identity();
 
-	cam->vertical_fov = 40.0f;
+	cam->vertical_fov = 90.0f;
 	cam->aspectRatio = (float)WIDTH / (float)HEIGHT;
 	cam->zNear = 0.1f;
 	cam->zFar = 100.0f;

@@ -3,18 +3,20 @@
 /*                                                        :::      ::::::::   */
 /*   main.h                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/09/14 23:41:12 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/26 14:20:33 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
+#ifndef MAIN_H
+# define MAIN_H
 
 # include <stdio.h>
 # include <stdlib.h>
 # include <stdbool.h>
 # include <GLFW/glfw3.h>
-# include <float.h>
 # include <math.h>
 # include <pthread.h>
 
@@ -23,14 +25,17 @@
 # include "darray.h"
 # include "lib3d.h"
 
-#define WIDTH 800
-#define HEIGHT 600
-#define PIXEL_SIZE 2
-#define MT 1
-#define THREADS 10
-#define ANTIALIASING 1
+# define WIDTH 400
+# define HEIGHT 400
+# define PIXEL_SIZE 4
+# define MT 1
+# define THREADS 10
+# define ANTIALIASING 1
 
-#define _USE_MATH_DEFINES
+# define _USE_MATH_DEFINES
+
+# define VEC_UP t_vec3{0, 1, 0}
+# define VEC_DOWN vec3_down()
 
 typedef struct s_render_block
 {
@@ -73,7 +78,6 @@ typedef struct s_plane
 	float		height;
 	t_material	material;
 }	t_plane;
-
 
 typedef struct s_camera
 {
@@ -138,9 +142,7 @@ typedef struct s_hitinfo
 	t_material	material;
 }	t_hitinfo;
 
-
 // t_vec4 *accumulated_data;
-
 
 // t_hitinfo	sphere_intersection(t_ray ray, t_vec3 center, float radius);
 
@@ -176,19 +178,14 @@ typedef struct s_hitinfo
 // 		thread();
 // }
 
-
-
-
-
 // camera.c
-void	recalculat_ray_directions(t_data *d);
-void	init_camera(t_camera *cam);
-void	recalculate_view(t_data *d);
-void	recalculated_projection(t_data *d);
-void	movement(t_data *d);
+void		recalculat_ray_directions(t_data *d);
+void		init_camera(t_camera *cam);
+void		recalculate_view(t_data *d);
+void		recalculated_projection(t_data *d);
+void		movement(t_data *d);
 
-void anti_aliasing(t_data *d);
-
+void		anti_aliasing(t_data *d);
 
 // intersection.c
 
@@ -202,3 +199,5 @@ t_sphere	create_sphere(t_vec3 center, float radius);
 void		init_scene_one(t_scene *scene);
 void		init_scene_two(t_scene *scene);
 void		init_scene_three(t_scene *scene);
+
+#endif

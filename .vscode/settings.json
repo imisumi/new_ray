@@ -1,5 +1,8 @@
 {
 	"files.associations": {
-		"main.h": "c"
+		"mlx42_int.h": "c",
+		"*.rmd": "markdown",
+		"main.h": "c",
+		"random": "c"
 	}
 }
