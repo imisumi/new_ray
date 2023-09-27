@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/09/26 23:46:09 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/27 16:56:24 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 #include <float.h>
 #include <pthread.h>
 static mlx_image_t* image;
-static mlx_texture_t* uv_tex;
+mlx_texture_t* uv_tex;
 int	total_frames = 0;
 double previousTime = 0.0;
 // uint32_t accumulated_frames = 1;
@@ -303,7 +303,19 @@ t_vec3 lerp(t_vec3 vec1, t_vec3 vec2, float t)
 	return result;
 }
 
-t_hitinfo	triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_vec3 a, t_vec3 b, t_vec3 c);
+// t_hitinfo	triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_vec3 a, t_vec3 b, t_vec3 c);
+t_hitinfo	triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_vec3 vert0, t_vec3 vert01, t_vec3 vert02, \
+										t_vec2 texCoord0, t_vec2 texCoord01, t_vec2 texCoord02);
+
+
+//	c - d
+//	| \ |
+//	a - b
+
+// a = 0.1
+// b = 1.1
+// c = 0.0
+// d = 1.0
 
 t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coord)
 {
@@ -328,15 +340,27 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 		// 														vec3_new(3.0f, 0.0f, 0.0f), \
 		// 														vec3_new(0.0f, 0.0f, 3.0f));
 
+		// closest_hit = triangle_intersection(ray, closest_hit, \
+		// 									vec3_new(-10.0f, -10.0f, -10.0f), \
+		// 									vec3_new(10.0f, -10.0f, -10.0f), \
+		// 									vec3_new(-10.0f, 10.0f, -10.0f), \
+		// 									vec2_new(0.0f, 1.0f), \
+		// 									vec2_new(1.0f, 1.0f), \
+		// 									vec2_new(0.0f, 0.0f));
 		closest_hit = triangle_intersection(ray, closest_hit, \
+											vec3_new(10.0f, -10.0f, -10.0f), \
+											vec3_new(-10.0f, 10.0f, -10.0f), \
 											vec3_new(-10.0f, -10.0f, -10.0f), \
-											vec3_new(10.0f, -10.0f, -10.0f), \
-											vec3_new(-10.0f, 10.0f, -10.0f));
-
+											vec2_new(0.0f, 1.0f), \
+											vec2_new(1.0f, 1.0f), \
+											vec2_new(0.0f, 0.0f));
 		closest_hit = triangle_intersection(ray, closest_hit, \
-											vec3_new(10.0f, 10.0f, -10.0f), \
 											vec3_new(10.0f, -10.0f, -10.0f), \
-											vec3_new(-10.0f, 10.0f, -10.0f));
+											vec3_new(10.0f, 10.0f, -10.0f), \
+											vec3_new(-10.0f, 10.0f, -10.0f), 
+											vec2_new(1.0f, 1.0f), \
+											vec2_new(1.0f, 0.0f), \
+											vec2_new(0.0f, 0.0f));
 		
 		if (closest_hit.hit)
 		{

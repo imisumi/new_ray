@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   intersection.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/09/27 00:03:48 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/27 16:53:10 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -290,7 +290,10 @@ t_vec3 vec3_negate(t_vec3 v) {
 // 	return (obj_hit);
 // }
 
-t_hitinfo	triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_vec3 vert0, t_vec3 vert01, t_vec3 vert02)
+extern mlx_texture_t* uv_tex;
+
+t_hitinfo	triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_vec3 vert0, t_vec3 vert01, t_vec3 vert02, \
+										t_vec2 texCoord0, t_vec2 texCoord01, t_vec2 texCoord02)
 {
 	t_vec3 E1 = vec3_sub(vert01, vert0);
 	t_vec3 E2 = vec3_sub(vert02, vert0);
@@ -305,16 +308,38 @@ t_hitinfo	triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_vec3 vert0, t_ve
 	float t = f * vec3_dot(Q, E2);
 	float u = f * vec3_dot(P, T);
 	float v = f * vec3_dot(Q, D);
+	float w = 1.0f - u - v;
+
+
 
 	if (u > -EPSILON && v > -EPSILON && u + v < 1.0f + EPSILON && t > EPSILON && t < obj_hit.distance)
 	{
 		if (t < obj_hit.distance)
 		{
+			if (u > 1.0f)
+				u -= 1.0f;
+			if (v > 1.0f)
+				v -= 1.0f;
+
+			int textureWidth = uv_tex->width;
+			int textureHeight = uv_tex->height;
+			int x = u * textureWidth;
+			int y = v * textureHeight;
+
+
+			int pixelIndex = (y * textureWidth + x) * 4; // 4 channels (R, G, B, A) per pixel
+
+			uint8_t r = uv_tex->pixels[pixelIndex];
+			uint8_t g = uv_tex->pixels[pixelIndex + 1];
+			uint8_t b = uv_tex->pixels[pixelIndex + 2];
+
+			
 			obj_hit.hit = true;
 			obj_hit.distance = t;
 			obj_hit.position = vec3_add(ray.origin, vec3_mulf(ray.direction, t));
 			obj_hit.normal = vec3_normalize(vec3_cross(E1, E2));
-			obj_hit.material.color = vec3_new(1.0f, 0.0f, 0.0f);
+			// obj_hit.material.color = vec3_new(1.0f, 0.0f, 0.0f);
+			obj_hit.material.color = vec3_new(r / 255.0f, g / 255.0f, b / 255.0f);
 			obj_hit.material.emission_strength = 0.0f;
 			obj_hit.material.specular = 0.0f;
 			obj_hit.material.roughness = 0.0f;
