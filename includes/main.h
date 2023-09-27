@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.h                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/09/26 14:20:33 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/09/26 23:45:53 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,15 +27,15 @@
 
 # define WIDTH 400
 # define HEIGHT 400
-# define PIXEL_SIZE 4
-# define MT 1
+# define PIXEL_SIZE 3
+# define MT 0
 # define THREADS 10
-# define ANTIALIASING 1
+# define ANTIALIASING 0
 
 # define _USE_MATH_DEFINES
 
-# define VEC_UP t_vec3{0, 1, 0}
-# define VEC_DOWN vec3_down()
+#define EPSILON 0.000001f
+#define FAR_CLIP 100000.0f
 
 typedef struct s_render_block
 {
@@ -199,5 +199,8 @@ t_sphere	create_sphere(t_vec3 center, float radius);
 void		init_scene_one(t_scene *scene);
 void		init_scene_two(t_scene *scene);
 void		init_scene_three(t_scene *scene);
+
+void	init_scene_five(t_scene *scene);
+void	init_scene_six(t_scene *scene);
 
 #endif

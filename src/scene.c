@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   scene.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 02:06:12 by ichiro            #+#    #+#             */
-/*   Updated: 2023/09/26 17:32:48 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/09/26 21:53:35 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,7 +102,7 @@ void	init_scene_two(t_scene *scene)
 	//! bottom
 	plane = create_plane(5.1f, 3.1f, \
 							vec3_new(0.0f, 0.0f, 0.0f), \
-							vec3_up(), \
+							vec3_new(0.0f, 1.0f, 0.0f), \
 							new_diffuse(vec3_new(0.4f, 0.4f, 0.4f)));
 	array_push(&scene->planes, &plane);
 	//! top
@@ -203,7 +203,7 @@ void	init_scene_five(t_scene *scene)
 
 	vec_init(&scene->spheres, 16, sizeof(t_sphere));
 	vec_init(&scene->planes, 32, sizeof(t_plane));
-	// return ;
+	return ;
 	// sphere = create_sphere(vec3_new(0.0f, -50.0f, 0.0f), 50.0f);
 	// array_push(&scene->spheres, &sphere);
 	sphere = create_sphere(vec3_new(-9.0f, -9.5f, -20.0f), 3.0f);
@@ -319,6 +319,22 @@ void	init_scene_six(t_scene *scene)
 	// array_push(&scene->spheres, &sphere);
 	plane = create_plane(10.1f, 15.1f, \
 							vec3_new(0.0f, 0.0f, 0.0f), \
+							vec3_new(0.0f, 1.0f, 0.0f), \
+							new_diffuse(vec3_new(1.0f, 0.7f, 0.7f)));
+	// array_push(&scene->planes, &plane);
+
+	plane = create_plane(1.1f, 1.1f, \
+							vec3_new(-3.0f, 0.0f, 0.0f), \
+							vec3_new(0.0f, 1.0f, 0.0f), \
+							new_diffuse(vec3_new(1.0f, 0.7f, 0.7f)));
+	array_push(&scene->planes, &plane);
+	plane = create_plane(1.1f, 1.1f, \
+							vec3_new(3.0f, 0.0f, 0.0f), \
+							vec3_new(0.0f, 1.0f, 0.0f), \
+							new_diffuse(vec3_new(1.0f, 0.7f, 0.7f)));
+	array_push(&scene->planes, &plane);
+	plane = create_plane(1.1f, 1.1f, \
+							vec3_new(0.0f, 0.0f, 3.0f), \
 							vec3_new(0.0f, 1.0f, 0.0f), \
 							new_diffuse(vec3_new(1.0f, 0.7f, 0.7f)));
 	array_push(&scene->planes, &plane);

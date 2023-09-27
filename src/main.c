@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/09/26 14:13:24 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/09/26 23:46:09 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -303,6 +303,8 @@ t_vec3 lerp(t_vec3 vec1, t_vec3 vec2, float t)
 	return result;
 }
 
+t_hitinfo	triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_vec3 a, t_vec3 b, t_vec3 c);
+
 t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coord)
 {
 	int	num_spheres = 1;
@@ -319,12 +321,28 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 	{
 		closest_hit.hit = false;
 		closest_hit.distance = FLT_MAX;
-		closest_hit = sphere_intersection(ray, s.spheres, closest_hit);
-		closest_hit = plane_intersection(ray, s.planes, closest_hit);
+		// closest_hit = sphere_intersection(ray, s.spheres, closest_hit);
+		// closest_hit = plane_intersection(ray, s.planes, closest_hit);
 
+		// closest_hit = triangle_intersection(ray, closest_hit, vec3_new(-3.0f, 1.0f, 0.0f), \
+		// 														vec3_new(3.0f, 0.0f, 0.0f), \
+		// 														vec3_new(0.0f, 0.0f, 3.0f));
+
+		closest_hit = triangle_intersection(ray, closest_hit, \
+											vec3_new(-10.0f, -10.0f, -10.0f), \
+											vec3_new(10.0f, -10.0f, -10.0f), \
+											vec3_new(-10.0f, 10.0f, -10.0f));
+
+		closest_hit = triangle_intersection(ray, closest_hit, \
+											vec3_new(10.0f, 10.0f, -10.0f), \
+											vec3_new(10.0f, -10.0f, -10.0f), \
+											vec3_new(-10.0f, 10.0f, -10.0f));
 		
 		if (closest_hit.hit)
 		{
+			incomming_light = closest_hit.material.color;
+			break ;
+			return (vec4_new(1.0f, 0.0f, 0.0f, 1.0f));
 			ray.origin = vec3_add(closest_hit.position, vec3_mulf(closest_hit.normal, 0.001f));
 			
 			// ray.direction = vec3_normalize(vec3_add(closest_hit.normal, random_direction(rngState)));
@@ -477,8 +495,8 @@ void init_scene(t_scene *s)
 	init_camera(&s->camera);
 	// init_scene_one(s);
 	// init_scene_two(s);
-	// init_scene_five(s);
-	init_scene_six(s);
+	init_scene_five(s);
+	// init_scene_six(s);
 	// init_scene_three(s);
 	return ;
 }
