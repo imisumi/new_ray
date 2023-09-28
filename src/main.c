@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/09/27 16:56:24 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/09/28 04:13:44 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -336,31 +336,104 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 		// closest_hit = sphere_intersection(ray, s.spheres, closest_hit);
 		// closest_hit = plane_intersection(ray, s.planes, closest_hit);
 
-		// closest_hit = triangle_intersection(ray, closest_hit, vec3_new(-3.0f, 1.0f, 0.0f), \
-		// 														vec3_new(3.0f, 0.0f, 0.0f), \
-		// 														vec3_new(0.0f, 0.0f, 3.0f));
-
-		// closest_hit = triangle_intersection(ray, closest_hit, \
-		// 									vec3_new(-10.0f, -10.0f, -10.0f), \
-		// 									vec3_new(10.0f, -10.0f, -10.0f), \
-		// 									vec3_new(-10.0f, 10.0f, -10.0f), \
-		// 									vec2_new(0.0f, 1.0f), \
-		// 									vec2_new(1.0f, 1.0f), \
-		// 									vec2_new(0.0f, 0.0f));
+		float z = 1.0f;
+		//! front
 		closest_hit = triangle_intersection(ray, closest_hit, \
-											vec3_new(10.0f, -10.0f, -10.0f), \
-											vec3_new(-10.0f, 10.0f, -10.0f), \
-											vec3_new(-10.0f, -10.0f, -10.0f), \
+											vec3_new(-1.0f, 1.0f, z), \
+											vec3_new(-1.0f, -1.0f, z), \
+											vec3_new(1.0f, -1.0f, z), \
+											vec2_new(0.0f, 0.0f), \
 											vec2_new(0.0f, 1.0f), \
-											vec2_new(1.0f, 1.0f), \
-											vec2_new(0.0f, 0.0f));
+											vec2_new(1.0f, 1.0f));
 		closest_hit = triangle_intersection(ray, closest_hit, \
-											vec3_new(10.0f, -10.0f, -10.0f), \
-											vec3_new(10.0f, 10.0f, -10.0f), \
-											vec3_new(-10.0f, 10.0f, -10.0f), 
+											vec3_new(1.0f, -1.0f, z), \
+											vec3_new(1.0f, 1.0f, z), \
+											vec3_new(-1.0f, 1.0f, z), \
 											vec2_new(1.0f, 1.0f), \
 											vec2_new(1.0f, 0.0f), \
 											vec2_new(0.0f, 0.0f));
+		//! back
+		z = -1.0f;
+		closest_hit = triangle_intersection(ray, closest_hit, \
+											vec3_new(1.0f, 1.0f, z), \
+											vec3_new(1.0f, -1.0f, z), \
+											vec3_new(-1.0f, -1.0f, z), \
+											vec2_new(0.0f, 0.0f), \
+											vec2_new(0.0f, 1.0f), \
+											vec2_new(1.0f, 1.0f));
+		closest_hit = triangle_intersection(ray, closest_hit, \
+											vec3_new(1.0f, 1.0f, z), \
+											vec3_new(-1.0f, -1.0f, z), \
+											vec3_new(-1.0f, 1.0f, z), \
+											vec2_new(0.0f, 0.0f), \
+											vec2_new(1.0f, 1.0f), \
+											vec2_new(1.0f, 0.0f));
+		float x = 1.0f;
+		//! right
+		closest_hit = triangle_intersection(ray, closest_hit, \
+											vec3_new(x, 1.0f, 1.0f), \
+											vec3_new(x, -1.0f, 1.0f), \
+											vec3_new(x, -1.0f, -1.0f), \
+											vec2_new(0.0f, 0.0f), \
+											vec2_new(0.0f, 1.0f), \
+											vec2_new(1.0f, 1.0f));
+		closest_hit = triangle_intersection(ray, closest_hit, \
+											vec3_new(x, 1.0f, 1.0f), \
+											vec3_new(x, -1.0f, -1.0f), \
+											vec3_new(x, 1.0f, -1.0f), \
+											vec2_new(0.0f, 0.0f), \
+											vec2_new(1.0f, 1.0f), \
+											vec2_new(1.0f, 0.0f));
+		//! left
+		x = -1.0f;
+		closest_hit = triangle_intersection(ray, closest_hit, \
+											vec3_new(x, 1.0f, -1.0f), \
+											vec3_new(x, -1.0f, -1.0f), \
+											vec3_new(x, -1.0f, 1.0f), \
+											vec2_new(0.0f, 0.0f), \
+											vec2_new(0.0f, 1.0f), \
+											vec2_new(1.0f, 1.0f));
+		closest_hit = triangle_intersection(ray, closest_hit, \
+											vec3_new(x, 1.0f, -1.0f), \
+											vec3_new(x, -1.0f, 1.0f), \
+											vec3_new(x, 1.0f, 1.0f), \
+											vec2_new(0.0f, 0.0f), \
+											vec2_new(1.0f, 1.0f), \
+											vec2_new(1.0f, 0.0f));
+		//! top
+		float y = 1.0f;
+		closest_hit = triangle_intersection(ray, closest_hit, \
+											vec3_new(-1.0f, y, -1.0f), \
+											vec3_new(-1.0f, y, 1.0f), \
+											vec3_new(1.0f, y, 1.0f), \
+											vec2_new(0.0f, 0.0f), \
+											vec2_new(0.0f, 1.0f), \
+											vec2_new(1.0f, 1.0f));
+		closest_hit = triangle_intersection(ray, closest_hit, \
+											vec3_new(-1.0f, y, -1.0f), \
+											vec3_new(1.0f, y, 1.0f), \
+											vec3_new(1.0f, y, -1.0f), \
+											vec2_new(0.0f, 0.0f), \
+											vec2_new(1.0f, 1.0f), \
+											vec2_new(1.0f, 0.0f));
+		//! bottom
+		y = -1.0f;
+		closest_hit = triangle_intersection(ray, closest_hit, \
+											vec3_new(-1.0f, y, 1.0f), \
+											vec3_new(-1.0f, y, -1.0f), \
+											vec3_new(1.0f, y, -1.0f), \
+											vec2_new(0.0f, 0.0f), \
+											vec2_new(0.0f, 1.0f), \
+											vec2_new(1.0f, 1.0f));
+		closest_hit = triangle_intersection(ray, closest_hit, \
+											vec3_new(-1.0f, y, 1.0f), \
+											vec3_new(1.0f, y, -1.0f), \
+											vec3_new(1.0f, y, 1.0f), \
+											vec2_new(0.0f, 0.0f), \
+											vec2_new(1.0f, 1.0f), \
+											vec2_new(1.0f, 0.0f));
+		
+
 		
 		if (closest_hit.hit)
 		{
