@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 02:06:12 by ichiro            #+#    #+#             */
-/*   Updated: 2023/09/28 04:14:10 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/28 22:31:56 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,7 @@ void anti_aliasing(t_data *d)
 
 void init_camera(t_camera *cam)
 {
-	cam->position = vec3_new(0.0, 2.0, 2.0f);
+	cam->position = vec3_new(0.0, 1.0, 4.0f);
 	// cam->position = vec3_new(0.0, 0.0, 1.0f  tan(90.0 * 0.5f * M_PI / 180.0f));
 	cam->direction = vec3_new(0.0, 0.0, -1.0);
 

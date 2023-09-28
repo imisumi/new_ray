@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/09/28 04:15:01 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/28 23:25:15 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,12 +25,12 @@
 # include "darray.h"
 # include "lib3d.h"
 
-# define WIDTH 1000
-# define HEIGHT 1000
-# define PIXEL_SIZE 1
+# define WIDTH 500
+# define HEIGHT 500
+# define PIXEL_SIZE 2
 # define MT 1
 # define THREADS 10
-# define ANTIALIASING 1
+# define ANTIALIASING 0
 
 # define _USE_MATH_DEFINES
 
@@ -62,6 +62,54 @@ typedef struct s_material
 	t_vec3	emission_color;
 	float	emission_strength;
 }	t_material;
+
+typedef struct s_tri
+{
+	t_vec3	a;
+	t_vec3	b;
+	t_vec3	c;
+
+	t_vec2	uv_a;
+	t_vec2	uv_b;
+	t_vec2	uv_c;
+
+	t_mat4	translate;
+	t_mat4	scale;
+	t_quat	rotation;
+}	t_tri;
+
+typedef struct s_quad
+{
+	t_tri	tri1;
+	t_tri	tri2;
+	
+	float	tx;
+	float	ty;
+	float	tz;
+	t_mat4	translate;
+
+	float	sx;
+	float	sy;
+	float	sz;
+	t_mat4	scale;
+
+	float	rx;
+	float	ry;
+	float	rz;
+	t_quat	rotation;
+	
+}	t_quad;
+
+// [0] = front
+// [1] = back
+// [2] = left
+// [3] = right
+// [4] = top
+// [5] = bottom
+typedef struct s_cube
+{
+	t_quad	faces[6];
+}	t_cube;
 
 typedef struct s_sphere
 {
@@ -107,6 +155,7 @@ typedef struct s_scene
 {
 	t_sphere	*spheres;
 	t_plane		*planes;
+	t_cube		*cubes;
 	t_camera	camera;
 }				t_scene;
 
@@ -202,5 +251,36 @@ void		init_scene_three(t_scene *scene);
 
 void	init_scene_five(t_scene *scene);
 void	init_scene_six(t_scene *scene);
+
+//! tri.c
+
+
+//! quad.c
+t_quad	scale_quad(t_quad quad, float sx, float sy, float sz);
+t_quad	translate_quad(t_quad quad, float sx, float sy, float sz);
+t_quad	rotate_quad(t_quad quad, float rx, float ry, float rz);
+t_quad	init_quad(void);
+t_quad	rotate_quad(t_quad quad, float rx, float ry, float rz);
+t_quad	translate_quad(t_quad quad, float sx, float sy, float sz);
+t_quad	scale_quad(t_quad quad, float sx, float sy, float sz);
+
+//! cube.c
+t_cube	scale_cube(t_cube cube, float sx, float sy, float sz);
+t_cube	translate_cube(t_cube cube, float sx, float sy, float sz);
+t_cube	rotate_cube(t_cube cube, float rx, float ry, float rz);
+t_cube	init_cube(void);
+
+
+
+
+//! math
+t_quat quaternion_multiply(t_quat q1, t_quat q2);
+t_vec3 mat4_mul_vec3(t_mat4 matrix, t_vec3 vector);
+t_mat4	create_translation_matrix(float x, float y, float z);
+t_mat4 create_scaling_matrix(float sx, float sy, float sz);
+t_quat create_rotation_x(float angle_degrees);
+t_quat create_rotation_y(float angle_degrees);
+t_quat create_rotation_z(float angle_degrees);
+
 
 #endif

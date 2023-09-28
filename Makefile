@@ -6,7 +6,7 @@
 #    By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/28 00:51:40 by ichiro            #+#    #+#              #
-#    Updated: 2023/09/13 00:22:43 by imisumi-wsl      ###   ########.fr        #
+#    Updated: 2023/09/28 22:59:19 by imisumi-wsl      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -49,7 +49,10 @@ SRCS =	src/main.c						\
 		src/darray.c					\
 		src/camera.c					\
 		src/intersection.c				\
-		src/scene.c						
+		src/scene.c						\
+		src/cube.c						\
+		src/quad.c					\
+		src/tri.c						
 
 
 all: $(LIBFT) $(LIB3D) $(MLX) $(NAME)

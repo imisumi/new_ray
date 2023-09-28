@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/09/28 05:04:16 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/28 23:33:37 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -348,13 +348,12 @@ extern mlx_texture_t* uv_tex;
 // 	}
 // 	return (obj_hit);
 // }
-
-t_hitinfo triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_vec3 vert0, t_vec3 vert01, t_vec3 vert02,
-                                t_vec2 texCoord0, t_vec2 texCoord01, t_vec2 texCoord02)
+//! changed to use t_tri
+t_hitinfo triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_tri tri)
 {
-    t_vec3 E1 = vec3_sub(vert01, vert0);
-    t_vec3 E2 = vec3_sub(vert02, vert0);
-    t_vec3 T = vec3_sub(ray.origin, vert0);
+    t_vec3 E1 = vec3_sub(tri.b, tri.a);
+    t_vec3 E2 = vec3_sub(tri.c, tri.a);
+    t_vec3 T = vec3_sub(ray.origin, tri.a);
     t_vec3 D = ray.direction;
     t_vec3 P = vec3_cross(D, E2);
     t_vec3 Q = vec3_cross(T, E1);
@@ -371,14 +370,15 @@ t_hitinfo triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_vec3 vert0, t_ve
     {
         if (t < obj_hit.distance)
         {
-            if (u > 1.0f)
+            if (u >= 1.0f)
                 u -= 1.0f;
-            if (v > 1.0f)
+            if (v >= 1.0f)
                 v -= 1.0f;
 
             // Interpolate texture coordinates
-            float texU = w * texCoord0.x + u * texCoord01.x + v * texCoord02.x;
-            float texV = w * texCoord0.y + u * texCoord01.y + v * texCoord02.y;
+            float texU = w * tri.uv_a.x + u * tri.uv_b.x + v * tri.uv_c.x;
+            float texV = w * tri.uv_a.y + u * tri.uv_b.y + v * tri.uv_c.y;
+
 
             // Wrap texture coordinates to [0, 1] (or tile the texture)
             texU = texU - floor(texU);
@@ -400,7 +400,7 @@ t_hitinfo triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_vec3 vert0, t_ve
             obj_hit.position = vec3_add(ray.origin, vec3_mulf(ray.direction, t));
             obj_hit.normal = vec3_normalize(vec3_cross(E1, E2));
             obj_hit.material.color = vec3_new(r / 255.0f, g / 255.0f, b / 255.0f);
-			obj_hit.material.color = vec3_new(u, v, w);
+			// obj_hit.material.color = vec3_new(u, v, w);
             obj_hit.material.emission_strength = 0.0f;
             obj_hit.material.specular = 0.0f;
             obj_hit.material.roughness = 0.0f;
@@ -408,4 +408,98 @@ t_hitinfo triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_vec3 vert0, t_ve
     }
     return (obj_hit);
 }
+
+t_hitinfo quad_intersection(t_ray ray, t_hitinfo obj_hit, t_quad quad)
+{
+	float	hit;
+
+	hit = obj_hit.distance;
+	obj_hit = triangle_intersection(ray, obj_hit, quad.tri1);
+	if (hit == obj_hit.distance)
+		obj_hit = triangle_intersection(ray, obj_hit, quad.tri2);
+	return (obj_hit);
+}
+
+t_hitinfo cube_intersection(t_ray ray, t_hitinfo obj_hit, t_cube cube)
+{
+	int	i;
+
+	i = 0;
+	while (i < 6)
+	{
+		obj_hit = quad_intersection(ray, obj_hit, cube.faces[i]);
+		i++;
+	}
+	return (obj_hit);
+}
+
+t_hitinfo cubes_intersection(t_ray ray, t_hitinfo obj_hit, t_cube *cubes)
+{
+	for (int i = 0; i < array_length(&cubes); i++)
+	{
+		obj_hit = cube_intersection(ray, obj_hit, cubes[i]);
+	}
+	return (obj_hit);
+}
+
+// t_hitinfo triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_vec3 vert0, t_vec3 vert01, t_vec3 vert02,
+//                                 t_vec2 texCoord0, t_vec2 texCoord01, t_vec2 texCoord02)
+// {
+//     t_vec3 E1 = vec3_sub(vert01, vert0);
+//     t_vec3 E2 = vec3_sub(vert02, vert0);
+//     t_vec3 T = vec3_sub(ray.origin, vert0);
+//     t_vec3 D = ray.direction;
+//     t_vec3 P = vec3_cross(D, E2);
+//     t_vec3 Q = vec3_cross(T, E1);
+
+//     float f = 1.0f / vec3_dot(P, E1);
+//     if (f < EPSILON)
+//         return (obj_hit);
+//     float t = f * vec3_dot(Q, E2);
+//     float u = f * vec3_dot(P, T);
+//     float v = f * vec3_dot(Q, D);
+//     float w = 1.0f - u - v;
+
+//     if (u > -EPSILON && v > -EPSILON && u + v < 1.0f + EPSILON && t > EPSILON && t < obj_hit.distance)
+//     {
+//         if (t < obj_hit.distance)
+//         {
+//             if (u >= 1.0f)
+//                 u -= 1.0f;
+//             if (v >= 1.0f)
+//                 v -= 1.0f;
+
+//             // Interpolate texture coordinates
+//             float texU = w * texCoord0.x + u * texCoord01.x + v * texCoord02.x;
+//             float texV = w * texCoord0.y + u * texCoord01.y + v * texCoord02.y;
+
+
+//             // Wrap texture coordinates to [0, 1] (or tile the texture)
+//             texU = texU - floor(texU);
+//             texV = texV - floor(texV);
+
+//             int textureWidth = uv_tex->width;
+//             int textureHeight = uv_tex->height;
+//             int x = texU * textureWidth;
+//             int y = texV * textureHeight;
+
+//             int pixelIndex = (y * textureWidth + x) * 4; // 4 channels (R, G, B, A) per pixel
+
+//             uint8_t r = uv_tex->pixels[pixelIndex];
+//             uint8_t g = uv_tex->pixels[pixelIndex + 1];
+//             uint8_t b = uv_tex->pixels[pixelIndex + 2];
+
+//             obj_hit.hit = true;
+//             obj_hit.distance = t;
+//             obj_hit.position = vec3_add(ray.origin, vec3_mulf(ray.direction, t));
+//             obj_hit.normal = vec3_normalize(vec3_cross(E1, E2));
+//             obj_hit.material.color = vec3_new(r / 255.0f, g / 255.0f, b / 255.0f);
+// 			// obj_hit.material.color = vec3_new(u, v, w);
+//             obj_hit.material.emission_strength = 0.0f;
+//             obj_hit.material.specular = 0.0f;
+//             obj_hit.material.roughness = 0.0f;
+//         }
+//     }
+//     return (obj_hit);
+// }
 

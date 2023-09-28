@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   main copy.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/09/28 23:43:03 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/28 23:04:27 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -107,6 +107,8 @@ void put_pixel(mlx_image_t* image, uint32_t x, uint32_t y, uint32_t color)
 		mlx_put_pixel(image, x, y, color);
 }
 
+
+
 void cartesian_to_spherical(t_vec3 point, float* theta, float* phi) {
     // *theta = acos(point.y); // Polar angle (theta)
 	*theta = atan2(sqrt(point.x * point.x + point.z * point.z), point.y);
@@ -114,6 +116,7 @@ void cartesian_to_spherical(t_vec3 point, float* theta, float* phi) {
     *phi = atan2(point.x, point.z); // Azimuthal angle (phi)
 	
 }
+
 
 t_quat create_rotation_quaternion(float axis_x, float axis_y, float axis_z, float angle_degrees) {
     // Convert degrees to radians
@@ -173,8 +176,7 @@ t_mat4 create_scaling_matrix(float sx, float sy, float sz)
     return m;
 }
 
-t_vec3 mat4_mul_vec3(t_mat4 matrix, t_vec3 vector)
-{
+t_vec3 mat4_mul_vec3(t_mat4 matrix, t_vec3 vector) {
     t_vec3 result;
 
     result.x = matrix.m[0][0] * vector.x + matrix.m[0][1] * vector.y + matrix.m[0][2] * vector.z + matrix.m[0][3];
@@ -184,57 +186,29 @@ t_vec3 mat4_mul_vec3(t_mat4 matrix, t_vec3 vector)
     return result;
 }
 
-t_quat create_rotation_x(float angle_degrees) {
-    float angle_radians = angle_degrees * (M_PI / 180.0);
-    float half_angle = angle_radians / 2.0f;
-    
-    t_quat rotation_quaternion;
-    rotation_quaternion.x = sinf(half_angle);
-    rotation_quaternion.y = 0.0f;
-    rotation_quaternion.z = 0.0f;
-    rotation_quaternion.w = cosf(half_angle);
-    
-    return rotation_quaternion;
-}
-
-// Function to create a quaternion for a rotation around the y-axis
-t_quat create_rotation_y(float angle_degrees)
+t_quad	init_quad(void)
 {
-    float angle_radians = angle_degrees * (M_PI / 180.0);
-    float half_angle = angle_radians / 2.0f;
-    
-    t_quat rotation_quaternion;
-    rotation_quaternion.x = 0.0f;
-    rotation_quaternion.y = sinf(half_angle);
-    rotation_quaternion.z = 0.0f;
-    rotation_quaternion.w = cosf(half_angle);
-    
-    return rotation_quaternion;
-}
+	t_quad	q;
+	float	y;
+	
+	y = 0.0f;
+	q.tri1.a = vec3_new(-1.0f, y, -1.0f);
+	q.tri1.b = vec3_new(-1.0f, y, 1.0f);
+	q.tri1.c = vec3_new(1.0f, y, 1.0f);
+	q.tri1.uv_a = vec2_new(0.0f, 0.0f);
+	q.tri1.uv_b = vec2_new(0.0f, 1.0f);
+	q.tri1.uv_c = vec2_new(1.0f, 1.0f);
+	q.tri1.scale = create_scaling_matrix(1.0f, 1.0f, 1.0f);
+	q.tri1.translate = create_translation_matrix(0.0f, 0.0f, 0.0f);
 
-// Function to create a quaternion for a rotation around the z-axis
-t_quat create_rotation_z(float angle_degrees)
-{
-    float angle_radians = angle_degrees * (M_PI / 180.0);
-    float half_angle = angle_radians / 2.0f;
-    
-    t_quat rotation_quaternion;
-    rotation_quaternion.x = 0.0f;
-    rotation_quaternion.y = 0.0f;
-    rotation_quaternion.z = sinf(half_angle);
-    rotation_quaternion.w = cosf(half_angle);
-    
-    return rotation_quaternion;
-}
+	q.tri2.a = q.tri1.a;
+	q.tri2.b = q.tri1.c;
+	q.tri2.c = vec3_new(1.0f, y, -1.0f);
+	q.tri2.uv_a = q.tri1.uv_a;
+	q.tri2.uv_b = q.tri1.uv_c;
+	q.tri2.uv_c = vec2_new(1.0f, 0.0f);
 
-t_quat quaternion_multiply(t_quat q1, t_quat q2)
-{
-    t_quat result;
-    result.x = q1.w * q2.x + q1.x * q2.w + q1.y * q2.z - q1.z * q2.y;
-    result.y = q1.w * q2.y - q1.x * q2.z + q1.y * q2.w + q1.z * q2.x;
-    result.z = q1.w * q2.z + q1.x * q2.y - q1.y * q2.x + q1.z * q2.w;
-    result.w = q1.w * q2.w - q1.x * q2.x - q1.y * q2.y - q1.z * q2.z;
-    return result;
+	return (q);
 }
 
 #define CHECKER_SIZE 20
@@ -458,9 +432,6 @@ t_hitinfo triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_tri tri);
 // t_hitinfo	triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_vec3 vert0, t_vec3 vert01, t_vec3 vert02, \
 // 										t_vec2 texCoord0, t_vec2 texCoord01, t_vec2 texCoord02);
 
-t_hitinfo quad_intersection(t_ray ray, t_hitinfo obj_hit, t_quad quad);
-t_hitinfo cube_intersection(t_ray ray, t_hitinfo obj_hit, t_cube cube);
-t_hitinfo cubes_intersection(t_ray ray, t_hitinfo obj_hit, t_cube *cubes);
 
 //	c - d
 //	| \ |
@@ -486,11 +457,6 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 
 	t_quad quad;
 	quad = init_quad();
-	t_cube cube;
-	cube = init_cube();
-	cube = scale_cube(cube, 0.5f, 0.5f, 0.5f);
-	// cube = translate_cube(cube, 5.0f, 0.0f, 0.0f);
-	cube = rotate_cube(cube, 45.0f, 45.0f, 45.0f);
 	while (bounces <= max_bounces)
 	{
 		closest_hit.hit = false;
@@ -498,8 +464,143 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 		// closest_hit = sphere_intersection(ray, s.spheres, closest_hit);
 		// closest_hit = plane_intersection(ray, s.planes, closest_hit);
 
+		// float z = 1.0f;
+		// //! front
+		// closest_hit = triangle_intersection(ray, closest_hit, \
+		// 									vec3_new(-1.0f, 1.0f, z), \
+		// 									vec3_new(-1.0f, -1.0f, z), \
+		// 									vec3_new(1.0f, -1.0f, z), \
+		// 									vec2_new(0.0f, 0.0f), \
+		// 									vec2_new(0.0f, 1.0f), \
+		// 									vec2_new(1.0f, 1.0f));
+		// closest_hit = triangle_intersection(ray, closest_hit, \
+		// 									vec3_new(1.0f, -1.0f, z), \
+		// 									vec3_new(1.0f, 1.0f, z), \
+		// 									vec3_new(-1.0f, 1.0f, z), \
+		// 									vec2_new(1.0f, 1.0f), \
+		// 									vec2_new(1.0f, 0.0f), \
+		// 									vec2_new(0.0f, 0.0f));
+		// //! back
+		// z = -1.0f;
+		// closest_hit = triangle_intersection(ray, closest_hit, \
+		// 									vec3_new(1.0f, 1.0f, z), \
+		// 									vec3_new(1.0f, -1.0f, z), \
+		// 									vec3_new(-1.0f, -1.0f, z), \
+		// 									vec2_new(0.0f, 0.0f), \
+		// 									vec2_new(0.0f, 1.0f), \
+		// 									vec2_new(1.0f, 1.0f));
+		// closest_hit = triangle_intersection(ray, closest_hit, \
+		// 									vec3_new(1.0f, 1.0f, z), \
+		// 									vec3_new(-1.0f, -1.0f, z), \
+		// 									vec3_new(-1.0f, 1.0f, z), \
+		// 									vec2_new(0.0f, 0.0f), \
+		// 									vec2_new(1.0f, 1.0f), \
+		// 									vec2_new(1.0f, 0.0f));
+		// float x = 1.0f;
+		// //! right
+		// closest_hit = triangle_intersection(ray, closest_hit, \
+		// 									vec3_new(x, 1.0f, 1.0f), \
+		// 									vec3_new(x, -1.0f, 1.0f), \
+		// 									vec3_new(x, -1.0f, -1.0f), \
+		// 									vec2_new(0.0f, 0.0f), \
+		// 									vec2_new(0.0f, 1.0f), \
+		// 									vec2_new(1.0f, 1.0f));
+		// closest_hit = triangle_intersection(ray, closest_hit, \
+		// 									vec3_new(x, 1.0f, 1.0f), \
+		// 									vec3_new(x, -1.0f, -1.0f), \
+		// 									vec3_new(x, 1.0f, -1.0f), \
+		// 									vec2_new(0.0f, 0.0f), \
+		// 									vec2_new(1.0f, 1.0f), \
+		// 									vec2_new(1.0f, 0.0f));
+		// //! left
+		// x = -1.0f;
+		// closest_hit = triangle_intersection(ray, closest_hit, \
+		// 									vec3_new(x, 1.0f, -1.0f), \
+		// 									vec3_new(x, -1.0f, -1.0f), \
+		// 									vec3_new(x, -1.0f, 1.0f), \
+		// 									vec2_new(0.0f, 0.0f), \
+		// 									vec2_new(0.0f, 1.0f), \
+		// 									vec2_new(1.0f, 1.0f));
+		// closest_hit = triangle_intersection(ray, closest_hit, \
+		// 									vec3_new(x, 1.0f, -1.0f), \
+		// 									vec3_new(x, -1.0f, 1.0f), \
+		// 									vec3_new(x, 1.0f, 1.0f), \
+		// 									vec2_new(0.0f, 0.0f), \
+		// 									vec2_new(1.0f, 1.0f), \
+		// 									vec2_new(1.0f, 0.0f));
+		// //! top
+		// float y = 1.0f;
+		// closest_hit = triangle_intersection(ray, closest_hit, \
+		// 									vec3_new(-1.0f, y, -1.0f), \
+		// 									vec3_new(-1.0f, y, 1.0f), \
+		// 									vec3_new(1.0f, y, 1.0f), \
+		// 									vec2_new(0.0f, 0.0f), \
+		// 									vec2_new(0.0f, 1.0f), \
+		// 									vec2_new(1.0f, 1.0f));
+		// closest_hit = triangle_intersection(ray, closest_hit, \
+		// 									vec3_new(-1.0f, y, -1.0f), \
+		// 									vec3_new(1.0f, y, 1.0f), \
+		// 									vec3_new(1.0f, y, -1.0f), \
+		// 									vec2_new(0.0f, 0.0f), \
+		// 									vec2_new(1.0f, 1.0f), \
+		// 									vec2_new(1.0f, 0.0f));
+		// //! bottom
+		// y = -1.0f;
+		// closest_hit = triangle_intersection(ray, closest_hit, \
+		// 									vec3_new(-1.0f, y, 1.0f), \
+		// 									vec3_new(-1.0f, y, -1.0f), \
+		// 									vec3_new(1.0f, y, -1.0f), \
+		// 									vec2_new(0.0f, 0.0f), \
+		// 									vec2_new(0.0f, 1.0f), \
+		// 									vec2_new(1.0f, 1.0f));
+		// closest_hit = triangle_intersection(ray, closest_hit, \
+		// 									vec3_new(-1.0f, y, 1.0f), \
+		// 									vec3_new(1.0f, y, -1.0f), \
+		// 									vec3_new(1.0f, y, 1.0f), \
+		// 									vec2_new(0.0f, 0.0f), \
+		// 									vec2_new(1.0f, 1.0f), \
+		// 									vec2_new(1.0f, 0.0f));
+		
 
-		// closest_hit = triangle_intersection(ray, closest_hit, quad.tri1);
+		
+		// float y = 0.0f;
+		// t_vec3 vert0 = vec3_new(-1.0f, y, -1.0f);
+		// t_vec3 vert01 = vec3_new(-1.0f, y, 1.0f);
+		// t_vec3 vert02 = vec3_new(1.0f, y, 1.0f);
+
+		// t_vec2 texCoord0 = vec2_new(0.0f, 0.0f);
+		// t_vec2 texCoord01 = vec2_new(0.0f, 1.0f);
+		// t_vec2 texCoord02 = vec2_new(1.0f, 1.0f);
+		
+		// closest_hit = triangle_intersection(ray, closest_hit, \
+		// 									vert0, \
+		// 									vert01, \
+		// 									vert02, \
+		// 									texCoord0, \
+		// 									texCoord01, \
+		// 									texCoord02);
+
+		// float angleInRadians = fov_radians(180.0f);
+		// t_quat rotationQuaternion = quat_angle_axis(angleInRadians, (t_vec3){0.0f, 1.0f, 0.0f});
+		// vert0 = quat_rotate(rotationQuaternion, vert0);
+		// vert01 = quat_rotate(rotationQuaternion, vert01);
+		// vert02 = quat_rotate(rotationQuaternion, vert02);
+
+		// angleInRadians = M_PI;
+		// Mat2 rotationMatrix = mat2_rotation_matrix(angleInRadians);
+		// texCoord0 = rotateVector(texCoord0, rotationMatrix);
+		// texCoord01 = rotateVector(texCoord01, rotationMatrix);
+		// texCoord02 = rotateVector(texCoord02, rotationMatrix);
+		// closest_hit = triangle_intersection(ray, closest_hit, \
+		// 									vert0, \
+		// 									vert01, \
+		// 									vert02, \
+		// 									texCoord0, \
+		// 									texCoord01, \
+		// 									texCoord02);
+		
+
+		closest_hit = triangle_intersection(ray, closest_hit, quad.tri1);
 		// t_mat4 translate = create_translation_matrix(0.0f, -1.0f, 0.0f);
 		// t_mat4 scale = create_scaling_matrix(2.0f, 2.0f, 2.0f);
 		// t_mat4 transform = mat4_mul(translate, scale);
@@ -507,28 +608,18 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 		// quad.tri1.b = mat4_mul_vec3(transform, quad.tri1.b);
 		// quad.tri1.c = mat4_mul_vec3(transform, quad.tri1.c);
 		
-		// t_quat rotation = create_rotation_quaternion(0.0f, 1.0f, 0.0f, 180.0f);
-		// quad.tri1.a = quat_rotate(rotation, quad.tri1.a);
-		// quad.tri1.b = quat_rotate(rotation, quad.tri1.b);
-		// quad.tri1.c = quat_rotate(rotation, quad.tri1.c);
+		t_quat rotation = create_rotation_quaternion(0.0f, 1.0f, 0.0f, 180.0f);
+		quad.tri1.a = quat_rotate(rotation, quad.tri1.a);
+		quad.tri1.b = quat_rotate(rotation, quad.tri1.b);
+		quad.tri1.c = quat_rotate(rotation, quad.tri1.c);
 
 	
-		// Mat2 rotationMatrix = mat2_rotation_matrix(180.0f);
-		// quad.tri1.uv_a = rotateVector(quad.tri1.uv_a, rotationMatrix);
-		// quad.tri1.uv_b = rotateVector(quad.tri1.uv_b, rotationMatrix);
-		// quad.tri1.uv_c = rotateVector(quad.tri1.uv_c, rotationMatrix);
-		// closest_hit = triangle_intersection(ray, closest_hit, quad.tri1);
-
-
-
-		// closest_hit = quad_intersection(ray, closest_hit, quad);
-		// // quad = scale_quad(quad, 2.0f, 1.0f, 2.0f);
-		// quad = rotate_quad(quad, 90.0f, 0.0f, 0.0f);
-		// quad = translate_quad(quad, 0.0f, 0.0f, 1.0f);
-		// closest_hit = quad_intersection(ray, closest_hit, quad);
-
-		// closest_hit = cube_intersection(ray, closest_hit, cube);
-		closest_hit = cubes_intersection(ray, closest_hit, s.cubes);
+		Mat2 rotationMatrix = mat2_rotation_matrix(180.0f);
+		quad.tri1.uv_a = rotateVector(quad.tri1.uv_a, rotationMatrix);
+		quad.tri1.uv_b = rotateVector(quad.tri1.uv_b, rotationMatrix);
+		quad.tri1.uv_c = rotateVector(quad.tri1.uv_c, rotationMatrix);
+		closest_hit = triangle_intersection(ray, closest_hit, quad.tri1);
+		// closest_hit = triangle_intersection(ray, closest_hit, quad.tri2);
 		if (closest_hit.hit)
 		{
 			incomming_light = closest_hit.material.color;
@@ -744,8 +835,7 @@ int32_t main(int32_t argc, const char* argv[])
 	data.utils.accumulated_data = malloc(sizeof(t_vec4) * WIDTH * HEIGHT);
 	data.scene.camera.ray_target = malloc(sizeof(t_vec4) * WIDTH * HEIGHT);
 
-	// uv_tex = mlx_load_png("./assets/uv.png");
-	uv_tex = mlx_load_png("./assets/grassblock.png");
+	uv_tex = mlx_load_png("./assets/uv.png");
 
 	init_scene(&data.scene);
 

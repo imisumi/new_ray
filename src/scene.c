@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 02:06:12 by ichiro            #+#    #+#             */
-/*   Updated: 2023/09/26 21:53:35 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/28 23:38:58 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -200,9 +200,21 @@ void	init_scene_five(t_scene *scene)
 {
 	t_sphere	sphere;
 	t_plane		plane;
+	t_cube		cube;
 
-	vec_init(&scene->spheres, 16, sizeof(t_sphere));
+	vec_init(&scene->spheres, 32, sizeof(t_sphere));
 	vec_init(&scene->planes, 32, sizeof(t_plane));
+	vec_init(&scene->cubes, 32, sizeof(t_cube));
+
+	cube = init_cube();
+	array_push(&scene->cubes, &cube);
+	cube = init_cube();
+	cube = translate_cube(cube, 2.5f, 0.0f, 0.0f);
+	array_push(&scene->cubes, &cube);
+	cube = init_cube();
+	cube = rotate_cube(cube, 0.0f, 0.0f, 45.0f);
+	cube = translate_cube(cube, -2.5f, 0.0f, 0.0f);
+	array_push(&scene->cubes, &cube);
 	return ;
 	// sphere = create_sphere(vec3_new(0.0f, -50.0f, 0.0f), 50.0f);
 	// array_push(&scene->spheres, &sphere);
