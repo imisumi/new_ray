@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 02:06:12 by ichiro            #+#    #+#             */
-/*   Updated: 2023/09/28 22:31:56 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/30 00:31:57 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,7 +111,7 @@ void init_camera(t_camera *cam)
 	cam->view = mat4_identity();
 	cam->inv_view = mat4_identity();
 
-	cam->vertical_fov = 90.0f;
+	cam->vertical_fov = 70.0f;
 	cam->aspectRatio = (float)WIDTH / (float)HEIGHT;
 	cam->zNear = 0.1f;
 	cam->zFar = 100.0f;
@@ -144,7 +144,7 @@ void	movement(t_data *d)
 	t_vec3 up_direction = vec3_new(0.0f, 1.0f, 0.0f);
 	t_vec3 right_direction = vec3_cross(d->scene.camera.direction, up_direction);
 
-	float speed = 0.25f;
+	float speed = 0.1f;
 
 	if (!mlx_is_mouse_down(d->mlx, MLX_MOUSE_BUTTON_RIGHT))
 	{

@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/09/28 23:43:03 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/30 00:28:42 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -529,6 +529,23 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 
 		// closest_hit = cube_intersection(ray, closest_hit, cube);
 		closest_hit = cubes_intersection(ray, closest_hit, s.cubes);
+		
+		// t_tri tri;
+		// tri.a = vec3_new(-1.0f, 1.0f, 0.0f);
+		// tri.b = vec3_new(-1.0f, -1.0f, 0.0f);
+		// tri.c = vec3_new(1.0f, -1.0f, 0.0f);
+		// tri.material.color = vec3_new(1.0f, 0.0f, 0.0f);
+		// closest_hit = triangle_intersection(ray, closest_hit, tri);
+		// tri.a = vec3_new(-1.0f, 1.0f, 0.0f);
+		// tri.b = vec3_new(1.0f, -1.0f, 0.0f);
+		// tri.c = vec3_new(1.0f, 1.0f, 0.0f);
+		// tri.material.color = vec3_new(0.0f, 1.0f, 0.0f);
+		// closest_hit = triangle_intersection(ray, closest_hit, tri);
+		// tri.a = vec3_new(-1.0f, 1.0f, -1.0f);
+		// tri.b = vec3_new(-1.0f, 1.0f, 0.0f);
+		// tri.c = vec3_new(1.0f, 1.0f, 0.0f);
+		// tri.material.color = vec3_new(0.0f, 0.0f, 1.0f);
+		// closest_hit = triangle_intersection(ray, closest_hit, tri);
 		if (closest_hit.hit)
 		{
 			incomming_light = closest_hit.material.color;

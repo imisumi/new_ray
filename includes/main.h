@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/09/28 23:25:15 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/30 00:32:47 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,16 +25,16 @@
 # include "darray.h"
 # include "lib3d.h"
 
-# define WIDTH 500
-# define HEIGHT 500
-# define PIXEL_SIZE 2
+# define WIDTH 400
+# define HEIGHT 400
+# define PIXEL_SIZE 3
 # define MT 1
 # define THREADS 10
 # define ANTIALIASING 0
 
 # define _USE_MATH_DEFINES
 
-#define EPSILON 0.000001f
+#define EPSILON 1e-6
 #define FAR_CLIP 100000.0f
 
 typedef struct s_render_block
@@ -76,6 +76,7 @@ typedef struct s_tri
 	t_mat4	translate;
 	t_mat4	scale;
 	t_quat	rotation;
+	t_material	material;
 }	t_tri;
 
 typedef struct s_quad

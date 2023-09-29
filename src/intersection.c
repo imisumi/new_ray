@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/09/28 23:33:37 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/30 00:31:43 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -348,66 +348,247 @@ extern mlx_texture_t* uv_tex;
 // 	}
 // 	return (obj_hit);
 // }
-//! changed to use t_tri
+
+int clamp(int value, int min, int max) {
+    if (value < min) {
+        return min;
+    } else if (value > max) {
+        return max;
+    } else {
+        return value;
+    }
+}
+
+//! sabastion
 t_hitinfo triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_tri tri)
 {
-    t_vec3 E1 = vec3_sub(tri.b, tri.a);
-    t_vec3 E2 = vec3_sub(tri.c, tri.a);
-    t_vec3 T = vec3_sub(ray.origin, tri.a);
-    t_vec3 D = ray.direction;
-    t_vec3 P = vec3_cross(D, E2);
-    t_vec3 Q = vec3_cross(T, E1);
+    t_vec3 e1 = vec3_sub(tri.b, tri.a); // tri.b - tri.a
+	t_vec3 e2 = vec3_sub(tri.c, tri.a); // tri.a - tri.c
+	// t_vec3 n = vec3_cross(e1, e2);
+	t_vec3 h = vec3_cross(ray.direction, e2);
+	float a = vec3_dot(e1, h);
 
-    float f = 1.0f / vec3_dot(P, E1);
-    if (f < EPSILON)
-        return (obj_hit);
-    float t = f * vec3_dot(Q, E2);
-    float u = f * vec3_dot(P, T);
-    float v = f * vec3_dot(Q, D);
-    float w = 1.0f - u - v;
+	if (a > -EPSILON && a < EPSILON)
+		return (obj_hit);
 
-    if (u > -EPSILON && v > -EPSILON && u + v < 1.0f + EPSILON && t > EPSILON && t < obj_hit.distance)
-    {
-        if (t < obj_hit.distance)
-        {
-            if (u >= 1.0f)
-                u -= 1.0f;
-            if (v >= 1.0f)
-                v -= 1.0f;
+	float f = 1.0f / a;
+	t_vec3 s = vec3_sub(ray.origin, tri.a);
+	float u = f * vec3_dot(s, h);
 
-            // Interpolate texture coordinates
-            float texU = w * tri.uv_a.x + u * tri.uv_b.x + v * tri.uv_c.x;
-            float texV = w * tri.uv_a.y + u * tri.uv_b.y + v * tri.uv_c.y;
+	if (u < 0.0f || u > 1.0f)
+		return (obj_hit);
+
+	t_vec3 q = vec3_cross(s, e1);
+	float v = f * vec3_dot(ray.direction, q);
+
+	if (v < 0.0f || u + v > 1.0f)
+		return (obj_hit);
+	
+	float t = f * vec3_dot(e2, q);
+
+	float w = 1.0f - u - v;
+	
+	if (t > EPSILON && t < obj_hit.distance)
+	{
+
+		int textureWidth = uv_tex->width;
+		int textureHeight = uv_tex->height;
+		
+		// Barycentric Interpolation for texture coordinates
+		float texU = (1 - u - v) * tri.uv_a.x + u * tri.uv_b.x + v * tri.uv_c.x;
+		float texV = (1 - u - v) * tri.uv_a.y + u * tri.uv_b.y + v * tri.uv_c.y;
+		
+		// Wrap texture coordinates to [0, 1] (or tile the texture)
+		// texU = fmod(texU, 1.0f);
+		// texV = fmod(texV, 1.0f);
+		texU = fmod(texU + 1.0f, 1.0f);
+		texV = fmod(texV + 1.0f, 1.0f);
+
+		if (texU < 0)
+		    texU += 1.0f;
+		if (texV < 0)
+		    texV += 1.0f;
+		
+		int x = (int)(texU * textureWidth);
+		int y = (int)(texV * textureHeight);
+		
+		int pixelIndex = (y * textureWidth + x) * 4; // 4 channels (R, G, B, A) per pixel
+		
+		uint8_t r = uv_tex->pixels[pixelIndex];
+		uint8_t g = uv_tex->pixels[pixelIndex + 1];
+		uint8_t b = uv_tex->pixels[pixelIndex + 2];
 
 
-            // Wrap texture coordinates to [0, 1] (or tile the texture)
-            texU = texU - floor(texU);
-            texV = texV - floor(texV);
 
-            int textureWidth = uv_tex->width;
-            int textureHeight = uv_tex->height;
-            int x = texU * textureWidth;
-            int y = texV * textureHeight;
 
-            int pixelIndex = (y * textureWidth + x) * 4; // 4 channels (R, G, B, A) per pixel
+		obj_hit.hit = true;
+		obj_hit.distance = t;
+		obj_hit.position = vec3_add(ray.origin, vec3_mulf(ray.direction, t));
+		obj_hit.normal = vec3_normalize(vec3_cross(e1, e2));
+		obj_hit.material.color = tri.material.color;
 
-            uint8_t r = uv_tex->pixels[pixelIndex];
-            uint8_t g = uv_tex->pixels[pixelIndex + 1];
-            uint8_t b = uv_tex->pixels[pixelIndex + 2];
-
-            obj_hit.hit = true;
-            obj_hit.distance = t;
-            obj_hit.position = vec3_add(ray.origin, vec3_mulf(ray.direction, t));
-            obj_hit.normal = vec3_normalize(vec3_cross(E1, E2));
-            obj_hit.material.color = vec3_new(r / 255.0f, g / 255.0f, b / 255.0f);
-			// obj_hit.material.color = vec3_new(u, v, w);
-            obj_hit.material.emission_strength = 0.0f;
-            obj_hit.material.specular = 0.0f;
-            obj_hit.material.roughness = 0.0f;
-        }
-    }
-    return (obj_hit);
+		obj_hit.material.color = vec3_new(r / 255.0f, g / 255.0f, b / 255.0f);
+	}
+	
+    return obj_hit;
 }
+
+//! use this
+// t_hitinfo triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_tri tri)
+// {
+//     t_vec3 E1 = vec3_sub(tri.b, tri.a);
+//     t_vec3 E2 = vec3_sub(tri.c, tri.a);
+//     t_vec3 T = vec3_sub(ray.origin, tri.a);
+//     t_vec3 D = ray.direction;
+//     t_vec3 P = vec3_cross(D, E2);
+//     t_vec3 Q = vec3_cross(T, E1);
+
+//     float f = 1.0f / vec3_dot(P, E1);
+//     if (f < EPSILON)
+//         return (obj_hit);
+//     float t = f * vec3_dot(Q, E2);
+//     float u = f * vec3_dot(P, T);
+//     float v = f * vec3_dot(Q, D);
+//     float w = 1.0f - u - v;
+
+// 	float bias = 0.0001f;
+
+//     // if (u > -EPSILON && v > -EPSILON && u + v < 1.0f + EPSILON && t > EPSILON && t < obj_hit.distance)
+// 	if (u > -EPSILON - bias && v > -EPSILON - bias && u + v < 1.0f + EPSILON + bias && t > EPSILON && t < obj_hit.distance)
+//     {
+//         if (t < obj_hit.distance)
+//         {
+//             if (u >= 1.0f)
+//                 u -= 1.0f;
+//             if (v >= 1.0f)
+//                 v -= 1.0f;
+
+// 			int textureWidth = uv_tex->width;
+//        		int textureHeight = uv_tex->height;
+
+//        		// Barycentric Interpolation for texture coordinates
+//        		float texU = (1 - u - v) * tri.uv_a.x + u * tri.uv_b.x + v * tri.uv_c.x;
+//        		float texV = (1 - u - v) * tri.uv_a.y + u * tri.uv_b.y + v * tri.uv_c.y;
+
+//        		// Wrap texture coordinates to [0, 1] (or tile the texture)
+//        		texU = fmod(texU, 1.0f);
+//        		texV = fmod(texV, 1.0f);
+//        		if (texU < 0)
+//        		    texU += 1.0f;
+//        		if (texV < 0)
+//        		    texV += 1.0f;
+
+//        		int x = (int)(texU * textureWidth);
+//        		int y = (int)(texV * textureHeight);
+
+//        		int pixelIndex = (y * textureWidth + x) * 4; // 4 channels (R, G, B, A) per pixel
+
+//        		uint8_t r = uv_tex->pixels[pixelIndex];
+//        		uint8_t g = uv_tex->pixels[pixelIndex + 1];
+//        		uint8_t b = uv_tex->pixels[pixelIndex + 2];
+
+
+
+
+
+
+			
+
+//             obj_hit.hit = true;
+//             obj_hit.distance = t;
+//             obj_hit.position = vec3_add(ray.origin, vec3_mulf(ray.direction, t));
+//             obj_hit.normal = vec3_normalize(vec3_cross(E1, E2));
+//             obj_hit.material.color = vec3_new(r / 255.0f, g / 255.0f, b / 255.0f);
+// 			// obj_hit.material.color = vec3_new(u, v, w);
+
+// 			// obj_hit.material.color = tri.material.color;
+//             obj_hit.material.emission_strength = 0.0f;
+//             obj_hit.material.specular = 0.0f;
+//             obj_hit.material.roughness = 0.0f;
+//         }
+//     }
+//     return (obj_hit);
+// }
+
+//! changed to use t_tri
+// t_hitinfo triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_tri tri)
+// {
+//     t_vec3 E1 = vec3_sub(tri.b, tri.a);
+//     t_vec3 E2 = vec3_sub(tri.c, tri.a);
+//     t_vec3 T = vec3_sub(ray.origin, tri.a);
+//     t_vec3 D = ray.direction;
+//     t_vec3 P = vec3_cross(D, E2);
+//     t_vec3 Q = vec3_cross(T, E1);
+
+//     float f = 1.0f / vec3_dot(P, E1);
+//     if (f < EPSILON)
+//         return (obj_hit);
+//     float t = f * vec3_dot(Q, E2);
+//     float u = f * vec3_dot(P, T);
+//     float v = f * vec3_dot(Q, D);
+//     float w = 1.0f - u - v;
+
+//     if (u > -EPSILON && v > -EPSILON && u + v < 1.0f + EPSILON && t > EPSILON && t < obj_hit.distance)
+//     {
+//         if (t < obj_hit.distance)
+//         {
+//             if (u >= 1.0f)
+//                 u -= 1.0f;
+//             if (v >= 1.0f)
+//                 v -= 1.0f;
+
+// 			int textureWidth = uv_tex->width;
+//             int textureHeight = uv_tex->height;
+
+			
+
+//             // Interpolate texture coordinates
+//             // float texU = w * tri.uv_a.x + u * tri.uv_b.x + v * tri.uv_c.x;
+//             // float texV = w * tri.uv_a.y + u * tri.uv_b.y + v * tri.uv_c.y;
+			
+// 			// Bilinear Interpolation for texture coordinates
+// 			float texU = (1 - u - v) * tri.uv_a.x + u * tri.uv_b.x + v * tri.uv_c.x;
+// 			float texV = (1 - u - v) * tri.uv_a.y + u * tri.uv_b.y + v * tri.uv_c.y;
+
+
+
+//             // Wrap texture coordinates to [0, 1] (or tile the texture)
+//             texU = texU - floor(texU);
+//             texV = texV - floor(texV);
+
+            
+//             int x = texU * textureWidth;
+//             int y = texV * textureHeight;
+// 			// int x = floor(texU * textureWidth);
+// 			// int y = floor(texV * textureHeight);
+
+//             int pixelIndex = (y * textureWidth + x) * 4; // 4 channels (R, G, B, A) per pixel
+
+//             uint8_t r = uv_tex->pixels[pixelIndex];
+//             uint8_t g = uv_tex->pixels[pixelIndex + 1];
+//             uint8_t b = uv_tex->pixels[pixelIndex + 2];
+
+
+
+
+
+
+
+			
+
+//             obj_hit.hit = true;
+//             obj_hit.distance = t;
+//             obj_hit.position = vec3_add(ray.origin, vec3_mulf(ray.direction, t));
+//             obj_hit.normal = vec3_normalize(vec3_cross(E1, E2));
+//             obj_hit.material.color = vec3_new(r / 255.0f, g / 255.0f, b / 255.0f);
+// 			// obj_hit.material.color = vec3_new(u, v, w);
+//             obj_hit.material.emission_strength = 0.0f;
+//             obj_hit.material.specular = 0.0f;
+//             obj_hit.material.roughness = 0.0f;
+//         }
+//     }
+//     return (obj_hit);
+// }
 
 t_hitinfo quad_intersection(t_ray ray, t_hitinfo obj_hit, t_quad quad)
 {

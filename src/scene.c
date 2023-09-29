@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 02:06:12 by ichiro            #+#    #+#             */
-/*   Updated: 2023/09/28 23:38:58 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/09/30 00:32:22 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -207,6 +207,7 @@ void	init_scene_five(t_scene *scene)
 	vec_init(&scene->cubes, 32, sizeof(t_cube));
 
 	cube = init_cube();
+	// cube = scale_cube(cube, 0.5f, .0f, 2.0f);
 	array_push(&scene->cubes, &cube);
 	cube = init_cube();
 	cube = translate_cube(cube, 2.5f, 0.0f, 0.0f);
