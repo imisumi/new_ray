@@ -6,7 +6,7 @@
 #    By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/28 00:51:40 by ichiro            #+#    #+#              #
-#    Updated: 2023/09/13 00:22:43 by imisumi-wsl      ###   ########.fr        #
+#    Updated: 2023/09/22 23:59:53 by imisumi-wsl      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,7 +27,9 @@ CFLAGS +=
 
 LEAKS = -fsanitize=address
 
-cc = gcc
+cc = gcc -msse4.2 -O3 -march=native
+
+# cc += -pg
 
 LFLAGS = -ldl -lglfw -pthread -lm 
 

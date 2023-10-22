@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 02:06:12 by ichiro            #+#    #+#             */
-/*   Updated: 2023/09/14 20:27:42 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/10/22 04:17:38 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ void recalculat_ray_directions(t_data *d)
 void anti_aliasing(t_data *d)
 {
 	uint32_t rngState;
-	float diverge = 0.5f;
+	float diverge = 1.0f;
 	for (uint32_t y = 0; y < HEIGHT; y++)
 	{
 		for (uint32_t x = 0; x < WIDTH; x++)
@@ -97,7 +97,7 @@ void anti_aliasing(t_data *d)
 
 void init_camera(t_camera *cam)
 {
-	cam->position = vec3_new(0.0, 1.5, 5.0f);
+	cam->position = vec3_new(0.0, 0.0, -3.0f);
 	cam->direction = vec3_new(0.0, 0.0, -1.0);
 
 	cam->ray_dir = malloc(sizeof(t_vec3) * WIDTH * HEIGHT);
@@ -110,7 +110,7 @@ void init_camera(t_camera *cam)
 	cam->view = mat4_identity();
 	cam->inv_view = mat4_identity();
 
-	cam->vertical_fov = 40.0f;
+	cam->vertical_fov = 45.0f;
 	cam->aspectRatio = (float)WIDTH / (float)HEIGHT;
 	cam->zNear = 0.1f;
 	cam->zFar = 100.0f;
@@ -143,7 +143,7 @@ void	movement(t_data *d)
 	t_vec3 up_direction = vec3_new(0.0f, 1.0f, 0.0f);
 	t_vec3 right_direction = vec3_cross(d->scene.camera.direction, up_direction);
 
-	float speed = 0.25f;
+	float speed = 1.25f;
 
 	if (!mlx_is_mouse_down(d->mlx, MLX_MOUSE_BUTTON_RIGHT))
 	{

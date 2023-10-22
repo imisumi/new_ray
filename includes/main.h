@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/09/14 23:41:12 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/10/22 01:45:06 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,12 +23,14 @@
 # include "darray.h"
 # include "lib3d.h"
 
-#define WIDTH 800
-#define HEIGHT 600
+#define WIDTH 400
+#define HEIGHT 400
 #define PIXEL_SIZE 2
-#define MT 1
+#define MT 0
 #define THREADS 10
-#define ANTIALIASING 1
+#define ANTIALIASING 0
+
+#define MAX_BOUNCHES 8
 
 #define _USE_MATH_DEFINES
 
@@ -56,6 +58,8 @@ typedef struct s_material
 	t_vec3	specular_color;
 	t_vec3	emission_color;
 	float	emission_strength;
+
+	// float	refractive_index;
 }	t_material;
 
 typedef struct s_sphere
@@ -74,6 +78,11 @@ typedef struct s_plane
 	t_material	material;
 }	t_plane;
 
+typedef struct s_aabb
+{
+	t_vec3	min;
+	t_vec3	max;
+}	t_aabb;
 
 typedef struct s_camera
 {
@@ -202,3 +211,4 @@ t_sphere	create_sphere(t_vec3 center, float radius);
 void		init_scene_one(t_scene *scene);
 void		init_scene_two(t_scene *scene);
 void		init_scene_three(t_scene *scene);
+void		init_scene_four(t_scene *scene);

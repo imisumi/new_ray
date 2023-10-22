@@ -1,0 +1,479 @@
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls  ms/call  ms/call  name    
+ 19.65      2.66     2.66 83738741     0.00     0.00  vec3_dot
+ 15.73      4.79     2.13  2348930     0.00     0.00  plane_intersection
+ 13.96      6.68     1.89   797555     0.00     0.01  per_pixel
+  8.42      7.82     1.14  2415592     0.00     0.00  sphere_intersection
+  7.75      8.87     1.05 36225092     0.00     0.00  vec3_sub
+  5.32      9.59     0.72 41308527     0.00     0.00  vec3_add
+  5.24     10.30     0.71 10002691     0.00     0.00  random_value_normal_distribution
+  4.36     10.89     0.59 39691996     0.00     0.00  vec3_mulf
+  3.18     11.32     0.43 34293254     0.00     0.00  vec3_new
+  3.18     11.75     0.43 19143632     0.00     0.00  vec3_normalize
+  2.88     12.14     0.39  7430533     0.00     0.00  vec3_mul
+  2.58     12.49     0.35 41723248     0.00     0.00  array_length
+  2.51     12.83     0.34                             render
+  1.33     13.01     0.18                             mlx_put_pixel
+  1.03     13.15     0.14                             mlx_draw_pixel
+  0.52     13.22     0.07  1423906     0.00     0.00  vec4_clamp
+  0.52     13.29     0.07  1334151     0.00     0.00  vec4_divf
+  0.44     13.35     0.06  1451079     0.00     0.00  vec4_add
+  0.37     13.40     0.05 19983704     0.00     0.00  vec2_new
+  0.30     13.44     0.04 18240000     0.00     0.00  randomFloat
+  0.22     13.47     0.03 10291686     0.00     0.00  vec2_mul
+  0.15     13.49     0.02 18360000     0.00     0.00  vec2_mulf
+  0.15     13.51     0.02       76     0.26    17.09  anti_aliasing
+  0.07     13.52     0.01  9120000     0.00     0.00  random_point_in_circle
+  0.07     13.53     0.01  1520107     0.00     0.00  vec4_new
+  0.07     13.54     0.01   120000     0.00     0.00  vec3_divf
+  0.00     13.54     0.00  9120000     0.00     0.00  vec2_divf
+  0.00     13.54     0.00   240000     0.00     0.00  mat4_mul_vec4
+  0.00     13.54     0.00   120000     0.00     0.00  vec2_subf
+  0.00     13.54     0.00   120000     0.00     0.00  vec4_normalize
+  0.00     13.54     0.00       78     0.00     0.00  vec3_cross
+  0.00     13.54     0.00       76     0.00     0.00  floatToString
+  0.00     13.54     0.00       76     0.00     0.00  frame_times
+  0.00     13.54     0.00       76     0.00     0.00  ft_hook
+  0.00     13.54     0.00       76     0.00     0.00  movement
+  0.00     13.54     0.00       76     0.00    17.09  render_loop
+  0.00     13.54     0.00       10     0.00     0.00  new_diffuse
+  0.00     13.54     0.00        9     0.00     0.00  array_push
+  0.00     13.54     0.00        7     0.00     0.00  create_mat4
+  0.00     13.54     0.00        4     0.00     0.00  mat4_identity
+  0.00     13.54     0.00        3     0.00     0.00  create_sphere
+  0.00     13.54     0.00        2     0.00     0.00  mat4_inverse
+  0.00     13.54     0.00        2     0.00     0.00  vec_init
+  0.00     13.54     0.00        1     0.00     0.00  fov_radians
+  0.00     13.54     0.00        1     0.00     0.00  init_camera
+  0.00     13.54     0.00        1     0.00     0.00  init_scene_four
+  0.00     13.54     0.00        1     0.00     0.00  mat4_look_at
+  0.00     13.54     0.00        1     0.00     0.00  mat4_perspective
+  0.00     13.54     0.00        1     0.00    14.72  recalculat_ray_directions
+  0.00     13.54     0.00        1     0.00     0.00  recalculate_view
+  0.00     13.54     0.00        1     0.00     0.00  recalculated_projection
+
+ %         the percentage of the total running time of the
+time       program used by this function.
+
+cumulative a running sum of the number of seconds accounted
+ seconds   for by this function and those listed above it.
+
+ self      the number of seconds accounted for by this
+seconds    function alone.  This is the major sort for this
+           listing.
+
+calls      the number of times this function was invoked, if
+           this function is profiled, else blank.
+
+ self      the average number of milliseconds spent in this
+ms/call    function per call, if this function is profiled,
+	   else blank.
+
+ total     the average number of milliseconds spent in this
+ms/call    function and its descendents per call, if this
+	   function is profiled, else blank.
+
+name       the name of the function.  This is the minor sort
+           for this listing. The index shows the location of
+	   the function in the gprof listing. If the index is
+	   in parenthesis it shows where it would appear in
+	   the gprof listing if it were to be printed.
+
+Copyright (C) 2012-2022 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+		     Call graph (explanation follows)
+
+
+granularity: each sample hit covers 4 byte(s) for 0.07% of 13.54 seconds
+
+index % time    self  children    called     name
+                                                 <spontaneous>
+[1]     87.9    0.34   11.57                 render [1]
+                1.89    9.46  797555/797555      per_pixel [2]
+                0.07    0.00 1423906/1423906     vec4_clamp [20]
+                0.07    0.00 1334151/1334151     vec4_divf [21]
+                0.06    0.00 1451079/1451079     vec4_add [22]
+                0.01    0.00 1280107/1520107     vec4_new [29]
+                0.00    0.00 1743704/19983704     vec2_new [23]
+                0.00    0.00 1171686/10291686     vec2_mul [25]
+-----------------------------------------------
+                1.89    9.46  797555/797555      render [1]
+[2]     83.8    1.89    9.46  797555         per_pixel [2]
+                2.13    2.64 2348930/2348930     plane_intersection [3]
+                1.14    1.57 2415592/2415592     sphere_intersection [4]
+                0.71    0.00 10002691/10002691     random_value_normal_distribution [11]
+                0.39    0.00 7430533/7430533     vec3_mul [15]
+                0.23    0.00 13099682/41308527     vec3_add [10]
+                0.22    0.00 9707452/19143632     vec3_normalize [13]
+                0.14    0.00 9388275/39691996     vec3_mulf [12]
+                0.11    0.00 3887941/36225092     vec3_sub [9]
+                0.10    0.00 3134949/83738741     vec3_dot [5]
+                0.08    0.00 6693121/34293254     vec3_new [14]
+-----------------------------------------------
+                2.13    2.64 2348930/2348930     per_pixel [2]
+[3]     35.2    2.13    2.64 2348930         plane_intersection [3]
+                1.50    0.00 47272298/83738741     vec3_dot [5]
+                0.58    0.00 19880416/36225092     vec3_sub [9]
+                0.21    0.00 25513962/41723248     array_length [16]
+                0.17    0.00 11765486/39691996     vec3_mulf [12]
+                0.17    0.00 9691063/41308527     vec3_add [10]
+-----------------------------------------------
+                1.14    1.57 2415592/2415592     per_pixel [2]
+[4]     20.0    1.14    1.57 2415592         sphere_intersection [4]
+                1.06    0.00 33331491/83738741     vec3_dot [5]
+                0.36    0.00 12456734/36225092     vec3_sub [9]
+                0.14    0.00 16209286/41723248     array_length [16]
+                0.01    0.00  316178/19143632     vec3_normalize [13]
+                0.00    0.00  277781/41308527     vec3_add [10]
+                0.00    0.00  298235/39691996     vec3_mulf [12]
+-----------------------------------------------
+                0.00    0.00       3/83738741     mat4_look_at [35]
+                0.10    0.00 3134949/83738741     per_pixel [2]
+                1.06    0.00 33331491/83738741     sphere_intersection [4]
+                1.50    0.00 47272298/83738741     plane_intersection [3]
+[5]     19.6    2.66    0.00 83738741         vec3_dot [5]
+-----------------------------------------------
+                0.00    1.30      76/76          mlx_loop [7]
+[6]      9.6    0.00    1.30      76         render_loop [6]
+                0.02    1.28      76/76          anti_aliasing [8]
+                0.00    0.00      76/76          movement [31]
+-----------------------------------------------
+                                                 <spontaneous>
+[7]      9.6    0.00    1.30                 mlx_loop [7]
+                0.00    1.30      76/76          render_loop [6]
+                0.00    0.00      76/76          frame_times [44]
+                0.00    0.00      76/76          ft_hook [45]
+-----------------------------------------------
+                0.02    1.28      76/76          render_loop [6]
+[8]      9.6    0.02    1.28      76         anti_aliasing [8]
+                0.34    0.00 27360000/34293254     vec3_new [14]
+                0.32    0.00 18240000/41308527     vec3_add [10]
+                0.27    0.00 18240000/39691996     vec3_mulf [12]
+                0.20    0.00 9120000/19143632     vec3_normalize [13]
+                0.01    0.06 9120000/9120000     random_point_in_circle [19]
+                0.03    0.00 9120000/10291686     vec2_mul [25]
+                0.02    0.00 9120000/19983704     vec2_new [23]
+                0.02    0.00 18240000/18360000     vec2_mulf [26]
+                0.00    0.00 9120000/9120000     vec2_divf [38]
+-----------------------------------------------
+                0.00    0.00       1/36225092     mat4_look_at [35]
+                0.11    0.00 3887941/36225092     per_pixel [2]
+                0.36    0.00 12456734/36225092     sphere_intersection [4]
+                0.58    0.00 19880416/36225092     plane_intersection [3]
+[9]      7.8    1.05    0.00 36225092         vec3_sub [9]
+-----------------------------------------------
+                0.00    0.00       1/41308527     recalculate_view [34]
+                0.00    0.00  277781/41308527     sphere_intersection [4]
+                0.17    0.00 9691063/41308527     plane_intersection [3]
+                0.23    0.00 13099682/41308527     per_pixel [2]
+                0.32    0.00 18240000/41308527     anti_aliasing [8]
+[10]     5.3    0.72    0.00 41308527         vec3_add [10]
+-----------------------------------------------
+                0.71    0.00 10002691/10002691     per_pixel [2]
+[11]     5.2    0.71    0.00 10002691         random_value_normal_distribution [11]
+-----------------------------------------------
+                0.00    0.00  298235/39691996     sphere_intersection [4]
+                0.14    0.00 9388275/39691996     per_pixel [2]
+                0.17    0.00 11765486/39691996     plane_intersection [3]
+                0.27    0.00 18240000/39691996     anti_aliasing [8]
+[12]     4.4    0.59    0.00 39691996         vec3_mulf [12]
+-----------------------------------------------
+                0.00    0.00       2/19143632     mat4_look_at [35]
+                0.01    0.00  316178/19143632     sphere_intersection [4]
+                0.20    0.00 9120000/19143632     anti_aliasing [8]
+                0.22    0.00 9707452/19143632     per_pixel [2]
+[13]     3.2    0.43    0.00 19143632         vec3_normalize [13]
+-----------------------------------------------
+                0.00    0.00       1/34293254     recalculate_view [34]
+                0.00    0.00       2/34293254     init_camera [37]
+                0.00    0.00       6/34293254     create_sphere [36]
+                0.00    0.00      20/34293254     new_diffuse [33]
+                0.00    0.00      28/34293254     init_scene_four [32]
+                0.00    0.00      76/34293254     movement [31]
+                0.00    0.00  240000/34293254     recalculat_ray_directions [28]
+                0.08    0.00 6693121/34293254     per_pixel [2]
+                0.34    0.00 27360000/34293254     anti_aliasing [8]
+[14]     3.2    0.43    0.00 34293254         vec3_new [14]
+-----------------------------------------------
+                0.39    0.00 7430533/7430533     per_pixel [2]
+[15]     2.9    0.39    0.00 7430533         vec3_mul [15]
+-----------------------------------------------
+                0.14    0.00 16209286/41723248     sphere_intersection [4]
+                0.21    0.00 25513962/41723248     plane_intersection [3]
+[16]     2.6    0.35    0.00 41723248         array_length [16]
+-----------------------------------------------
+                                                 <spontaneous>
+[17]     1.3    0.18    0.00                 mlx_put_pixel [17]
+-----------------------------------------------
+                                                 <spontaneous>
+[18]     1.0    0.14    0.00                 mlx_draw_pixel [18]
+-----------------------------------------------
+                0.01    0.06 9120000/9120000     anti_aliasing [8]
+[19]     0.5    0.01    0.06 9120000         random_point_in_circle [19]
+                0.04    0.00 18240000/18240000     randomFloat [24]
+                0.02    0.00 9120000/19983704     vec2_new [23]
+-----------------------------------------------
+                0.07    0.00 1423906/1423906     render [1]
+[20]     0.5    0.07    0.00 1423906         vec4_clamp [20]
+-----------------------------------------------
+                0.07    0.00 1334151/1334151     render [1]
+[21]     0.5    0.07    0.00 1334151         vec4_divf [21]
+-----------------------------------------------
+                0.06    0.00 1451079/1451079     render [1]
+[22]     0.4    0.06    0.00 1451079         vec4_add [22]
+-----------------------------------------------
+                0.00    0.00 1743704/19983704     render [1]
+                0.02    0.00 9120000/19983704     random_point_in_circle [19]
+                0.02    0.00 9120000/19983704     anti_aliasing [8]
+[23]     0.4    0.05    0.00 19983704         vec2_new [23]
+-----------------------------------------------
+                0.04    0.00 18240000/18240000     random_point_in_circle [19]
+[24]     0.3    0.04    0.00 18240000         randomFloat [24]
+-----------------------------------------------
+                0.00    0.00 1171686/10291686     render [1]
+                0.03    0.00 9120000/10291686     anti_aliasing [8]
+[25]     0.2    0.03    0.00 10291686         vec2_mul [25]
+-----------------------------------------------
+                0.00    0.00  120000/18360000     recalculat_ray_directions [28]
+                0.02    0.00 18240000/18360000     anti_aliasing [8]
+[26]     0.1    0.02    0.00 18360000         vec2_mulf [26]
+-----------------------------------------------
+                                                 <spontaneous>
+[27]     0.1    0.00    0.01                 main [27]
+                0.00    0.01       1/1           recalculat_ray_directions [28]
+                0.00    0.00       1/1           init_scene_four [32]
+                0.00    0.00       1/1           recalculate_view [34]
+                0.00    0.00       1/1           init_camera [37]
+                0.00    0.00       1/1           recalculated_projection [53]
+-----------------------------------------------
+                0.00    0.01       1/1           main [27]
+[28]     0.1    0.00    0.01       1         recalculat_ray_directions [28]
+                0.01    0.00  120000/120000      vec3_divf [30]
+                0.00    0.00  240000/34293254     vec3_new [14]
+                0.00    0.00  240000/1520107     vec4_new [29]
+                0.00    0.00  120000/18360000     vec2_mulf [26]
+                0.00    0.00  240000/240000      mat4_mul_vec4 [39]
+                0.00    0.00  120000/120000      vec2_subf [40]
+                0.00    0.00  120000/120000      vec4_normalize [41]
+-----------------------------------------------
+                0.00    0.00  240000/1520107     recalculat_ray_directions [28]
+                0.01    0.00 1280107/1520107     render [1]
+[29]     0.1    0.01    0.00 1520107         vec4_new [29]
+-----------------------------------------------
+                0.01    0.00  120000/120000      recalculat_ray_directions [28]
+[30]     0.1    0.01    0.00  120000         vec3_divf [30]
+-----------------------------------------------
+                0.00    0.00      76/76          render_loop [6]
+[31]     0.0    0.00    0.00      76         movement [31]
+                0.00    0.00      76/34293254     vec3_new [14]
+                0.00    0.00      76/78          vec3_cross [42]
+-----------------------------------------------
+                0.00    0.00       1/1           main [27]
+[32]     0.0    0.00    0.00       1         init_scene_four [32]
+                0.00    0.00      28/34293254     vec3_new [14]
+                0.00    0.00      10/10          new_diffuse [33]
+                0.00    0.00       3/3           create_sphere [36]
+                0.00    0.00       9/9           array_push [46]
+                0.00    0.00       2/2           vec_init [50]
+-----------------------------------------------
+                0.00    0.00      10/10          init_scene_four [32]
+[33]     0.0    0.00    0.00      10         new_diffuse [33]
+                0.00    0.00      20/34293254     vec3_new [14]
+-----------------------------------------------
+                0.00    0.00       1/1           main [27]
+[34]     0.0    0.00    0.00       1         recalculate_view [34]
+                0.00    0.00       1/1           mat4_look_at [35]
+                0.00    0.00       1/41308527     vec3_add [10]
+                0.00    0.00       1/34293254     vec3_new [14]
+                0.00    0.00       1/2           mat4_inverse [49]
+-----------------------------------------------
+                0.00    0.00       1/1           recalculate_view [34]
+[35]     0.0    0.00    0.00       1         mat4_look_at [35]
+                0.00    0.00       3/83738741     vec3_dot [5]
+                0.00    0.00       2/19143632     vec3_normalize [13]
+                0.00    0.00       1/36225092     vec3_sub [9]
+                0.00    0.00       2/78          vec3_cross [42]
+-----------------------------------------------
+                0.00    0.00       3/3           init_scene_four [32]
+[36]     0.0    0.00    0.00       3         create_sphere [36]
+                0.00    0.00       6/34293254     vec3_new [14]
+-----------------------------------------------
+                0.00    0.00       1/1           main [27]
+[37]     0.0    0.00    0.00       1         init_camera [37]
+                0.00    0.00       2/34293254     vec3_new [14]
+                0.00    0.00       4/4           mat4_identity [48]
+-----------------------------------------------
+                0.00    0.00 9120000/9120000     anti_aliasing [8]
+[38]     0.0    0.00    0.00 9120000         vec2_divf [38]
+-----------------------------------------------
+                0.00    0.00  240000/240000      recalculat_ray_directions [28]
+[39]     0.0    0.00    0.00  240000         mat4_mul_vec4 [39]
+-----------------------------------------------
+                0.00    0.00  120000/120000      recalculat_ray_directions [28]
+[40]     0.0    0.00    0.00  120000         vec2_subf [40]
+-----------------------------------------------
+                0.00    0.00  120000/120000      recalculat_ray_directions [28]
+[41]     0.0    0.00    0.00  120000         vec4_normalize [41]
+-----------------------------------------------
+                0.00    0.00       2/78          mat4_look_at [35]
+                0.00    0.00      76/78          movement [31]
+[42]     0.0    0.00    0.00      78         vec3_cross [42]
+-----------------------------------------------
+                0.00    0.00      76/76          frame_times [44]
+[43]     0.0    0.00    0.00      76         floatToString [43]
+-----------------------------------------------
+                0.00    0.00      76/76          mlx_loop [7]
+[44]     0.0    0.00    0.00      76         frame_times [44]
+                0.00    0.00      76/76          floatToString [43]
+-----------------------------------------------
+                0.00    0.00      76/76          mlx_loop [7]
+[45]     0.0    0.00    0.00      76         ft_hook [45]
+-----------------------------------------------
+                0.00    0.00       9/9           init_scene_four [32]
+[46]     0.0    0.00    0.00       9         array_push [46]
+-----------------------------------------------
+                0.00    0.00       1/7           mat4_perspective [52]
+                0.00    0.00       2/7           mat4_inverse [49]
+                0.00    0.00       4/7           mat4_identity [48]
+[47]     0.0    0.00    0.00       7         create_mat4 [47]
+-----------------------------------------------
+                0.00    0.00       4/4           init_camera [37]
+[48]     0.0    0.00    0.00       4         mat4_identity [48]
+                0.00    0.00       4/7           create_mat4 [47]
+-----------------------------------------------
+                0.00    0.00       1/2           recalculate_view [34]
+                0.00    0.00       1/2           recalculated_projection [53]
+[49]     0.0    0.00    0.00       2         mat4_inverse [49]
+                0.00    0.00       2/7           create_mat4 [47]
+-----------------------------------------------
+                0.00    0.00       2/2           init_scene_four [32]
+[50]     0.0    0.00    0.00       2         vec_init [50]
+-----------------------------------------------
+                0.00    0.00       1/1           recalculated_projection [53]
+[51]     0.0    0.00    0.00       1         fov_radians [51]
+-----------------------------------------------
+                0.00    0.00       1/1           recalculated_projection [53]
+[52]     0.0    0.00    0.00       1         mat4_perspective [52]
+                0.00    0.00       1/7           create_mat4 [47]
+-----------------------------------------------
+                0.00    0.00       1/1           main [27]
+[53]     0.0    0.00    0.00       1         recalculated_projection [53]
+                0.00    0.00       1/1           fov_radians [51]
+                0.00    0.00       1/1           mat4_perspective [52]
+                0.00    0.00       1/2           mat4_inverse [49]
+-----------------------------------------------
+
+ This table describes the call tree of the program, and was sorted by
+ the total amount of time spent in each function and its children.
+
+ Each entry in this table consists of several lines.  The line with the
+ index number at the left hand margin lists the current function.
+ The lines above it list the functions that called this function,
+ and the lines below it list the functions this one called.
+ This line lists:
+     index	A unique number given to each element of the table.
+		Index numbers are sorted numerically.
+		The index number is printed next to every function name so
+		it is easier to look up where the function is in the table.
+
+     % time	This is the percentage of the `total' time that was spent
+		in this function and its children.  Note that due to
+		different viewpoints, functions excluded by options, etc,
+		these numbers will NOT add up to 100%.
+
+     self	This is the total amount of time spent in this function.
+
+     children	This is the total amount of time propagated into this
+		function by its children.
+
+     called	This is the number of times the function was called.
+		If the function called itself recursively, the number
+		only includes non-recursive calls, and is followed by
+		a `+' and the number of recursive calls.
+
+     name	The name of the current function.  The index number is
+		printed after it.  If the function is a member of a
+		cycle, the cycle number is printed between the
+		function's name and the index number.
+
+
+ For the function's parents, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the function into this parent.
+
+     children	This is the amount of time that was propagated from
+		the function's children into this parent.
+
+     called	This is the number of times this parent called the
+		function `/' the total number of times the function
+		was called.  Recursive calls to the function are not
+		included in the number after the `/'.
+
+     name	This is the name of the parent.  The parent's index
+		number is printed after it.  If the parent is a
+		member of a cycle, the cycle number is printed between
+		the name and the index number.
+
+ If the parents of the function cannot be determined, the word
+ `<spontaneous>' is printed in the `name' field, and all the other
+ fields are blank.
+
+ For the function's children, the fields have the following meanings:
+
+     self	This is the amount of time that was propagated directly
+		from the child into the function.
+
+     children	This is the amount of time that was propagated from the
+		child's children to the function.
+
+     called	This is the number of times the function called
+		this child `/' the total number of times the child
+		was called.  Recursive calls by the child are not
+		listed in the number after the `/'.
+
+     name	This is the name of the child.  The child's index
+		number is printed after it.  If the child is a
+		member of a cycle, the cycle number is printed
+		between the name and the index number.
+
+ If there are any cycles (circles) in the call graph, there is an
+ entry for the cycle-as-a-whole.  This entry shows who called the
+ cycle (as parents) and the members of the cycle (as children.)
+ The `+' recursive calls entry shows the number of function calls that
+ were internal to the cycle, and the calls entry for each member shows,
+ for that member, how many times it was called from other members of
+ the cycle.
+
+Copyright (C) 2012-2022 Free Software Foundation, Inc.
+
+Copying and distribution of this file, with or without modification,
+are permitted in any medium without royalty provided the copyright
+notice and this notice are preserved.
+
+Index by function name
+
+   [8] anti_aliasing          [17] mlx_put_pixel          [23] vec2_new
+  [16] array_length           [31] movement               [40] vec2_subf
+  [46] array_push             [33] new_diffuse            [10] vec3_add
+  [47] create_mat4             [2] per_pixel              [42] vec3_cross
+  [36] create_sphere           [3] plane_intersection     [30] vec3_divf
+  [43] floatToString          [24] randomFloat             [5] vec3_dot
+  [51] fov_radians            [19] random_point_in_circle [15] vec3_mul
+  [44] frame_times            [11] random_value_normal_distribution [12] vec3_mulf
+  [45] ft_hook                [28] recalculat_ray_directions [14] vec3_new
+  [37] init_camera            [34] recalculate_view       [13] vec3_normalize
+  [32] init_scene_four        [53] recalculated_projection [9] vec3_sub
+  [48] mat4_identity           [1] render                 [22] vec4_add
+  [49] mat4_inverse            [6] render_loop            [20] vec4_clamp
+  [35] mat4_look_at            [4] sphere_intersection    [21] vec4_divf
+  [39] mat4_mul_vec4          [38] vec2_divf              [29] vec4_new
+  [52] mat4_perspective       [25] vec2_mul               [41] vec4_normalize
+  [18] mlx_draw_pixel         [26] vec2_mulf              [50] vec_init
