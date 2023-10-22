@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/22 04:52:13 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/10/22 05:17:30 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -497,6 +497,66 @@ t_vec3 calculate_shading(t_vec3 surface_normal) {
     return shading_color;
 }
 
+float intersectCube(t_ray ray, t_vec3 close, t_vec3 far)
+{
+	float t1,t2,tnear = -1000.0f,tfar = 1000.0f,temp,tCube;
+	bool intersectFlag = true;
+
+	float rayDirection[3];
+	rayDirection[0] = ray.direction.x;
+	rayDirection[1] = ray.direction.y;
+	rayDirection[2] = ray.direction.z;
+
+	float rayStart[3];
+	rayStart[0] = ray.origin.x;
+	rayStart[1] = ray.origin.y;
+	rayStart[2] = ray.origin.z;
+
+	float b1[3];
+	b1[0] = close.x;
+	b1[1] = close.y;
+	b1[2] = close.z;
+
+	float b2[3];
+	b2[0] = far.x;
+	b2[1] = far.y;
+	b2[2] = far.z;
+	
+	for(int i =0 ;i < 3; i++)
+	{
+		if(rayDirection[i] == 0)
+		{
+			if(rayStart[i] < b1[i] || rayStart[i] > b2[i])
+				intersectFlag = false;
+		}
+		else
+		{
+			t1 = (b1[i] - rayStart[i])/rayDirection[i];
+			t2 = (b2[i] - rayStart[i])/rayDirection[i];
+		if(t1 > t2)
+		{
+			temp = t1;
+			t1 = t2;
+			t2 = temp;
+		}
+		if(t1 > tnear)
+			tnear = t1;
+		if(t2 < tfar)
+			tfar = t2;
+		if(tnear > tfar)
+			intersectFlag = false;
+		if(tfar < 0)
+			intersectFlag = false;
+		}
+	}
+	if(intersectFlag == false)
+		tCube = 0;
+	else
+		tCube = tnear;
+	
+	return tCube;
+}
+
 t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coord)
 {
 	int	i = 0;
@@ -519,34 +579,28 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 		// aabb.max = vec3_new(-3.0f, -3.0f, -3.0f);
 		aabb.min = vec3_new(-3.0f, -3.0f, -3.0f);
 		aabb.max = vec3_new(1.2f, 1.2f, 1.2f);
-		// if (intersectAABB(ray, aabb, &closest_hit))
-		// 	return vec4_new(0.4f, 0.4f, 0.4f, 1.0f);
-		// else
-		// {
-		// 	t_vec3 unit_direction = vec3_normalize(ray.direction);
-		// 	float t = 0.5f * (unit_direction.y + 1.0f);
-		// 	t_vec3 sky = vec3_add(vec3_mulf(vec3_new(1.0f, 1.0f, 1.0f), 1.0f - t), vec3_mulf(vec3_new(0.5f, 0.7f, 1.0f), t));
-		// 	incomming_light = vec3_add(incomming_light, vec3_mul(ray_color, sky));
-		// 	break ;
-		// }
 
-		
-		// t_vec3 b = box(ray.origin, ray.direction, aabb.min, aabb.max);
-		// float is_box_hit = b.x;
-		// float box_t_max = b.y;
-		// float box_t_min = b.z;
-		// t_vec3 boxctr = vec3_mulf(vec3_add(aabb.min, aabb.max), 0.5f);
-		// t_vec3 box_hit = vec3_sub(boxctr ,vec3_add(ray.origin, vec3_mulf(ray.direction, box_t_min)));
-		// t_vec3 box_intersect_normal = vec3_divf(box_hit, fmaxf(fmaxf(fabsf(box_hit.x), fabsf(box_hit.y)), fabsf(box_hit.z)));
-		// box_intersect_normal = vec3_clampf(box_intersect_normal, 0.0f, 1.0f);
-		// box_intersect_normal = vec3_normalize(vec3_floorf(vec3_mulf(box_intersect_normal, 1.0000001)));
-		
-		// t_vec3 box_reflect = vec3_reflect(ray.direction, box_intersect_normal);
-		// t_vec3 bg_col = background(50.0f, ray.direction);
-		// // t_vec3 col = vec3_mul(background(50.0f, box_reflect), vec3_new(0.9, 0.8, 1.0));
-		// t_vec3 col = vec3_mul(background(50.0f, box_reflect), vec3_new(0.8f, 0.8f, 0.8f));
-		// col = vec3_mix(bg_col, col, is_box_hit);
-		// return vec4_new(col.x, col.y, col.z, 1.0f);
+		float t = intersectCube(ray, aabb.min, aabb.max);
+		float EPSI = 0.0001;
+		// intersection point
+		t_vec3 p = vec3_add(ray.origin, vec3_mulf(ray.direction, t));
+		if (t > 0.0f)
+		{
+			if (fabsf(p.x - aabb.min.x) < EPSI)
+				return vec4_new(1.0f, 0.0f, 0.0f, 1.0f);
+			if (fabsf(p.x - aabb.max.x) < EPSI)
+				return vec4_new(0.0f, 1.0f, 0.0f, 1.0f);
+			if (fabsf(p.y - aabb.min.y) < EPSI)
+				return vec4_new(0.0f, 0.0f, 1.0f, 1.0f);
+			if (fabsf(p.y - aabb.max.y) < EPSI)
+				return vec4_new(1.0f, 1.0f, 0.0f, 1.0f);
+			if (fabsf(p.z - aabb.min.z) < EPSI)
+				return vec4_new(0.0f, 1.0f, 1.0f, 1.0f);
+			if (fabsf(p.z - aabb.max.z) < EPSI)
+				return vec4_new(1.0f, 0.0f, 1.0f, 1.0f);
+			return vec4_new(0.4f, 0.4f, 0.4f, 1.0f);
+		}
+		return vec4_new(0.0f, 0.0f, 0.0f, 1.0f);
 
 		t_vec3 constant_gray_color = vec3_new(0.5f, 0.5f, 0.5f);
 		float brightness_factor = 0.2f;
