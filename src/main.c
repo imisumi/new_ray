@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/22 05:17:30 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/10/24 01:15:26 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -564,6 +564,8 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 	t_hitinfo closest_hit;
 	t_vec3	incomming_light = vec3_new(0.0f, 0.0f, 0.0f);
 	t_vec3 ray_color = vec3_new(1.0f, 1.0f, 1.0f);
+	t_vert *vert = vert_cube();
+	t_tri_faces *faces = cube_faces();
 	while (bounces <= MAX_BOUNCHES)
 	{
 		closest_hit.hit = false;
@@ -573,6 +575,14 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 		// return vec4_new(bg.x, bg.y, bg.z, 1.0f);
 		// closest_hit = sphere_intersection(ray, s.spheres, closest_hit);
 		// closest_hit = plane_intersection(ray, s.planes, closest_hit);
+
+		// array_length(faces);
+		for (int i = 0; i < array_length(&faces); i++)
+		{
+			t_tri tri;
+			tri.a = faces[i].index[0];
+			closest_hit = triangle_intersection(ray, closest_hit, tri);
+		}
 
 		t_aabb aabb;
 		// aabb.min = vec3_new(1.2f, 1.2f, 1.2f);
@@ -586,18 +596,18 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 		t_vec3 p = vec3_add(ray.origin, vec3_mulf(ray.direction, t));
 		if (t > 0.0f)
 		{
-			if (fabsf(p.x - aabb.min.x) < EPSI)
-				return vec4_new(1.0f, 0.0f, 0.0f, 1.0f);
-			if (fabsf(p.x - aabb.max.x) < EPSI)
-				return vec4_new(0.0f, 1.0f, 0.0f, 1.0f);
-			if (fabsf(p.y - aabb.min.y) < EPSI)
-				return vec4_new(0.0f, 0.0f, 1.0f, 1.0f);
-			if (fabsf(p.y - aabb.max.y) < EPSI)
-				return vec4_new(1.0f, 1.0f, 0.0f, 1.0f);
-			if (fabsf(p.z - aabb.min.z) < EPSI)
-				return vec4_new(0.0f, 1.0f, 1.0f, 1.0f);
-			if (fabsf(p.z - aabb.max.z) < EPSI)
-				return vec4_new(1.0f, 0.0f, 1.0f, 1.0f);
+			if (fabsf(p.x - aabb.min.x) < EPSI) // left
+				return vec4_new(0.5, 0.5, 0.5, 1.0f);
+			if (fabsf(p.x - aabb.max.x) < EPSI) // right
+				return vec4_new(0.5, 0.5, 0.5, 1.0f);
+			if (fabsf(p.y - aabb.min.y) < EPSI) // bottom
+				return vec4_new(0.55, 0.55, 0.55, 1.0f);
+			if (fabsf(p.y - aabb.max.y) < EPSI) // top
+				return vec4_new(0.55, 0.55, 0.55, 1.0f);
+			if (fabsf(p.z - aabb.min.z) < EPSI) // back
+				return vec4_new(0.6, 0.6, 0.6, 1.0f);
+			if (fabsf(p.z - aabb.max.z) < EPSI) // front
+				return vec4_new(0.6, 0.6, 0.6, 1.0f);
 			return vec4_new(0.4f, 0.4f, 0.4f, 1.0f);
 		}
 		return vec4_new(0.0f, 0.0f, 0.0f, 1.0f);

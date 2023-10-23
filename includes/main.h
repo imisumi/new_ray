@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/22 01:45:06 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/10/24 01:10:03 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,6 +137,25 @@ typedef struct
 	int threadIndex;
 } t_thread_data;
 
+typedef struct s_vert
+{
+	t_vec3	position;
+	t_vec3	normal;
+	t_vec2	uv;
+}	t_vert;
+
+typedef struct s_tri_faces
+{
+	t_vec3	index[3];
+}	t_tri_faces;
+
+typedef struct s_tri
+{
+	t_vec3 a;
+	t_vec3 b;
+	t_vec3 c;
+} t_tri;
+
 typedef struct s_hitinfo
 {
 	bool	hit;
@@ -212,3 +231,11 @@ void		init_scene_one(t_scene *scene);
 void		init_scene_two(t_scene *scene);
 void		init_scene_three(t_scene *scene);
 void		init_scene_four(t_scene *scene);
+
+
+
+
+
+t_vert	*vert_cube();
+t_tri_faces	*cube_faces();
+t_hitinfo triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_tri tri);

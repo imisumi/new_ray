@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/13 18:23:32 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/10/24 01:10:17 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,3 +170,89 @@ t_hitinfo	plane_intersection(t_ray ray, t_plane *planes, t_hitinfo obj_hit)
 // 	}
 // 	return (obj_hit);
 // }
+
+int clamp(int value, int min, int max) {
+    if (value < min) {
+        return min;
+    } else if (value > max) {
+        return max;
+    } else {
+        return value;
+    }
+}
+
+#define EPSILON 0.00001f
+
+//! sabastion
+t_hitinfo triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_tri tri)
+{
+    t_vec3 e1 = vec3_sub(tri.b, tri.a); // tri.b - tri.a
+	t_vec3 e2 = vec3_sub(tri.c, tri.a); // tri.a - tri.c
+	// t_vec3 n = vec3_cross(e1, e2);
+	t_vec3 h = vec3_cross(ray.direction, e2);
+	float a = vec3_dot(e1, h);
+
+	if (a > -EPSILON && a < EPSILON)
+		return (obj_hit);
+
+	float f = 1.0f / a;
+	t_vec3 s = vec3_sub(ray.origin, tri.a);
+	float u = f * vec3_dot(s, h);
+
+	if (u < 0.0f || u > 1.0f)
+		return (obj_hit);
+
+	t_vec3 q = vec3_cross(s, e1);
+	float v = f * vec3_dot(ray.direction, q);
+
+	if (v < 0.0f || u + v > 1.0f)
+		return (obj_hit);
+	
+	float t = f * vec3_dot(e2, q);
+
+	float w = 1.0f - u - v;
+	
+	if (t > EPSILON && t < obj_hit.distance)
+	{
+
+		// int textureWidth = uv_tex->width;
+		// int textureHeight = uv_tex->height;
+		
+		// // Barycentric Interpolation for texture coordinates
+		// float texU = (1 - u - v) * tri.uv_a.x + u * tri.uv_b.x + v * tri.uv_c.x;
+		// float texV = (1 - u - v) * tri.uv_a.y + u * tri.uv_b.y + v * tri.uv_c.y;
+		
+		// // Wrap texture coordinates to [0, 1] (or tile the texture)
+		// // texU = fmod(texU, 1.0f);
+		// // texV = fmod(texV, 1.0f);
+		// texU = fmod(texU + 1.0f, 1.0f);
+		// texV = fmod(texV + 1.0f, 1.0f);
+
+		// if (texU < 0)
+		//     texU += 1.0f;
+		// if (texV < 0)
+		//     texV += 1.0f;
+		
+		// int x = (int)(texU * textureWidth);
+		// int y = (int)(texV * textureHeight);
+		
+		// int pixelIndex = (y * textureWidth + x) * 4; // 4 channels (R, G, B, A) per pixel
+		
+		// uint8_t r = uv_tex->pixels[pixelIndex];
+		// uint8_t g = uv_tex->pixels[pixelIndex + 1];
+		// uint8_t b = uv_tex->pixels[pixelIndex + 2];
+
+
+
+
+		obj_hit.hit = true;
+		obj_hit.distance = t;
+		// obj_hit.position = vec3_add(ray.origin, vec3_mulf(ray.direction, t));
+		// obj_hit.normal = vec3_normalize(vec3_cross(e1, e2));
+		obj_hit.material.color = vec3_new(0.5, 0.5, 0.5);
+
+		// obj_hit.material.color = vec3_new(r / 255.0f, g / 255.0f, b / 255.0f);
+	}
+	
+    return obj_hit;
+}
