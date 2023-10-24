@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/24 01:10:17 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/10/24 23:06:39 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -248,8 +248,15 @@ t_hitinfo triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_tri tri)
 		obj_hit.hit = true;
 		obj_hit.distance = t;
 		// obj_hit.position = vec3_add(ray.origin, vec3_mulf(ray.direction, t));
-		// obj_hit.normal = vec3_normalize(vec3_cross(e1, e2));
+		obj_hit.normal = vec3_normalize(vec3_cross(e1, e2));
 		obj_hit.material.color = vec3_new(0.5, 0.5, 0.5);
+
+		float r = fabs(obj_hit.normal.x);
+		float g = fabs(obj_hit.normal.y);
+		float b = fabs(obj_hit.normal.z);
+		if (obj_hit.normal.y < 0)
+			r = 0.8;
+		obj_hit.material.color = vec3_new(r, g, b);
 
 		// obj_hit.material.color = vec3_new(r / 255.0f, g / 255.0f, b / 255.0f);
 	}

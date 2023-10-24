@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/24 20:03:10 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/10/24 23:22:25 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@
 
 #define _USE_MATH_DEFINES
 
-#define MAX_TRIS_LEAF 8
+#define MAX_TRIS_LEAF 4
 
 
 typedef struct s_render_block
@@ -259,4 +259,4 @@ t_tri_faces	*cube_faces();
 t_hitinfo triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_tri tri);
 
 
-void	load_obj_file_data(char *filename, t_vec3 **vertex, t_face **faces);
+void	load_obj_file_data(char *filename, t_vec3 **vertex, t_face **faces, t_vec3 **vn);

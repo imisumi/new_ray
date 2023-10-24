@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   obj.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/24 16:32:51 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/10/24 23:00:38 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/main.h"
 
-void	load_obj_file_data(char *filename, t_vec3 **vertex, t_face **faces)
+void	load_obj_file_data(char *filename, t_vec3 **vertex, t_face **faces, t_vec3 **vn)
 {
 	int		i;
 	int		fd;
@@ -57,6 +57,12 @@ void	load_obj_file_data(char *filename, t_vec3 **vertex, t_face **faces)
 			face.index[1] = vertex_indices[1];
 			face.index[2] = vertex_indices[2];
 			array_push(faces, &face);
+
+			t_vec3 normal;
+			normal.x = normal_indices[0];
+			normal.y = normal_indices[1];
+			normal.z = normal_indices[2];
+			array_push(vn, &normal);
 			
 			// printf("%s", line);
 		}
