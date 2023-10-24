@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.h                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/24 15:23:18 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/10/24 20:03:10 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 
 #define WIDTH 400
 #define HEIGHT 400
-#define PIXEL_SIZE 4
+#define PIXEL_SIZE 3
 #define MT 0
 #define THREADS 10
 #define ANTIALIASING 0
@@ -33,6 +33,8 @@
 #define MAX_BOUNCHES 8
 
 #define _USE_MATH_DEFINES
+
+#define MAX_TRIS_LEAF 8
 
 
 typedef struct s_render_block
@@ -161,6 +163,16 @@ typedef struct s_tri
 	t_vec3 b;
 	t_vec3 c;
 } t_tri;
+
+typedef struct s_bvh_node
+{
+	int	start;
+	int	end;
+	t_aabb aabb;
+	struct s_bvh_node *left;
+	struct s_bvh_node *right;
+	bool is_leaf;
+}	t_bvh_node;
 
 typedef struct s_hitinfo
 {
