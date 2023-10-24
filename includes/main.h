@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.h                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/24 01:10:03 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/10/24 15:23:18 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@
 
 #define WIDTH 400
 #define HEIGHT 400
-#define PIXEL_SIZE 2
+#define PIXEL_SIZE 4
 #define MT 0
 #define THREADS 10
 #define ANTIALIASING 0
@@ -33,6 +33,7 @@
 #define MAX_BOUNCHES 8
 
 #define _USE_MATH_DEFINES
+
 
 typedef struct s_render_block
 {
@@ -149,6 +150,11 @@ typedef struct s_tri_faces
 	t_vec3	index[3];
 }	t_tri_faces;
 
+typedef struct s_face
+{
+	int	index[3];
+}	t_face;
+
 typedef struct s_tri
 {
 	t_vec3 a;
@@ -239,3 +245,6 @@ void		init_scene_four(t_scene *scene);
 t_vert	*vert_cube();
 t_tri_faces	*cube_faces();
 t_hitinfo triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_tri tri);
+
+
+void	load_obj_file_data(char *filename, t_vec3 **vertex, t_face **faces);

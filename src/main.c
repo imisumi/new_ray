@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/24 01:15:26 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/10/24 16:43:48 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,10 @@ static mlx_image_t* image;
 int	total_frames = 0;
 double previousTime = 0.0;
 // uint32_t accumulated_frames = 1;
+
+t_vec3	*vertex;
+t_face	*faces;
+t_tri	*tris;
 // -----------------------------------------------------------------------------
 
 float my_sign(float num) {
@@ -564,12 +568,20 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 	t_hitinfo closest_hit;
 	t_vec3	incomming_light = vec3_new(0.0f, 0.0f, 0.0f);
 	t_vec3 ray_color = vec3_new(1.0f, 1.0f, 1.0f);
-	t_vert *vert = vert_cube();
-	t_tri_faces *faces = cube_faces();
+	// t_vert *vert = vert_cube();
+	// t_tri_faces *faces = cube_faces();
 	while (bounces <= MAX_BOUNCHES)
 	{
 		closest_hit.hit = false;
 		closest_hit.distance = FLT_MAX;
+
+		for (int i = 0; i < array_length(&tris); i++)
+		{
+			closest_hit = triangle_intersection(ray, closest_hit, tris[i]);
+		}
+		if (closest_hit.hit)
+			return vec4_new(1.0f, 0.0f, 0.0f, 1.0f);
+		return vec4_new(0.0f, 0.0f, 0.0f, 1.0f);
 
 		// t_vec3 bg = calculate_sky_color(ray.direction);
 		// return vec4_new(bg.x, bg.y, bg.z, 1.0f);
@@ -577,12 +589,12 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 		// closest_hit = plane_intersection(ray, s.planes, closest_hit);
 
 		// array_length(faces);
-		for (int i = 0; i < array_length(&faces); i++)
-		{
-			t_tri tri;
-			tri.a = faces[i].index[0];
-			closest_hit = triangle_intersection(ray, closest_hit, tri);
-		}
+		// for (int i = 0; i < array_length(&faces); i++)
+		// {
+		// 	t_tri tri;
+		// 	tri.a = faces[i].index[0];
+		// 	closest_hit = triangle_intersection(ray, closest_hit, tri);
+		// }
 
 		t_aabb aabb;
 		// aabb.min = vec3_new(1.2f, 1.2f, 1.2f);
@@ -822,8 +834,46 @@ void	render_loop(void *param)
 
 // -----------------------------------------------------------------------------
 
+t_tri create_tri()
+{
+	t_tri tri;
+
+	// tri.a = vec3_new(vertex)
+}
+
 void init_scene(t_scene *s)
 {
+	vec_init(&tris, 16, sizeof(t_tri));
+	vec_init(&vertex, 16, sizeof(t_vec3));
+	vec_init(&faces, 16, sizeof(t_face));
+	// load_obj_file_data("cube_tri.obj", &vertex, &faces);
+	load_obj_file_data("f22.obj", &vertex, &faces);
+
+	// t_face *f;
+	// vec_init(&f, 16, sizeof(t_face));
+	t_face face;
+	face.index[0] = 0;
+	face.index[1] = 1;
+	face.index[2] = 2;
+
+	for (int i = 0; i < array_length(&faces); i++)
+	{
+		t_tri tri;
+		tri.a = vertex[faces[i].index[0] - 1];
+		tri.b = vertex[faces[i].index[1] - 1];
+		tri.c = vertex[faces[i].index[2] - 1];
+		array_push(&tris, &tri);
+	}
+	
+
+	// array_push(&f, &face);
+	// array_push(&faces, &face);
+	
+	// printf("%d\n", array_length(&faces));
+	// printf("%d %d %d\n", faces[0].index[0], faces[0].index[1], faces[0].index[2]);
+
+	printf("%f %f %f\n", tris[0].a.x, tris[0].a.y, tris[0].a.z);
+	// exit(0);
 	init_camera(&s->camera);
 	// init_scene_one(s);
 	// init_scene_two(s);
