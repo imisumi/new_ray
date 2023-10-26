@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.h                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/26 17:34:30 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/10/26 21:49:38 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -262,3 +262,4 @@ t_hitinfo triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_tri tri);
 
 
 void	load_obj_file_data(char *filename, t_vec3 **vertex, t_face **faces, t_vec3 **vn);
+t_hitinfo intersectRayPlane(t_ray ray, float yLevel, t_hitinfo hitinfo);

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/26 17:35:21 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/10/26 22:07:48 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -238,6 +238,7 @@ void	set_render_zones(t_utils *utils)
 	}
 	else
 	{
+		printf("MT = 0\n");
 		utils->blocks[0].x_start = 0;
 		utils->blocks[0].x_end = WIDTH;
 		utils->blocks[0].y_start = 0;
@@ -644,66 +645,6 @@ t_hitinfo bvh_rec(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 co
 	return closest_hit;
 }
 
-// t_hitinfo testing_bvh(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coord, t_bvh_node *bvh_nodes)
-// {
-// 	int	i = 0;
-// 	int	bounces = 0;
-// 	t_hitinfo closest_hit;
-// 	t_vec3	incomming_light = vec3_new(0.0f, 0.0f, 0.0f);
-// 	t_vec3 ray_color = vec3_new(1.0f, 1.0f, 1.0f);
-// 	closest_hit.material.color = vec3_new(0.0f, 0.0f, 0.0f);
-// 	while (bounces <= MAX_BOUNCHES)
-// 	{
-// 		closest_hit.hit = false;
-// 		closest_hit.distance = FLT_MAX;
-// 		if (bvh_nodes->is_leaf == true)
-// 		{
-// 			if (intersectCube(ray, bvh_nodes->aabb.min, bvh_nodes->aabb.max) > 0.0f)
-// 			{
-// 				float EPSI = 0.0001;
-// 				float t = intersectCube(ray, bvh_nodes->aabb.min, bvh_nodes->aabb.max);
-// 				if (t > 0.0f)
-// 				{
-// 					t_vec3 p = vec3_add(ray.origin, vec3_mulf(ray.direction, t));
-// 					if (fabsf(p.x - bvh_nodes->aabb.min.x) < EPSI) // left
-// 						closest_hit.material.color = vec3_new(0.5, 0.5, 0.5);
-// 					if (fabsf(p.x - bvh_nodes->aabb.max.x) < EPSI) // right
-// 						closest_hit.material.color = vec3_new(0.5, 0.5, 0.5);
-// 					if (fabsf(p.y - bvh_nodes->aabb.min.y) < EPSI) // bottom
-// 						closest_hit.material.color = vec3_new(0.55, 0.55, 0.55);
-// 					if (fabsf(p.y - bvh_nodes->aabb.max.y) < EPSI) // top
-// 						closest_hit.material.color = vec3_new(0.55, 0.55, 0.55);
-// 					if (fabsf(p.z - bvh_nodes->aabb.min.z) < EPSI) // back
-// 						closest_hit.material.color = vec3_new(0.6, 0.6, 0.6);
-// 					if (fabsf(p.z - bvh_nodes->aabb.max.z) < EPSI) // front
-// 						closest_hit.material.color = vec3_new(0.6, 0.6, 0.6);
-// 					closest_hit.material.color = vec3_new(0.4f, 0.4f, 0.4f);
-// 				}
-// 			}
-// 			return closest_hit;
-// 		}
-// 		else
-// 		{
-// 			t_hitinfo left = bvh_rec(ray, s, xy, rngState, coord, bvh_nodes->left);
-// 			t_hitinfo right = bvh_rec(ray, s, xy, rngState, coord, bvh_nodes->right);
-
-// 			if (left.hit == false && right.hit == false)
-// 				return closest_hit;
-// 			if (left.hit == true && right.hit == false)
-// 				return left;
-// 			if (left.hit == false && right.hit == true)
-// 				return right;
-// 			if (left.distance > right.distance)
-// 				return right;
-// 			else
-// 				return left;
-// 		}
-// 		return closest_hit;
-// 		bounces++;
-// 	}
-// 	return closest_hit;
-// }
-
 t_hitinfo	render_bvh(t_ray ray, t_hitinfo closest_hit, float t)
 {
 	t_vec3	color;
@@ -733,7 +674,6 @@ t_hitinfo	render_bvh(t_ray ray, t_hitinfo closest_hit, float t)
 
 t_hitinfo testing_bvh(t_ray ray, t_bvh_node *bvh_nodes, t_hitinfo closest_hit)
 {
-	// closest_hit.hit = false;
 	float	t;
 
 	t = intersectCube(ray, bvh_nodes->aabb.min, bvh_nodes->aabb.max);
@@ -748,9 +688,7 @@ t_hitinfo testing_bvh(t_ray ray, t_bvh_node *bvh_nodes, t_hitinfo closest_hit)
 				else
 				{
 					for (int i = bvh_nodes->start; i < bvh_nodes->end; i++)
-					{
 						closest_hit = triangle_intersection(ray, closest_hit, tris[i]);
-					}
 				}
 			}
 			return (closest_hit);
@@ -779,44 +717,53 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 {
 	int	i = 0;
 	int	bounces = 0;
+	float is_specular = 0.0f;
 	t_hitinfo closest_hit;
 	t_vec3	incomming_light = vec3_new(0.0f, 0.0f, 0.0f);
 	t_vec3 ray_color = vec3_new(1.0f, 1.0f, 1.0f);
-	// t_vert *vert = vert_cube();
-	// t_tri_faces *faces = cube_faces();
 	while (bounces <= MAX_BOUNCHES)
 	{
 		closest_hit.hit = false;
 		closest_hit.distance = FLT_MAX;
 
-		closest_hit.material.color = vec3_new(0.0f, 0.0f, 0.0f);
 		closest_hit = testing_bvh(ray, bvh_nodes, closest_hit);
-		// closest_hit = testing_bvh(ray, node->right, closest_hit);
-		// return vec4_new(closest_hit.material.color.x, closest_hit.material.color.y, closest_hit.material.color.z, 1.0f);
 
-		// t_vec3 bg = calculate_sky_color(ray.direction);
-		// return vec4_new(bg.x, bg.y, bg.z, 1.0f);
-		// closest_hit = sphere_intersection(ray, s.spheres, closest_hit);
-		// closest_hit = plane_intersection(ray, s.planes, closest_hit);
+		closest_hit = plane_intersection(ray, s.planes, closest_hit);
 
 		if (closest_hit.hit)
 		{
-			return vec4_new(closest_hit.material.color.x, closest_hit.material.color.y, closest_hit.material.color.z, 1.0f);
-			// return (vec4_new(0.4f, 0.4f, 0.4f, 1.0f));
-			
-			// t_vec3 ambient_light = vec3_new(0.4f, 0.4f, 0.4f); // Ambient light color (grey)
-			// t_vec3 final_color = vec3_mul(ambient_light, vec3_new(0.4f, 0.4f, 0.4f));
-			// return vec4_new(final_color.x, final_color.y, final_color.z, 1.0f);
+			// return vec4_new(closest_hit.material.color.x, closest_hit.material.color.y, closest_hit.material.color.z, 1.0f);
 
-			// t_vec3 normal = closest_hit.normal; // Assuming closest_hit is the normal vector (make sure it's normalized)
-			// t_vec3 final_color = vec3_mulf(normal, 0.5f); // Scale the normal to [0, 1] range for color representation
-			// return vec4_new(final_color.x, final_color.y, final_color.z, 1.0f);
+			ray.origin = vec3_add(closest_hit.position, vec3_mulf(closest_hit.normal, 0.001f));
 			
+			t_vec3 diffuse_dir = vec3_normalize(vec3_add(closest_hit.normal, random_direction(rngState)));
+			t_vec3 specular_dir = vec3_reflect(ray.direction, closest_hit.normal);
+
+			is_specular = closest_hit.material.specular >= randomFloat(rngState);
+			
+			ray.direction =  lerp(diffuse_dir, specular_dir, \
+									closest_hit.material.roughness * is_specular);
+			
+			t_material material = closest_hit.material;
+			t_vec3 emitted_light = vec3_mulf(material.emission_color, material.emission_strength);
+			
+			incomming_light = vec3_add(incomming_light, vec3_mul(ray_color, emitted_light));
+
+			ray_color = vec3_mul(ray_color, lerp(material.color, material.specular_color, is_specular));
+
+			//!russian roullet
+			// float p = fmaxf(ray_color.x, fmaxf(ray_color.y, ray_color.z));
+			// if (bounces > 3)
+			// {
+			// 	if (randomFloat(rngState) > p)
+			// 		break ;
+			// 	ray_color = vec3_divf(ray_color, p);
+			// }
 		}
 		else
 		{
-			t_vec3 bg = background(0.0f, ray.direction);
-			return vec4_new(bg.x, bg.y, bg.z, 1.0f);
+			// t_vec3 bg = background(0.0f, ray.direction);
+			// return vec4_new(bg.x, bg.y, bg.z, 1.0f);
 			t_vec3 unit_direction = vec3_normalize(ray.direction);
 			float t = 0.5f * (unit_direction.y + 1.0f);
 			t_vec3 sky = vec3_add(vec3_mulf(vec3_new(1.0f, 1.0f, 1.0f), 1.0f - t), vec3_mulf(vec3_new(0.5f, 0.7f, 1.0f), t));
@@ -824,48 +771,13 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 			break ;
 		}
 
-
-		
-		return (vec4_new(0.0f, 0.0f, 0.0f, 1.0f));
+		// return (vec4_new(0.0f, 0.0f, 0.0f, 1.0f));
 		bounces++;
 	}
 	return (vec4_new(incomming_light.x, incomming_light.y, incomming_light.z, 1.0f));
 }
 
 
-// t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coord)
-// {
-// 	int	i = 0;
-// 	int	bounces = 0;
-// 	t_hitinfo closest_hit;
-// 	t_vec3	incomming_light = vec3_new(0.0f, 0.0f, 0.0f);
-// 	t_vec3 ray_color = vec3_new(1.0f, 1.0f, 1.0f);
-// 	while (bounces <= MAX_BOUNCHES)
-// 	{
-// 		closest_hit.hit = false;
-// 		closest_hit.distance = FLT_MAX;
-// 		// closest_hit = sphere_intersection(ray, s.spheres, closest_hit);
-// 		// closest_hit = plane_intersection(ray, s.planes, closest_hit);
-
-// 		t_aabb aabb;
-// 		aabb.min = vec3_new(0.0f, -9.5f, 20.0f);
-// 		aabb.max = vec3_new(10.0f, -9.0f, 30.0f);
-// 		closest_hit.hit = intersectAABB(ray, &aabb);
-// 		if (closest_hit.hit)
-// 			return (vec4_new(0.4f, 0.4f, 0.4f, 1.0f));
-// 		else
-// 		{
-// 			t_vec3 unit_direction = vec3_normalize(ray.direction);
-// 			float t = 0.5f * (unit_direction.y + 1.0f);
-// 			t_vec3 sky = vec3_add(vec3_mulf(vec3_new(1.0f, 1.0f, 1.0f), 1.0f - t), vec3_mulf(vec3_new(0.5f, 0.7f, 1.0f), t));
-// 			incomming_light = vec3_add(incomming_light, vec3_mul(ray_color, sky));
-// 			break ;
-// 		}
-// 		return (vec4_new(0.0f, 0.0f, 0.0f, 1.0f));
-// 		bounces++;
-// 	}
-// 	return (vec4_new(incomming_light.x, incomming_light.y, incomming_light.z, 1.0f));
-// }
 
 void	*render(void *param)
 {
@@ -1123,24 +1035,24 @@ void init_scene(t_scene *s)
 	
 	// bvh = calculate_bounding_box(0, array_length(&vertex));
 	//!------------------------------
-	bvh.min = vertex[0];
-	bvh.max = vertex[0];
-	for (int i = 0; i < array_length(&vertex); i++)
-	{
-		if (vertex[i].x < bvh.min.x)
-			bvh.min.x = vertex[i].x;
-		if (vertex[i].y < bvh.min.y)
-			bvh.min.y = vertex[i].y;
-		if (vertex[i].z < bvh.min.z)
-			bvh.min.z = vertex[i].z;
+	// bvh.min = vertex[0];
+	// bvh.max = vertex[0];
+	// for (int i = 0; i < array_length(&vertex); i++)
+	// {
+	// 	if (vertex[i].x < bvh.min.x)
+	// 		bvh.min.x = vertex[i].x;
+	// 	if (vertex[i].y < bvh.min.y)
+	// 		bvh.min.y = vertex[i].y;
+	// 	if (vertex[i].z < bvh.min.z)
+	// 		bvh.min.z = vertex[i].z;
 		
-		if (vertex[i].x > bvh.max.x)
-			bvh.max.x = vertex[i].x;
-		if (vertex[i].y > bvh.max.y)
-			bvh.max.y = vertex[i].y;
-		if (vertex[i].z > bvh.max.z)
-			bvh.max.z = vertex[i].z;
-	}
+	// 	if (vertex[i].x > bvh.max.x)
+	// 		bvh.max.x = vertex[i].x;
+	// 	if (vertex[i].y > bvh.max.y)
+	// 		bvh.max.y = vertex[i].y;
+	// 	if (vertex[i].z > bvh.max.z)
+	// 		bvh.max.z = vertex[i].z;
+	// }
 
 	// array_push(&f, &face);
 	// array_push(&faces, &face);

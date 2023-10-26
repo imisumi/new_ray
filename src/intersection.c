@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/24 23:06:39 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/10/26 21:53:16 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -250,6 +250,7 @@ t_hitinfo triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_tri tri)
 		// obj_hit.position = vec3_add(ray.origin, vec3_mulf(ray.direction, t));
 		obj_hit.normal = vec3_normalize(vec3_cross(e1, e2));
 		obj_hit.material.color = vec3_new(0.5, 0.5, 0.5);
+		return obj_hit;
 
 		float r = fabs(obj_hit.normal.x);
 		float g = fabs(obj_hit.normal.y);
@@ -262,4 +263,27 @@ t_hitinfo triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_tri tri)
 	}
 	
     return obj_hit;
+}
+
+t_hitinfo intersectRayPlane(t_ray ray, float yLevel, t_hitinfo hitinfo)
+{
+	float	t;
+	
+	// If the ray is parallel to the plane (direction.y is 0), there is no intersection
+	if (ray.direction.y == 0)
+		hitinfo;
+		
+
+	t = (yLevel - ray.origin.y) / ray.direction.y;
+
+	// If the intersection point is behind the ray, there is no intersection
+	if (t < 0)
+		hitinfo;
+
+
+	hitinfo.hit = true;
+	hitinfo.distance = t;
+	hitinfo.position = vec3_add(ray.origin, vec3_mulf(ray.direction, t + 0.0001f));
+	hitinfo.material.color = vec3_new(1.0, 0.5, 0.5);
+	return hitinfo;
 }

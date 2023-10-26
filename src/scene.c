@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 02:06:12 by ichiro            #+#    #+#             */
-/*   Updated: 2023/09/15 20:12:27 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/10/26 22:01:06 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -203,108 +203,14 @@ void	init_scene_four(t_scene *scene)
 	t_sphere	sphere;
 	t_plane		plane;
 
-	vec_init(&scene->spheres, 16, sizeof(t_sphere));
-	vec_init(&scene->planes, 32, sizeof(t_plane));
+	// vec_init(&scene->spheres, 16, sizeof(t_sphere));
+	vec_init(&scene->planes, 8, sizeof(t_plane));
 	// scene->spheres[0] = create_sphere(vec3_new(0.0f, 0.0f, 0.0f), 1.0f);
 
 	// //! bottom
-	plane = create_plane(25.1f, 25.1f, \
-							vec3_new(0.0f, -12.5f, 20.0f), \
+	plane = create_plane(5.0f, 5.0f, \
+							vec3_new(0.0f, -0.8f, 0.0f), \
 							vec3_new(0.0f, 1.0f, 0.0f), \
 							new_diffuse(vec3_new(0.7f, 0.7f, 0.7f)));
 	array_push(&scene->planes, &plane);
-	// //! top
-	plane = create_plane(25.1f, 25.1f, \
-							vec3_new(0.0f, 12.5f, 20.0f), \
-							vec3_new(0.0f,-1.0f, 0.0f), \
-							new_diffuse(vec3_new(0.7f, 0.7f, 0.7f)));
-	array_push(&scene->planes, &plane);
-	// //! left
-	plane = create_plane(25.1f, 25.1f, \
-							vec3_new(-12.5f, 0.0f, 20.0f), \
-							vec3_new(1.0f, 0.0f, 0.0f), \
-							new_diffuse(vec3_new(0.7f, 0.1f, 0.1f)));
-	array_push(&scene->planes, &plane);
-	// ! right
-	plane = create_plane(25.1f, 25.1f, \
-							vec3_new(12.5f, 0.0f, 20.0f), \
-							vec3_new(-1.0f, 0.0f, 0.0f), \
-							new_diffuse(vec3_new(0.1f, 0.7f, 0.1f)));
-	array_push(&scene->planes, &plane);
-	// //! front
-	plane = create_plane(25.1f, 25.1f, \
-							vec3_new(0.0f, 1.5f, 32.5f), \
-							vec3_new(0.0f, 0.0f, -1.0f), \
-							new_diffuse(vec3_new(0.7f, 0.7f, 0.7f)));
-	// array_push(&scene->planes, &plane);
-	// //! back
-	plane = create_plane(25.1f, 25.1f, \
-							vec3_new(0.0f, 0.0f, 7.5f), \
-							vec3_new(0.0f, 0.0f, 1.0f), \
-							new_diffuse(vec3_new(0.7f, 0.7f, 0.7f)));
-	array_push(&scene->planes, &plane);
-
-
-	plane = create_plane(10.1f, 10.1f, \
-							vec3_new(0.0f, 12.4f, 20.0f), \
-							vec3_new(0.0f,-1.0f, 0.0f), \
-							new_diffuse(vec3_new(0.0f, 0.0f, 0.0f)));
-	plane.material.emission_color = vec3_new(1.0f, 0.9f, 0.7f);
-	plane.material.emission_strength = 10.0f;
-	array_push(&scene->planes, &plane);
-
-
-	// //! light
-	// plane = create_plane(2.1f, 2.1f, \
-	// 						vec3_new(0.0f, 2.999f, 0.0f), \
-	// 						vec3_new(0.0f,-1.0f, 0.0f), \
-	// 						new_diffuse(vec3_new(0.0, 0.0, 0.0)));
-	// array_push(&scene->planes, &plane);
-	// scene->planes[6].material = new_emission(vec3_new(1.0f, 1.0f, 1.0f), 3.1f);
-	
-	// // scene->spheres[0].material = new_diffuse(vec3_new(0.365f, 0.87f, 0.749f));
-
-	// sphere = create_sphere(vec3_new(-9.0f, -9.5f, 20.0f), 3.0f);
-	sphere = create_sphere(vec3_new(-9.0f, -9.5f, 20.0f), 3.0f);
-	sphere.material = new_diffuse(vec3_new(0.9f, 0.9f, 0.75f));
-	array_push(&scene->spheres, &sphere);
-
-	sphere = create_sphere(vec3_new(0.0f, -9.5f, 20.0f), 3.0f);
-	sphere.material = new_diffuse(vec3_new(0.9f, 0.75f, 0.9f));
-	array_push(&scene->spheres, &sphere);
-
-	sphere = create_sphere(vec3_new(9.0f, -9.5f, 20.0f), 3.0f);
-	sphere.material = new_diffuse(vec3_new(0.75f, 0.9f, 0.9f));
-	array_push(&scene->spheres, &sphere);
-	// sphere = create_sphere(vec3_new(-0.5f, 1.5f, 0.0f), 0.4f);
-	// array_push(&scene->spheres, &sphere);
-	// sphere = create_sphere(vec3_new(0.5f, 1.5f, 0.0f), 0.4f);
-	// array_push(&scene->spheres, &sphere);
-	// sphere = create_sphere(vec3_new(1.5f, 1.5f, 0.0f), 0.4f);
-	// array_push(&scene->spheres, &sphere);
-
-	// scene->spheres[0].material.roughness = 1.0f;
-	// scene->spheres[0].material.specular = 1.0f;
-	// scene->spheres[0].material.specular_color = vec3_new(1.0f, 1.0f, 1.0f);
-	// scene->spheres[0].material.refractive_index = 2.5f;
-
-	// scene->spheres[1].material.roughness = 1.0f;
-	// scene->spheres[1].material.specular = 0.2f;
-	// scene->spheres[1].material.specular_color = vec3_new(1.0f, 1.0f, 1.0f);
-	// scene->spheres[1].material.color = vec3_new(1.0f, 0.0f, 0.0f);
-
-	// scene->spheres[2].material.roughness = 1.0f;
-	// scene->spheres[2].material.specular = 0.15f;
-	// scene->spheres[2].material.specular_color = vec3_new(1.0f, 1.0f, 1.0f);
-	
-	// scene->spheres[3].material.roughness = 1.0f;
-	// // scene->spheres[3].material.color = vec3_new(1.0f, 0.0f, 0.0f);
-	// scene->spheres[3].material.specular = 0.02f;
-	// scene->spheres[3].material.specular_color = vec3_new(1.0f, 1.0f, 1.0f);
-	
-	
-	// scene->spheres[0].material.color = vec3_new(0.0f, 0.0f, 0.0f);
-	// scene->spheres[0].material.emission_color = vec3_new(1.0f, 1.0f, 1.0f);
-	// scene->spheres[0].material.emission_strength = 102.1f;
-	// exit(0);
 }
