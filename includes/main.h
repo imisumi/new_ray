@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/24 23:22:25 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/10/25 16:51:50 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,18 +23,20 @@
 # include "darray.h"
 # include "lib3d.h"
 
-#define WIDTH 400
-#define HEIGHT 400
-#define PIXEL_SIZE 3
-#define MT 0
-#define THREADS 10
-#define ANTIALIASING 0
+# define WIDTH 400
+# define HEIGHT 400
+# define PIXEL_SIZE 3
+# define MT 0
+# define THREADS 10
+# define ANTIALIASING 0
 
-#define MAX_BOUNCHES 8
+# define MAX_BOUNCHES 8
 
-#define _USE_MATH_DEFINES
+# define _USE_MATH_DEFINES
 
-#define MAX_TRIS_LEAF 4
+# define MAX_TRIS_LEAF 4
+
+# define RENDER_BVH 1
 
 
 typedef struct s_render_block
