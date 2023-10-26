@@ -6,7 +6,7 @@
 /*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/26 16:33:41 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/10/26 17:34:30 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@
 
 # define MAX_TRIS_LEAF 4
 
-# define RENDER_BVH 1
+# define RENDER_BVH 0
 
 
 typedef struct s_render_block

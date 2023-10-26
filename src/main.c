@@ -6,7 +6,7 @@
 /*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/26 16:36:36 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/10/26 17:35:21 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -745,9 +745,12 @@ t_hitinfo testing_bvh(t_ray ray, t_bvh_node *bvh_nodes, t_hitinfo closest_hit)
 			{
 				if (RENDER_BVH)
 					closest_hit = render_bvh(ray, closest_hit, t);
-				for (int i = bvh_nodes->start; i < bvh_nodes->end; i++)
+				else
 				{
-					closest_hit = triangle_intersection(ray, closest_hit, tris[i]);
+					for (int i = bvh_nodes->start; i < bvh_nodes->end; i++)
+					{
+						closest_hit = triangle_intersection(ray, closest_hit, tris[i]);
+					}
 				}
 			}
 			return (closest_hit);
@@ -1094,7 +1097,7 @@ void init_scene(t_scene *s)
 	}
 
 	
-	bvh_nodes = build_bvh(tris, 0, array_length(&tris), 20);
+	bvh_nodes = build_bvh(tris, 0, array_length(&tris), 50);
 
 	// bvh_nodes->aabb.min = vertex[0];
 	// bvh_nodes->aabb.max = vertex[0];
