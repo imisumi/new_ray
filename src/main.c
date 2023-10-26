@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/25 17:13:31 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/10/26 16:36:36 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,11 @@ t_vec3	*vn;
 t_aabb bvh;
 t_bvh_node *bvh_nodes;
 // -----------------------------------------------------------------------------
+
+float	delta_time()
+{
+	
+}
 
 float my_sign(float num) {
     if (num > 0.0f) {
@@ -780,166 +785,20 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 	{
 		closest_hit.hit = false;
 		closest_hit.distance = FLT_MAX;
-		t_bvh_node *node = malloc(sizeof(t_bvh_node));
-		node->is_leaf = false;
-		node->aabb.min = vec3_new(-1.0f, -1.0f, -1.0f);
-		node->aabb.max = vec3_new(1.0f, 1.0f, 1.0f);
-		node->left = NULL;
-		node->right = NULL;
-		
-		node->left = malloc(sizeof(t_bvh_node));
-		node->left->left = NULL;
-		node->left->right = NULL;
-		node->left->is_leaf = true;
-		node->left->aabb.min = vec3_new(-0.9f, -0.9f, -0.9f);
-		node->left->aabb.max = vec3_new(-0.1f, -0.1f, -0.1f);
 
-		
-		node->right = malloc(sizeof(t_bvh_node));
-		node->right->left = NULL;
-		node->right->right = NULL;
-		node->right->is_leaf = true;
-		node->right->aabb.min = vec3_new(0.1f, 0.1f, 0.1f);
-		node->right->aabb.max = vec3_new(0.9f, 0.9f, 0.9f);
-		
-
-		// closest_hit = bvh_rec(ray, s, xy, rngState, coord, bvh_nodes);
 		closest_hit.material.color = vec3_new(0.0f, 0.0f, 0.0f);
-		// closest_hit = testing_bvh(ray, node, closest_hit);
 		closest_hit = testing_bvh(ray, bvh_nodes, closest_hit);
 		// closest_hit = testing_bvh(ray, node->right, closest_hit);
-		return vec4_new(closest_hit.material.color.x, closest_hit.material.color.y, closest_hit.material.color.z, 1.0f);
+		// return vec4_new(closest_hit.material.color.x, closest_hit.material.color.y, closest_hit.material.color.z, 1.0f);
 
-
-		// if (!bvh_nodes || (intersectCube(ray, bvh_nodes->aabb.min, bvh_nodes->aabb.max) < 0.0f))
-		// 	return vec4_new(0.0f, 0.0f, 0.5f, 1.0f);
-
-		if (bvh_nodes->is_leaf == true)
-		{
-			if (intersectCube(ray, bvh_nodes->aabb.min, bvh_nodes->aabb.max) > 0.0f)
-			{
-				float EPSI = 0.0001;
-				float t = intersectCube(ray, bvh_nodes->aabb.min, bvh_nodes->aabb.max);
-				if (t > 0.0f)
-				{
-					t_vec3 p = vec3_add(ray.origin, vec3_mulf(ray.direction, t));
-					if (fabsf(p.x - bvh_nodes->aabb.min.x) < EPSI) // left
-						return vec4_new(0.5, 0.5, 0.5, 1.0f);
-					if (fabsf(p.x - bvh_nodes->aabb.max.x) < EPSI) // right
-						return vec4_new(0.5, 0.5, 0.5, 1.0f);
-					if (fabsf(p.y - bvh_nodes->aabb.min.y) < EPSI) // bottom
-						return vec4_new(0.55, 0.55, 0.55, 1.0f);
-					if (fabsf(p.y - bvh_nodes->aabb.max.y) < EPSI) // top
-						return vec4_new(0.55, 0.55, 0.55, 1.0f);
-					if (fabsf(p.z - bvh_nodes->aabb.min.z) < EPSI) // back
-						return vec4_new(0.6, 0.6, 0.6, 1.0f);
-					if (fabsf(p.z - bvh_nodes->aabb.max.z) < EPSI) // front
-						return vec4_new(0.6, 0.6, 0.6, 1.0f);
-					return vec4_new(0.4f, 0.4f, 0.4f, 1.0f);
-				}
-				return vec4_new(0.0f, 0.0f, 0.0f, 1.0f);
-
-				
-				for (int i = bvh_nodes->start; i < bvh_nodes->end; i++)
-				{
-					closest_hit = triangle_intersection(ray, closest_hit, tris[i]);
-				}
-				if (closest_hit.hit == true)
-					return vec4_new(1.0f, 0.0f, 0.0f, 1.0f);
-			}
-		}
-		else
-		{
-			t_hitinfo left_hit;
-			t_hitinfo right_hit;
-		}
-
-
-		return vec4_new(0.0f, 0.0f, 0.0f, 1.0f);
-//! -----------------------------------------------------------------------------
-		if (intersectCube(ray, bvh.min, bvh.max) > 0.0f)
-		{
-			for (int i = 0; i < array_length(&tris); i++)
-			{
-				closest_hit = triangle_intersection(ray, closest_hit, tris[i]);
-			}
-			if (closest_hit.hit)
-				return vec4_new(1.0f, 0.0f, 0.0f, 1.0f);
-		}
-		return vec4_new(0.0f, 0.0f, 0.0f, 1.0f);
-
-//! -----------------------------------------------------------------------------
 		// t_vec3 bg = calculate_sky_color(ray.direction);
 		// return vec4_new(bg.x, bg.y, bg.z, 1.0f);
 		// closest_hit = sphere_intersection(ray, s.spheres, closest_hit);
 		// closest_hit = plane_intersection(ray, s.planes, closest_hit);
 
-		// array_length(faces);
-		// for (int i = 0; i < array_length(&faces); i++)
-		// {
-		// 	t_tri tri;
-		// 	tri.a = faces[i].index[0];
-		// 	closest_hit = triangle_intersection(ray, closest_hit, tri);
-		// }
-
-		t_aabb aabb;
-		// aabb.min = vec3_new(1.2f, 1.2f, 1.2f);
-		// aabb.max = vec3_new(-3.0f, -3.0f, -3.0f);
-		aabb.min = vec3_new(-3.0f, -3.0f, -3.0f);
-		aabb.max = vec3_new(1.2f, 1.2f, 1.2f);
-		aabb = bvh;
-		float t = intersectCube(ray, aabb.min, aabb.max);
-		float EPSI = 0.0001;
-		// intersection point
-		t_vec3 p = vec3_add(ray.origin, vec3_mulf(ray.direction, t));
-		if (t > 0.0f)
-		{
-			if (fabsf(p.x - aabb.min.x) < EPSI) // left
-				return vec4_new(0.5, 0.5, 0.5, 1.0f);
-			if (fabsf(p.x - aabb.max.x) < EPSI) // right
-				return vec4_new(0.5, 0.5, 0.5, 1.0f);
-			if (fabsf(p.y - aabb.min.y) < EPSI) // bottom
-				return vec4_new(0.55, 0.55, 0.55, 1.0f);
-			if (fabsf(p.y - aabb.max.y) < EPSI) // top
-				return vec4_new(0.55, 0.55, 0.55, 1.0f);
-			if (fabsf(p.z - aabb.min.z) < EPSI) // back
-				return vec4_new(0.6, 0.6, 0.6, 1.0f);
-			if (fabsf(p.z - aabb.max.z) < EPSI) // front
-				return vec4_new(0.6, 0.6, 0.6, 1.0f);
-			return vec4_new(0.4f, 0.4f, 0.4f, 1.0f);
-		}
-		return vec4_new(0.0f, 0.0f, 0.0f, 1.0f);
-
-		t_vec3 constant_gray_color = vec3_new(0.5f, 0.5f, 0.5f);
-		float brightness_factor = 0.2f;
-		t_vec3 b = box(ray.origin, ray.direction, aabb.min, aabb.max);
-		float is_box_hit = b.x;
-		float box_t_max = b.y;
-		float box_t_min = b.z;
-		t_vec3 boxctr = vec3_mulf(vec3_add(aabb.min, aabb.max), 0.5f);
-		t_vec3 box_hit = vec3_sub(boxctr ,vec3_add(ray.origin, vec3_mulf(ray.direction, box_t_min)));
-		t_vec3 box_intersect_normal = vec3_divf(box_hit, fmaxf(fmaxf(fabsf(box_hit.x), fabsf(box_hit.y)), fabsf(box_hit.z)));
-		box_intersect_normal = vec3_clampf(box_intersect_normal, 0.0f, 1.0f);
-		box_intersect_normal = vec3_normalize(vec3_floorf(vec3_mulf(box_intersect_normal, 1.0000001)));
-		
-		t_vec3 box_reflect = vec3_reflect(ray.direction, box_intersect_normal);
-
-
-		float dot_product = vec3_dot(box_intersect_normal, vec3_normalize(ray.direction));
-		float brightness_adjustment = dot_product * brightness_factor;
-		t_vec3 adjusted_gray_color = vec3_add(constant_gray_color, vec3_new(brightness_adjustment, brightness_adjustment, brightness_adjustment));
-		
-		t_vec3 col = is_box_hit ? adjusted_gray_color : vec3_new(0.0f, 0.0f, 0.0f);
-		return vec4_new(col.x, col.y, col.z, 1.0f);
-		// t_vec3 bg_col = background(50.0f, ray.direction);
-		// // t_vec3 col = vec3_mul(background(50.0f, box_reflect), vec3_new(0.9, 0.8, 1.0));
-		// t_vec3 col = vec3_mul(background(50.0f, box_reflect), vec3_new(0.8f, 0.8f, 0.8f));
-		// col = vec3_mix(bg_col, col, is_box_hit);
-		// return vec4_new(col.x, col.y, col.z, 1.0f);
-		
-		intersectAABB(ray, aabb, &closest_hit);
 		if (closest_hit.hit)
 		{
+			return vec4_new(closest_hit.material.color.x, closest_hit.material.color.y, closest_hit.material.color.z, 1.0f);
 			// return (vec4_new(0.4f, 0.4f, 0.4f, 1.0f));
 			
 			// t_vec3 ambient_light = vec3_new(0.4f, 0.4f, 0.4f); // Ambient light color (grey)
@@ -949,24 +808,6 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 			// t_vec3 normal = closest_hit.normal; // Assuming closest_hit is the normal vector (make sure it's normalized)
 			// t_vec3 final_color = vec3_mulf(normal, 0.5f); // Scale the normal to [0, 1] range for color representation
 			// return vec4_new(final_color.x, final_color.y, final_color.z, 1.0f);
-
-			// printf("%f\n", closest_hit.normal.y);
-			t_vec3 normal = closest_hit.normal;
-			// if (normal.x == -1.0f && normal.y == 0.0f && normal.z == 0.0f)
-			// 	return vec4_new(0.4f, 0.4f, 0.4f, 1.0f);
-			if (vec3_cmp(normal, vec3_up()))
-				return vec4_new(0.4f, 0.4f, 0.4f, 1.0f);
-			if (vec3_cmp(normal, vec3_down()))
-				return vec4_new(0.6f, 0.4f, 0.4f, 1.0f);
-			if (vec3_cmp(normal, vec3_left()))
-				return vec4_new(0.4f, 0.6f, 0.4f, 1.0f);
-			if (vec3_cmp(normal, vec3_right()))
-				return vec4_new(0.4f, 0.4f, 0.6f, 1.0f);
-			if (vec3_cmp(normal, vec3_forward()))
-				return vec4_new(0.6f, 0.6f, 0.4f, 1.0f);
-			if (vec3_cmp(normal, vec3_backward()))
-				return vec4_new(0.4f, 0.6f, 0.6f, 1.0f);
-			return vec4_new(0.0f, 0.0f, 0.0f, 1.0f);
 			
 		}
 		else
@@ -1230,8 +1071,8 @@ void init_scene(t_scene *s)
 	vec_init(&faces, 16, sizeof(t_face));
 	vec_init(&vn, 16, sizeof(t_vec3));
 	// load_obj_file_data("cube_tri.obj", &vertex, &faces);
-	load_obj_file_data("f22.obj", &vertex, &faces, &vn);
-	// load_obj_file_data("monkey.obj", &vertex, &faces, &vn);
+	// load_obj_file_data("f22.obj", &vertex, &faces, &vn);
+	load_obj_file_data("monkey.obj", &vertex, &faces, &vn);
 	// load_obj_file_data("sup.obj", &vertex, &faces, &vn);
 
 	// t_face *f;
