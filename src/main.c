@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/26 22:07:48 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/10/27 03:05:07 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ t_vec3	*vertex;
 t_face	*faces;
 t_tri	*tris;
 t_vec3	*vn;
+t_vec3 	*normal_index;
 t_aabb bvh;
 t_bvh_node *bvh_nodes;
 // -----------------------------------------------------------------------------
@@ -54,7 +55,12 @@ float randomFloat(uint32_t *state)
 float random_value_normal_distribution(uint32_t *state)
 {
 	float theta = 2 * 3.1415926 * randomFloat(state);
-	float rho = sqrtf(-2 * logf(randomFloat(state)));
+	float random_float = randomFloat(state);
+	//! avoid NaN
+	while (random_float <= FLT_EPSILON)
+		random_float = randomFloat(state);
+	// float rho = sqrtf(-2 * logf(randomFloat(state)));
+	float rho = sqrtf(-2 * logf(random_float));
 	return rho * cosf(theta);
 }
 
@@ -238,7 +244,7 @@ void	set_render_zones(t_utils *utils)
 	}
 	else
 	{
-		printf("MT = 0\n");
+		// printf("MT = 0\n");
 		utils->blocks[0].x_start = 0;
 		utils->blocks[0].x_end = WIDTH;
 		utils->blocks[0].y_start = 0;
@@ -495,20 +501,20 @@ t_vec3 calculate_sky_color(t_vec3 ray_direction) {
     return sky_color;
 }
 
-t_vec3 calculate_lighting(t_vec3 surface_normal, t_vec3 light_direction) {
-    // Lambertian reflection model: diffuse reflection
-    float diffuse_intensity = fmaxf(0.0f, vec3_dot(surface_normal, light_direction));
-    t_vec3 light_color = vec3_new(1.0f, 1.0f, 1.0f);  // White light color
-    t_vec3 diffuse_component = vec3_mulf(light_color, diffuse_intensity);
-    return diffuse_component;
-}
+// t_vec3 calculate_lighting(t_vec3 surface_normal, t_vec3 light_direction) {
+//     // Lambertian reflection model: diffuse reflection
+//     float diffuse_intensity = fmaxf(0.0f, vec3_dot(surface_normal, light_direction));
+//     t_vec3 light_color = vec3_new(1.0f, 1.0f, 1.0f);  // White light color
+//     t_vec3 diffuse_component = vec3_mulf(light_color, diffuse_intensity);
+//     return diffuse_component;
+// }
 
-t_vec3 calculate_shading(t_vec3 surface_normal) {
-    // Lambertian reflection model: diffuse reflection
-    float diffuse_intensity = fmaxf(0.0f, vec3_dot(surface_normal, vec3_new(1.0f, 1.0f, 1.0f))); // Assuming light from down-left-forward direction
-    t_vec3 shading_color = vec3_new(diffuse_intensity, diffuse_intensity, diffuse_intensity);
-    return shading_color;
-}
+// t_vec3 calculate_shading(t_vec3 surface_normal) {
+//     // Lambertian reflection model: diffuse reflection
+//     float diffuse_intensity = fmaxf(0.0f, vec3_dot(surface_normal, vec3_new(1.0f, 1.0f, 1.0f))); // Assuming light from down-left-forward direction
+//     t_vec3 shading_color = vec3_new(diffuse_intensity, diffuse_intensity, diffuse_intensity);
+//     return shading_color;
+// }
 
 float intersectCube(t_ray ray, t_vec3 close, t_vec3 far)
 {
@@ -713,6 +719,25 @@ t_hitinfo testing_bvh(t_ray ray, t_bvh_node *bvh_nodes, t_hitinfo closest_hit)
 	return (closest_hit);
 }
 
+void	check_nan(t_vec3 vec)
+{
+	if (isnan(vec.x))
+	{
+		printf("\nx = nan\n");
+		sleep(10000000);
+	}
+	if (isnan(vec.y))
+	{
+		printf("\ny = nan\n");
+		sleep(10000000);
+	}
+	if (isnan(vec.z))
+	{
+		printf("\nz = nan\n");
+		sleep(10000000);
+	}
+}
+
 t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coord)
 {
 	int	i = 0;
@@ -726,28 +751,48 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 		closest_hit.hit = false;
 		closest_hit.distance = FLT_MAX;
 
-		closest_hit = testing_bvh(ray, bvh_nodes, closest_hit);
+		// closest_hit = testing_bvh(ray, bvh_nodes, closest_hit);
 
 		closest_hit = plane_intersection(ray, s.planes, closest_hit);
+		// closest_hit = sphere_intersection(ray, s.spheres, closest_hit);
 
 		if (closest_hit.hit)
 		{
 			// return vec4_new(closest_hit.material.color.x, closest_hit.material.color.y, closest_hit.material.color.z, 1.0f);
 
-			ray.origin = vec3_add(closest_hit.position, vec3_mulf(closest_hit.normal, 0.001f));
+			ray.origin = vec3_add(closest_hit.position, vec3_mulf(closest_hit.normal, 0.00001f));
 			
-			t_vec3 diffuse_dir = vec3_normalize(vec3_add(closest_hit.normal, random_direction(rngState)));
+			t_vec3 temp = random_direction(rngState);
+			t_vec3 diffuse_dir = vec3_normalize(vec3_add(closest_hit.normal, temp));
+			if (isnan(diffuse_dir.x))
+			{
+				printf("temp = %f %f %f\n", temp.x, temp.y, temp.z);
+				printf("closest_hit.normal = %f %f %f\n", closest_hit.normal.x, closest_hit.normal.y, closest_hit.normal.z);
+				sleep(10000000);
+			}
 			t_vec3 specular_dir = vec3_reflect(ray.direction, closest_hit.normal);
 
 			is_specular = closest_hit.material.specular >= randomFloat(rngState);
 			
+			// check_nan(ray.direction);
 			ray.direction =  lerp(diffuse_dir, specular_dir, \
 									closest_hit.material.roughness * is_specular);
+			if (isnan(ray.direction.x))
+			{
+				printf("\nx = nan\n");
+				printf("diffuse_dir = %f %f %f\n", diffuse_dir.x, diffuse_dir.y, diffuse_dir.z);
+				printf("specular_dir = %f %f %f\n", specular_dir.x, specular_dir.y, specular_dir.z);
+				printf("roughness = %f\n", closest_hit.material.roughness);
+				printf("specular = %f\n", is_specular);
+				sleep(10000000);
+			}
+			check_nan(ray.direction);
 			
 			t_material material = closest_hit.material;
 			t_vec3 emitted_light = vec3_mulf(material.emission_color, material.emission_strength);
 			
 			incomming_light = vec3_add(incomming_light, vec3_mul(ray_color, emitted_light));
+			// check_nan(incomming_light);
 
 			ray_color = vec3_mul(ray_color, lerp(material.color, material.specular_color, is_specular));
 
@@ -764,16 +809,26 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 		{
 			// t_vec3 bg = background(0.0f, ray.direction);
 			// return vec4_new(bg.x, bg.y, bg.z, 1.0f);
+			// check_nan(ray.direction);
 			t_vec3 unit_direction = vec3_normalize(ray.direction);
+			// check_nan(ray_color);
+			// check_nan(unit_direction);
 			float t = 0.5f * (unit_direction.y + 1.0f);
+			if (t <= 0.0f)
+			{
+				printf("t < 0.0f\n");
+				sleep(5555555);
+			}
 			t_vec3 sky = vec3_add(vec3_mulf(vec3_new(1.0f, 1.0f, 1.0f), 1.0f - t), vec3_mulf(vec3_new(0.5f, 0.7f, 1.0f), t));
 			incomming_light = vec3_add(incomming_light, vec3_mul(ray_color, sky));
+			// incomming_light = vec3_add(incomming_light, vec3_new(0.5f, 0.7f, 1.0f));
 			break ;
 		}
 
 		// return (vec4_new(0.0f, 0.0f, 0.0f, 1.0f));
 		bounces++;
 	}
+	// check_nan(incomming_light);
 	return (vec4_new(incomming_light.x, incomming_light.y, incomming_light.z, 1.0f));
 }
 
@@ -813,7 +868,9 @@ void	*render(void *param)
 			if (col.z < 0.0f)
 				col.z = 0.0f;
 
+			// pthread_mutex_lock(&data->utils.mutex);
 			data->utils.accumulated_data[x + y * WIDTH] = vec4_add(data->utils.accumulated_data[x + y * WIDTH], col);
+			// pthread_mutex_unlock(&data->utils.mutex);
 			t_vec4 accumulated_color = data->utils.accumulated_data[x + y * WIDTH];
 			accumulated_color = vec4_divf(accumulated_color, data->utils.accumulated_frames);
 			accumulated_color = vec4_clamp(accumulated_color, 0.0, 1.0);
@@ -979,15 +1036,32 @@ t_bvh_node	*build_bvh(t_tri *tris, int start, int end, int max_depth)
 	return node;
 }
 
+t_tri transform_tri(t_tri tri, float x, float y, float z, float s)
+{
+	tri.a.x = tri.a.x * s + x;
+	tri.a.y = tri.a.y * s + y;
+	tri.a.z = tri.a.z * s + z;
+
+	tri.b.x = tri.b.x * s + x;
+	tri.b.y = tri.b.y * s + y;
+	tri.b.z = tri.b.z * s + z;
+
+	tri.c.x = tri.c.x * s + x;
+	tri.c.y = tri.c.y * s + y;
+	tri.c.z = tri.c.z * s + z;
+	return tri;
+}
+
 void init_scene(t_scene *s)
 {
 	vec_init(&tris, 16, sizeof(t_tri));
 	vec_init(&vertex, 16, sizeof(t_vec3));
 	vec_init(&faces, 16, sizeof(t_face));
 	vec_init(&vn, 16, sizeof(t_vec3));
-	// load_obj_file_data("cube_tri.obj", &vertex, &faces);
+	vec_init(&normal_index, 16, sizeof(t_vec3));
+	// load_obj_file_data("cube_tri.obj", &vertex, &faces, &vn, &normal_index);
 	// load_obj_file_data("f22.obj", &vertex, &faces, &vn);
-	load_obj_file_data("monkey.obj", &vertex, &faces, &vn);
+	load_obj_file_data("monkey.obj", &vertex, &faces, &vn, &normal_index);
 	// load_obj_file_data("sup.obj", &vertex, &faces, &vn);
 
 	// t_face *f;
@@ -1005,54 +1079,16 @@ void init_scene(t_scene *s)
 		tri.a = vertex[faces[i].index[0] - 1];
 		tri.b = vertex[faces[i].index[1] - 1];
 		tri.c = vertex[faces[i].index[2] - 1];
+		tri = transform_tri(tri, 0.0, 1.0, 0.0, 0.5);
+		tri.normal.x = vn[faces[i].normal_index[0] - 1].x;
+		tri.normal.y = vn[faces[i].normal_index[1] - 1].y;
+		tri.normal.z = vn[faces[i].normal_index[2] - 1].z;
 		array_push(&tris, &tri);
+		// printf("normal = %f %f %f\n", tri.normal.x, tri.normal.y, tri.normal.z);
 	}
 
 	
 	bvh_nodes = build_bvh(tris, 0, array_length(&tris), 50);
-
-	// bvh_nodes->aabb.min = vertex[0];
-	// bvh_nodes->aabb.max = vertex[0];
-	// for (int i = 0; i < array_length(&vertex); i++)
-	// {
-	// 	if (vertex[i].x < bvh_nodes->aabb.min.x)
-	// 		bvh_nodes->aabb.min.x = vertex[i].x;
-	// 	if (vertex[i].y < bvh_nodes->aabb.min.y)
-	// 		bvh_nodes->aabb.min.y = vertex[i].y;
-	// 	if (vertex[i].z < bvh_nodes->aabb.min.z)
-	// 		bvh_nodes->aabb.min.z = vertex[i].z;
-		
-	// 	if (vertex[i].x > bvh_nodes->aabb.max.x)
-	// 		bvh_nodes->aabb.max.x = vertex[i].x;
-	// 	if (vertex[i].y > bvh_nodes->aabb.max.y)
-	// 		bvh_nodes->aabb.max.y = vertex[i].y;
-	// 	if (vertex[i].z > bvh_nodes->aabb.max.z)
-	// 		bvh_nodes->aabb.max.z = vertex[i].z;
-	// }
-
-	// printf("aabb min = %f %f %f\n", bvh_nodes->aabb.min.x, bvh_nodes->aabb.min.y, bvh_nodes->aabb.min.z);
-	// printf("aabb max = %f %f %f\n", bvh_nodes->aabb.max.x, bvh_nodes->aabb.max.y, bvh_nodes->aabb.max.z);
-	
-	// bvh = calculate_bounding_box(0, array_length(&vertex));
-	//!------------------------------
-	// bvh.min = vertex[0];
-	// bvh.max = vertex[0];
-	// for (int i = 0; i < array_length(&vertex); i++)
-	// {
-	// 	if (vertex[i].x < bvh.min.x)
-	// 		bvh.min.x = vertex[i].x;
-	// 	if (vertex[i].y < bvh.min.y)
-	// 		bvh.min.y = vertex[i].y;
-	// 	if (vertex[i].z < bvh.min.z)
-	// 		bvh.min.z = vertex[i].z;
-		
-	// 	if (vertex[i].x > bvh.max.x)
-	// 		bvh.max.x = vertex[i].x;
-	// 	if (vertex[i].y > bvh.max.y)
-	// 		bvh.max.y = vertex[i].y;
-	// 	if (vertex[i].z > bvh.max.z)
-	// 		bvh.max.z = vertex[i].z;
-	// }
 
 	// array_push(&f, &face);
 	// array_push(&faces, &face);
@@ -1064,9 +1100,9 @@ void init_scene(t_scene *s)
 	// exit(0);
 	init_camera(&s->camera);
 	// init_scene_one(s);
-	// init_scene_two(s);
+	init_scene_two(s);
 	// init_scene_three(s);
-	init_scene_four(s);
+	// init_scene_four(s);
 	return ;
 }
 
@@ -1101,27 +1137,12 @@ int32_t main(int32_t argc, const char* argv[])
 		mlx_close_window(data.mlx);
 		exit(EXIT_FAILURE);
 	}
-	// if (!(data.mlx = mlx_init(width, height, "MLX42", true)))
-	// {
-	// 	puts(mlx_strerror(mlx_errno));
-	// 	return(EXIT_FAILURE);
-	// }
-	// if (!(image = mlx_new_image(data.mlx, width, height)))
-	// {
-	// 	mlx_close_window(data.mlx);
-	// 	puts(mlx_strerror(mlx_errno));
-	// 	return(EXIT_FAILURE);
-	// }
-	// if (mlx_image_to_window(data.mlx, image, 0, 0) == -1)
-	// {
-	// 	mlx_close_window(data.mlx);
-	// 	puts(mlx_strerror(mlx_errno));
-	// 	return(EXIT_FAILURE);
-	// }
 	data.utils.accumulated_frames = 1;
 	data.utils.accumulated_data = malloc(sizeof(t_vec4) * WIDTH * HEIGHT);
 	data.scene.camera.ray_target = malloc(sizeof(t_vec4) * WIDTH * HEIGHT);
 	mlx_set_window_title(data.mlx, "Testing");
+
+	pthread_mutex_init(&data.utils.mutex, NULL);
 
 	init_scene(&data.scene);
 

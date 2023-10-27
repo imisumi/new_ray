@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/26 21:53:16 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/10/27 01:54:09 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,6 @@ t_hitinfo	sphere_intersection(t_ray ray, t_sphere *spheres, t_hitinfo hitinfo)
 
 t_hitinfo	plane_intersection(t_ray ray, t_plane *planes, t_hitinfo obj_hit)
 {
-	// printf("plane_intersection\n");
 	int	i;
 
 	i = 0;
@@ -116,10 +115,10 @@ t_hitinfo	plane_intersection(t_ray ray, t_plane *planes, t_hitinfo obj_hit)
 						if (vec3_dot(ray.direction, planes[i].normal) < 0.0f)
 						{
 							obj_hit.hit = true;
-							// obj_hit.distance = t;
-							// obj_hit.position = vec3_add(ray.origin, vec3_mulf(ray.direction, t));
+							obj_hit.distance = t;
+							obj_hit.position = vec3_add(ray.origin, vec3_mulf(ray.direction, t));
 							// // obj_hit.normal = vec3_normalize(vec3_sub(obj_hit.position, planes[i].position));
-							// obj_hit.normal = planes[i].normal;
+							obj_hit.normal = planes[i].normal;
 							obj_hit.material = planes[i].material;
 						}
 					}
@@ -247,9 +246,16 @@ t_hitinfo triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_tri tri)
 
 		obj_hit.hit = true;
 		obj_hit.distance = t;
-		// obj_hit.position = vec3_add(ray.origin, vec3_mulf(ray.direction, t));
-		obj_hit.normal = vec3_normalize(vec3_cross(e1, e2));
-		obj_hit.material.color = vec3_new(0.5, 0.5, 0.5);
+		obj_hit.position = vec3_add(ray.origin, vec3_mulf(ray.direction, t));
+		// obj_hit.normal = vec3_normalize(vec3_cross(e1, e2));
+		obj_hit.normal = tri.normal;
+		obj_hit.material.color = vec3_new(0.8, 0.8, 0.8);
+		// obj_hit.material.color = vec3_new(fabs(obj_hit.normal.x), fabs(obj_hit.normal.y), fabs(obj_hit.normal.z));
+		obj_hit.material.roughness = 0.0f;
+		obj_hit.material.specular = 0.0f;
+		obj_hit.material.specular_color = vec3_new(0.0f, 0.0f, 0.0f);
+		obj_hit.material.emission_color = vec3_new(0.0f, 0.0f, 0.0f);
+		obj_hit.material.emission_strength = 0.0f;
 		return obj_hit;
 
 		float r = fabs(obj_hit.normal.x);
@@ -283,7 +289,7 @@ t_hitinfo intersectRayPlane(t_ray ray, float yLevel, t_hitinfo hitinfo)
 
 	hitinfo.hit = true;
 	hitinfo.distance = t;
-	hitinfo.position = vec3_add(ray.origin, vec3_mulf(ray.direction, t + 0.0001f));
+	hitinfo.position = vec3_add(ray.origin, vec3_mulf(ray.direction, t));
 	hitinfo.material.color = vec3_new(1.0, 0.5, 0.5);
 	return hitinfo;
 }

@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/26 21:49:38 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/10/27 03:05:45 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,9 @@
 # define WIDTH 400
 # define HEIGHT 400
 # define PIXEL_SIZE 3
-# define MT 0
-# define THREADS 10
-# define ANTIALIASING 0
+# define MT 1
+# define THREADS 8
+# define ANTIALIASING 1
 
 # define MAX_BOUNCHES 8
 
@@ -124,6 +124,7 @@ typedef struct s_utils
 {
 	pthread_t			threads[THREADS];
 	t_render_block		blocks[THREADS];
+	pthread_mutex_t		mutex;
 	uint32_t			accumulated_frames;
 	t_vec4				*accumulated_data;
 }				t_utils;
@@ -157,13 +158,15 @@ typedef struct s_tri_faces
 typedef struct s_face
 {
 	int	index[3];
+	int	normal_index[3];
 }	t_face;
 
 typedef struct s_tri
 {
-	t_vec3 a;
-	t_vec3 b;
-	t_vec3 c;
+	t_vec3	a;
+	t_vec3	b;
+	t_vec3	c;
+	t_vec3	normal;
 } t_tri;
 
 typedef struct s_bvh_node
@@ -261,5 +264,6 @@ t_tri_faces	*cube_faces();
 t_hitinfo triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_tri tri);
 
 
-void	load_obj_file_data(char *filename, t_vec3 **vertex, t_face **faces, t_vec3 **vn);
+// void	load_obj_file_data(char *filename, t_vec3 **vertex, t_face **faces, t_vec3 **vn);
+void	load_obj_file_data(char *filename, t_vec3 **vertex, t_face **faces, t_vec3 **vn, t_vec3 **normal_index);
 t_hitinfo intersectRayPlane(t_ray ray, float yLevel, t_hitinfo hitinfo);
