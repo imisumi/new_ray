@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.h                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/27 03:05:45 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/10/27 14:42:33 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,9 @@
 # include "darray.h"
 # include "lib3d.h"
 
-# define WIDTH 400
-# define HEIGHT 400
-# define PIXEL_SIZE 3
+# define WIDTH 800
+# define HEIGHT 800
+# define PIXEL_SIZE 2
 # define MT 1
 # define THREADS 8
 # define ANTIALIASING 1

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   intersection.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/27 01:54:09 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/10/27 14:41:31 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -253,7 +253,7 @@ t_hitinfo triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_tri tri)
 		// obj_hit.material.color = vec3_new(fabs(obj_hit.normal.x), fabs(obj_hit.normal.y), fabs(obj_hit.normal.z));
 		obj_hit.material.roughness = 0.0f;
 		obj_hit.material.specular = 0.0f;
-		obj_hit.material.specular_color = vec3_new(0.0f, 0.0f, 0.0f);
+		obj_hit.material.specular_color = vec3_new(1.0f, 1.0f, 1.0f);
 		obj_hit.material.emission_color = vec3_new(0.0f, 0.0f, 0.0f);
 		obj_hit.material.emission_strength = 0.0f;
 		return obj_hit;

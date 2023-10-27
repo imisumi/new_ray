@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/27 03:05:07 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/10/27 14:38:31 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -751,7 +751,7 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 		closest_hit.hit = false;
 		closest_hit.distance = FLT_MAX;
 
-		// closest_hit = testing_bvh(ray, bvh_nodes, closest_hit);
+		closest_hit = testing_bvh(ray, bvh_nodes, closest_hit);
 
 		closest_hit = plane_intersection(ray, s.planes, closest_hit);
 		// closest_hit = sphere_intersection(ray, s.spheres, closest_hit);
@@ -797,13 +797,13 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 			ray_color = vec3_mul(ray_color, lerp(material.color, material.specular_color, is_specular));
 
 			//!russian roullet
-			// float p = fmaxf(ray_color.x, fmaxf(ray_color.y, ray_color.z));
-			// if (bounces > 3)
-			// {
-			// 	if (randomFloat(rngState) > p)
-			// 		break ;
-			// 	ray_color = vec3_divf(ray_color, p);
-			// }
+			float p = fmaxf(ray_color.x, fmaxf(ray_color.y, ray_color.z));
+			if (bounces > 3)
+			{
+				if (randomFloat(rngState) > p)
+					break ;
+				ray_color = vec3_divf(ray_color, p);
+			}
 		}
 		else
 		{
