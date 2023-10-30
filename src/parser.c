@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 02:06:12 by ichiro            #+#    #+#             */
-/*   Updated: 2023/10/30 03:59:29 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/10/30 15:59:59 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,7 +134,7 @@ bool	convert_input_to_scene(int argc, char **argv, t_data *data)
 	{
 		line = get_next_line(fd);
 		if (line == NULL)
-			exit(0);
+			break ;
 		if (line[0] == '\0')
 		{
 			free(line);
@@ -153,31 +153,20 @@ bool	convert_input_to_scene(int argc, char **argv, t_data *data)
 			i++;
 		}
 		split = ft_split(line, ' ');
-		if (strcmp(split[0], "A") == 0)
+		if (strcmp(split[0], "A") == 0) //! Ambient light
 		{
 			if (ft_2d_strlen(split) != 3 || char_count(split[2], ',') != 2 || ft_strlen(split[2]) > 12)
 				return (printf("Invalid input: Ambient light\n"), false);
-			float f = string_to_float(split[1]);
-			printf("f: %f\n", f);
-			t_vec3 color;
-			if (srgb_to_vec3(split[2], &color) == false)
+			data->scene.ambient.strength = string_to_float(split[1]);
+			if (srgb_to_vec3(split[2], &data->scene.ambient.color) == false)
 				return (printf("Invalid input: Ambient light!\n"), false);
-			printf("color: %f, %f, %f\n", color.x, color.y, color.z);
+			data->scene.ambient.enabled = true;
 		}
-		// for (int i = 0; split[i]; i++)
-		// {
-		// 	// if (ft_strchr(split[i], '.'))
-		// 	// {
-		// 	// 	float f = string_to_float(split[i]);
-		// 	// 	printf("f: %f\n", f);
-		// 	// }
-		// 	// printf("%s\n", split[i]);
-		// 	// if (strcmp(split[i], "A") == 0)
-		// 	// {
-		// 	// 	// if (split[3][0] != '\0')
-		// 	// 	// 	printf("Error: invalid input\n");
-		// 	// }
-		// }
+		else if (strcmp(split[0], "C") == 0) //! Camera
+		{
+			if (ft_2d_strlen(split) != 4)
+				return (printf("Invalid input: Camera\n"), false);
+		}
 		free(line);
 	}
 	close(fd);
@@ -186,6 +175,7 @@ bool	convert_input_to_scene(int argc, char **argv, t_data *data)
 
 bool	parse_input(int argc, char **argv, t_data *data)
 {
+	data->scene.ambient.enabled = false;
 	if (input_is_valid(argc, argv, data) == false)
 	{
 		printf("Error: invalid input\n");
@@ -193,6 +183,11 @@ bool	parse_input(int argc, char **argv, t_data *data)
 	}
 	printf("parse_input\n");
 	convert_input_to_scene(argc, argv, data);
+	printf("----------------------\n");
+	printf("ambient = %d\n", data->scene.ambient.enabled);
+	t_vec3 ambient = data->scene.ambient.color;
+	printf("ambient = %f\n", data->scene.ambient.strength);
+	printf("ambient = %f, %f, %f\n", ambient.x, ambient.y, ambient.z);
 
 
 	exit(0);

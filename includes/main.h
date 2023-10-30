@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.h                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/30 03:14:00 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/10/30 15:45:39 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,8 +113,17 @@ typedef struct s_camera
 	t_vec4	*ray_target;
 }	t_camera;
 
+typedef struct s_ambient
+{
+	bool	enabled;
+	t_vec3	color;
+	float	strength;
+}	t_ambient;
+
 typedef struct s_scene
 {
+	t_ambient	ambient;
+
 	t_sphere	*spheres;
 	t_plane		*planes;
 	t_camera	camera;
@@ -186,11 +195,7 @@ typedef struct s_light
 	float	strength;
 }	t_light;
 
-typedef struct s_ambient
-{
-	t_vec3	color;
-	float	strength;
-}	t_ambient;
+
 
 typedef struct s_hitinfo
 {
