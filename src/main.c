@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/27 14:38:31 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/10/29 22:32:32 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -738,6 +738,14 @@ void	check_nan(t_vec3 vec)
 	}
 }
 
+float calculate_distance(t_vec3 point1, t_vec3 point2) {
+    float distance = sqrtf(powf(point2.x - point1.x, 2) + powf(point2.y - point1.y, 2) + powf(point2.z - point1.z, 2));
+    return distance;
+}
+
+t_sphere *sp;
+t_sphere s;
+
 t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coord)
 {
 	int	i = 0;
@@ -751,10 +759,10 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 		closest_hit.hit = false;
 		closest_hit.distance = FLT_MAX;
 
-		closest_hit = testing_bvh(ray, bvh_nodes, closest_hit);
+		// closest_hit = testing_bvh(ray, bvh_nodes, closest_hit);
 
 		closest_hit = plane_intersection(ray, s.planes, closest_hit);
-		// closest_hit = sphere_intersection(ray, s.spheres, closest_hit);
+		closest_hit = sphere_intersection(ray, s.spheres, closest_hit);
 
 		if (closest_hit.hit)
 		{
@@ -764,32 +772,46 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 			
 			t_vec3 temp = random_direction(rngState);
 			t_vec3 diffuse_dir = vec3_normalize(vec3_add(closest_hit.normal, temp));
-			if (isnan(diffuse_dir.x))
-			{
-				printf("temp = %f %f %f\n", temp.x, temp.y, temp.z);
-				printf("closest_hit.normal = %f %f %f\n", closest_hit.normal.x, closest_hit.normal.y, closest_hit.normal.z);
-				sleep(10000000);
-			}
 			t_vec3 specular_dir = vec3_reflect(ray.direction, closest_hit.normal);
 
 			is_specular = closest_hit.material.specular >= randomFloat(rngState);
 			
-			// check_nan(ray.direction);
 			ray.direction =  lerp(diffuse_dir, specular_dir, \
 									closest_hit.material.roughness * is_specular);
-			if (isnan(ray.direction.x))
-			{
-				printf("\nx = nan\n");
-				printf("diffuse_dir = %f %f %f\n", diffuse_dir.x, diffuse_dir.y, diffuse_dir.z);
-				printf("specular_dir = %f %f %f\n", specular_dir.x, specular_dir.y, specular_dir.z);
-				printf("roughness = %f\n", closest_hit.material.roughness);
-				printf("specular = %f\n", is_specular);
-				sleep(10000000);
-			}
 			check_nan(ray.direction);
 			
 			t_material material = closest_hit.material;
 			t_vec3 emitted_light = vec3_mulf(material.emission_color, material.emission_strength);
+
+
+			//! manditoy light
+			t_vec3 light_direction = vec3_normalize(vec3_sub(vec3_new(0, 2, 0), closest_hit.position));
+			float diffuse_intensity = fmaxf(vec3_dot(closest_hit.normal, light_direction), 0.0f);
+			t_vec3 diffuse_contribution = vec3_mulf(vec3_new(1, 1, 1), diffuse_intensity * 0.3f);
+
+			t_ray shadow_ray;
+			shadow_ray.origin = vec3_add(closest_hit.position, vec3_mulf(closest_hit.normal, 0.00001f)); // Offset the origin slightly to avoid self-intersections
+			shadow_ray.direction = light_direction;
+			t_hitinfo shadow_hit;
+			shadow_hit.hit = false;
+			shadow_hit.distance = FLT_MAX;
+			// shadow_hit = testing_bvh(shadow_ray, bvh_nodes, shadow_hit);
+			shadow_hit = plane_intersection(shadow_ray, s.planes, shadow_hit);
+			shadow_hit = sphere_intersection(shadow_ray, s.spheres, shadow_hit);
+			
+			// if (shadow_hit.hit == false && shadow_hit.distance >= calculate_distance(shadow_ray.origin, vec3_new(0, 2, 0)))
+			// t_sphere *sp;
+			// t_sphere s;
+
+			// vec_init(&sp, 8, sizeof(t_sphere));
+			
+			// s.position = vec3_new(0, 2, 0);
+			// s.radius = 0.01f;
+			// array_push(&sp, &s);
+			float x = sphere_intersection(shadow_ray, sp, shadow_hit).distance;
+			// if (shadow_hit.hit == false && shadow_hit.hit > sphere_intersection(shadow_ray, sp, shadow_hit).distance)
+			if (x < shadow_hit.distance)
+				emitted_light = vec3_add(emitted_light, diffuse_contribution);
 			
 			incomming_light = vec3_add(incomming_light, vec3_mul(ray_color, emitted_light));
 			// check_nan(incomming_light);
@@ -809,10 +831,7 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 		{
 			// t_vec3 bg = background(0.0f, ray.direction);
 			// return vec4_new(bg.x, bg.y, bg.z, 1.0f);
-			// check_nan(ray.direction);
 			t_vec3 unit_direction = vec3_normalize(ray.direction);
-			// check_nan(ray_color);
-			// check_nan(unit_direction);
 			float t = 0.5f * (unit_direction.y + 1.0f);
 			if (t <= 0.0f)
 			{
@@ -1062,6 +1081,8 @@ void init_scene(t_scene *s)
 	// load_obj_file_data("cube_tri.obj", &vertex, &faces, &vn, &normal_index);
 	// load_obj_file_data("f22.obj", &vertex, &faces, &vn);
 	load_obj_file_data("monkey.obj", &vertex, &faces, &vn, &normal_index);
+	// load_obj_file_data("1.obj", &vertex, &faces, &vn, &normal_index);
+	printf("vertex = %d\n", array_length(&vertex));
 	// load_obj_file_data("sup.obj", &vertex, &faces, &vn);
 
 	// t_face *f;
@@ -1106,11 +1127,18 @@ void init_scene(t_scene *s)
 	return ;
 }
 
-int32_t main(int32_t argc, const char* argv[])
+int32_t main(int32_t argc, char* argv[])
 {
 	mlx_t* mlx;
 
+	vec_init(&sp, 8, sizeof(t_sphere));
+			
+	s.position = vec3_new(0, 2, 0);
+	s.radius = 0.01f;
+	array_push(&sp, &s);
+
 	t_data	data;
+	parse_input(argc, argv, &data);
 	// Gotta error check this stuff
 	int width = WIDTH;
 	int height = HEIGHT;

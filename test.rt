@@ -1,0 +1,51 @@
+
+
+
+#! A  - Ambient light
+# Strength 0.0 - 1.0
+# Color 0 - 255 R,G,B
+
+#! C  - Camera
+# Position X,Y,Z
+# Orientation X,Y,Z
+# FOV 
+
+#! L  - Light
+# Position X,Y,Z
+# Strength 0.0 - 1.0
+# Color 0 - 255 R,G,B
+
+#! sp - Sphere
+# Position X,Y,Z
+# Radius
+# Color 0 - 255 R,G,B
+
+#! pl - Plane
+# Position X,Y,Z
+# Orientation X,Y,Z
+# Color 0 - 255 R,G,B
+
+#! cy - Cylinder
+# Position X,Y,Z
+# Orientation X,Y,Z
+# Radius
+# Height
+# Color 0 - 255 R,G,B
+
+
+
+
+
+
+
+
+
+
+
+# A	123.123 255,255,255
+A	123.0 0,50,255
+# C	-50,0,20 0,0,0 70
+# L	-40,0,30 0.7 255,255,255
+# pl	0,0,0 0,1.0,0 255,0,225
+# sp	0,0,20 20 255,0,0
+# cy	50.0,0.0,20.6 0,0,1.0 14.2 21.42 10,0,255

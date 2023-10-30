@@ -4,6 +4,8 @@
 		"*.rmd": "markdown",
 		"main.h": "c",
 		"stdlib.h": "c",
-		"limits": "c"
+		"limits": "c",
+		"cmath": "c",
+		"cstdlib": "c"
 	}
 }

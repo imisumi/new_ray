@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+         #
+#    By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/28 00:51:40 by ichiro            #+#    #+#              #
-#    Updated: 2023/10/24 16:29:12 by imisumi          ###   ########.fr        #
+#    Updated: 2023/10/30 00:44:06 by imisumi-wsl      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -53,7 +53,9 @@ SRCS =	src/main.c						\
 		src/intersection.c				\
 		src/scene.c						\
 		src/cube.c \
-		src/obj.c
+		src/obj.c \
+		src/parser.c \
+		src/utils.c
 
 
 all: $(LIBFT) $(LIB3D) $(MLX) $(NAME)

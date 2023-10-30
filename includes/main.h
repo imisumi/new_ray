@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.h                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/27 14:42:33 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/10/30 03:14:00 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,9 @@
 # include "darray.h"
 # include "lib3d.h"
 
-# define WIDTH 800
-# define HEIGHT 800
-# define PIXEL_SIZE 2
+# define WIDTH 400
+# define HEIGHT 400
+# define PIXEL_SIZE 3
 # define MT 1
 # define THREADS 8
 # define ANTIALIASING 1
@@ -179,6 +179,19 @@ typedef struct s_bvh_node
 	bool is_leaf;
 }	t_bvh_node;
 
+typedef struct s_light
+{
+	t_vec3	position;
+	t_vec3	color;
+	float	strength;
+}	t_light;
+
+typedef struct s_ambient
+{
+	t_vec3	color;
+	float	strength;
+}	t_ambient;
+
 typedef struct s_hitinfo
 {
 	bool	hit;
@@ -267,3 +280,16 @@ t_hitinfo triangle_intersection(t_ray ray, t_hitinfo obj_hit, t_tri tri);
 // void	load_obj_file_data(char *filename, t_vec3 **vertex, t_face **faces, t_vec3 **vn);
 void	load_obj_file_data(char *filename, t_vec3 **vertex, t_face **faces, t_vec3 **vn, t_vec3 **normal_index);
 t_hitinfo intersectRayPlane(t_ray ray, float yLevel, t_hitinfo hitinfo);
+
+
+
+
+
+
+
+
+bool	parse_input(int argc, char **argv, t_data *data);
+float	string_to_float(char *str);
+bool	srgb_to_vec3(char *str, t_vec3 *color);
+int		char_count(char *str, char c);
+int		ft_2d_strlen(char **arr);
