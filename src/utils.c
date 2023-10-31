@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 02:06:12 by ichiro            #+#    #+#             */
-/*   Updated: 2023/10/30 16:13:28 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/10/30 20:18:59 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,14 +54,14 @@ float	string_to_float(char *str)
 		sign = -1;
 	}
 	start = simple_string_to_int(str, &i);
-	if (str[i] == '\0')
-		return (start * sign);
+	if (str[i] == '\0' || str[i] == '\n')
+		return ((float)start * sign);
 	if (str[i] != '.')
 		return (NAN);
 	i++;
 	end = simple_string_to_int(str, &i);
 	if (end == 0)
-		return (start * sign);
+		return ((float)start * sign);
 	int	num_digits = pow(10, floor(log10(end)) + 1);
 	res = start + (float)end / num_digits;
 	return (res * sign);
@@ -168,5 +168,43 @@ bool	srgb_to_vec3(char *str, t_vec3 *color)
 
 bool	parse_get_pos(char *str, t_vec3 *pos)
 {
-	
+	char	**split;
+
+	if (str[ft_strlen(str) - 1] == '\n')
+		str[ft_strlen(str) - 1] = '\0';
+	split = ft_split(str, ',');
+	if (split == NULL)
+		return (false);
+	if (ft_2d_strlen(split) != 3)
+		return (free_2d_arr(split), false);
+	pos->x = string_to_float(split[0]);
+	pos->y = string_to_float(split[1]);
+	pos->z = string_to_float(split[2]);
+	free_2d_arr(split);
+	return (true);
 }
+
+bool	parse_get_normal(char *str, t_vec3 *normal)
+{
+	char	**split;
+
+	if (str[ft_strlen(str) - 1] == '\n')
+		str[ft_strlen(str) - 1] = '\0';
+	split = ft_split(str, ',');
+	if (split == NULL)
+		return (false);
+	if (ft_2d_strlen(split) != 3)
+		return (free_2d_arr(split), false);
+	normal->x = string_to_float(split[0]);
+	normal->y = string_to_float(split[1]);
+	normal->z = string_to_float(split[2]);
+	free_2d_arr(split);
+	if (normal->x < -1.0f || normal->x > 1.0f)
+		return (false);
+	if (normal->y < -1.0f || normal->y > 1.0f)
+		return (false);
+	if (normal->z < -1.0f || normal->z > 1.0f)
+		return (false);
+	return (true);
+}
+

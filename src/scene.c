@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 02:06:12 by ichiro            #+#    #+#             */
-/*   Updated: 2023/10/29 22:13:37 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/10/30 21:33:29 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,42 +100,42 @@ void	init_scene_two(t_scene *scene)
 	vec_init(&scene->planes, 32, sizeof(t_plane));
 	// scene->spheres[0] = create_sphere(vec3_new(0.0f, 0.0f, 0.0f), 1.0f);
 
-	//! bottom
-	plane = create_plane(5.1f, 3.1f, \
-							vec3_new(0.0f, 0.0f, 0.0f), \
-							vec3_new(0.0f, 1.0f, 0.0f), \
-							new_diffuse(vec3_new(0.4f, 0.4f, 0.4f)));
-	array_push(&scene->planes, &plane);
-	//! top
-	plane = create_plane(5.1f, 3.1f, \
-							vec3_new(0.0f, 3.0f, 0.0f), \
-							vec3_new(0.0f,-1.0f, 0.0f), \
-							new_diffuse(vec3_new(0.9f, 0.9f, 0.9f)));
-	array_push(&scene->planes, &plane);
-	//! left
-	plane = create_plane(3.1f, 3.1f, \
-							vec3_new(-2.5f, 1.5f, 0.0f), \
-							vec3_new(1.0f, 0.0f, 0.0f), \
-							new_diffuse(vec3_new(0.478f, 0.792f, 0.949f)));
-	array_push(&scene->planes, &plane);
-	// ! right
-	plane = create_plane(5.1f, 3.1f, \
-							vec3_new(2.5f, 1.5f, 0.0f), \
-							vec3_new(-1.0f, 0.0f, 0.0f), \
-							new_diffuse(vec3_new(0.941f, 0.4787f, 0.949f)));
-	array_push(&scene->planes, &plane);
-	//! front
-	plane = create_plane(5.1f, 3.1f, \
-							vec3_new(0.0f, 1.5f, 1.5f), \
-							vec3_new(0.0f, 0.0f, -1.0f), \
-							new_diffuse(vec3_new(1.0f, 1.0f, 1.0f)));
-	array_push(&scene->planes, &plane);
-	//! back
-	plane = create_plane(5.1f, 3.1f, \
-							vec3_new(0.0f, 1.5f, -1.5f), \
-							vec3_new(0.0f, 0.0f, 1.0f), \
-							new_diffuse(vec3_new(0.365f, 0.87f, 0.749f)));
-	array_push(&scene->planes, &plane);
+	// //! bottom
+	// plane = create_plane(5.1f, 3.1f, \
+	// 						vec3_new(0.0f, 0.0f, 0.0f), \
+	// 						vec3_new(0.0f, 1.0f, 0.0f), \
+	// 						new_diffuse(vec3_new(0.4f, 0.4f, 0.4f)));
+	// array_push(&scene->planes, &plane);
+	// //! top
+	// plane = create_plane(5.1f, 3.1f, \
+	// 						vec3_new(0.0f, 3.0f, 0.0f), \
+	// 						vec3_new(0.0f,-1.0f, 0.0f), \
+	// 						new_diffuse(vec3_new(0.9f, 0.9f, 0.9f)));
+	// array_push(&scene->planes, &plane);
+	// //! left
+	// plane = create_plane(3.1f, 3.1f, \
+	// 						vec3_new(-2.5f, 1.5f, 0.0f), \
+	// 						vec3_new(1.0f, 0.0f, 0.0f), \
+	// 						new_diffuse(vec3_new(0.478f, 0.792f, 0.949f)));
+	// array_push(&scene->planes, &plane);
+	// // ! right
+	// plane = create_plane(5.1f, 3.1f, \
+	// 						vec3_new(2.5f, 1.5f, 0.0f), \
+	// 						vec3_new(-1.0f, 0.0f, 0.0f), \
+	// 						new_diffuse(vec3_new(0.941f, 0.4787f, 0.949f)));
+	// array_push(&scene->planes, &plane);
+	// //! front
+	// plane = create_plane(5.1f, 3.1f, \
+	// 						vec3_new(0.0f, 1.5f, 1.5f), \
+	// 						vec3_new(0.0f, 0.0f, -1.0f), \
+	// 						new_diffuse(vec3_new(1.0f, 1.0f, 1.0f)));
+	// array_push(&scene->planes, &plane);
+	// //! back
+	// plane = create_plane(5.1f, 3.1f, \
+	// 						vec3_new(0.0f, 1.5f, -1.5f), \
+	// 						vec3_new(0.0f, 0.0f, 1.0f), \
+	// 						new_diffuse(vec3_new(0.365f, 0.87f, 0.749f)));
+	// array_push(&scene->planes, &plane);
 
 
 

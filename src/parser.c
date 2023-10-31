@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 02:06:12 by ichiro            #+#    #+#             */
-/*   Updated: 2023/10/30 15:59:59 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/10/30 21:40:13 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,11 +161,33 @@ bool	convert_input_to_scene(int argc, char **argv, t_data *data)
 			if (srgb_to_vec3(split[2], &data->scene.ambient.color) == false)
 				return (printf("Invalid input: Ambient light!\n"), false);
 			data->scene.ambient.enabled = true;
+			free_2d_arr(split);
 		}
 		else if (strcmp(split[0], "C") == 0) //! Camera
 		{
 			if (ft_2d_strlen(split) != 4)
 				return (printf("Invalid input: Camera\n"), false);
+			if (parse_get_pos(split[1], &data->scene.camera.position) == false)
+				return (printf("Invalid input: Camera\n"), free_2d_arr(split), false);
+			if (parse_get_normal(split[2], &data->scene.camera.direction) == false)
+				return (printf("Invalid input: Camera\n"), free_2d_arr(split), false);
+			data->scene.camera.vertical_fov = string_to_float(split[3]);
+			free_2d_arr(split);
+		}
+		else if (strcmp(split[0], "sp") == 0) //! Sphere
+		{
+			if (ft_2d_strlen(split) != 4)
+				return (printf("Invalid input: Sphere\n"), false);
+			t_vec3 pos;
+			if (parse_get_pos(split[1], &pos) == false)
+				return (printf("Invalid input: Sphere\n"), free_2d_arr(split), false);
+			float radius = string_to_float(split[2]);
+			t_vec3 c;
+			if (srgb_to_vec3(split[3], &c) == false)
+				return (printf("Invalid input: Sphere!\n"), false);
+			printf("pos = %f, %f, %f\n", pos.x, pos.y, pos.z);
+			printf("radius = %f\n", radius);
+			printf("color = %f, %f, %f\n", c.x, c.y, c.z);
 		}
 		free(line);
 	}
@@ -175,6 +197,7 @@ bool	convert_input_to_scene(int argc, char **argv, t_data *data)
 
 bool	parse_input(int argc, char **argv, t_data *data)
 {
+	
 	data->scene.ambient.enabled = false;
 	if (input_is_valid(argc, argv, data) == false)
 	{
@@ -184,11 +207,26 @@ bool	parse_input(int argc, char **argv, t_data *data)
 	printf("parse_input\n");
 	convert_input_to_scene(argc, argv, data);
 	printf("----------------------\n");
-	printf("ambient = %d\n", data->scene.ambient.enabled);
-	t_vec3 ambient = data->scene.ambient.color;
-	printf("ambient = %f\n", data->scene.ambient.strength);
-	printf("ambient = %f, %f, %f\n", ambient.x, ambient.y, ambient.z);
 
 
-	exit(0);
+	t_sphere	sphere;
+	vec_init(&data->scene.spheres, 16, sizeof(t_sphere));
+	vec_init(&data->scene.planes, 16, sizeof(t_plane));
+	sphere = create_sphere(vec3_new(-1.5f, 1.5f, 0.0f), 0.4f);
+	array_push(&data->scene.spheres, &sphere);
+
+
+	// printf("ambient = %d\n", data->scene.ambient.enabled);
+	// t_vec3 ambient = data->scene.ambient.color;
+	// printf("ambient = %f\n", data->scene.ambient.strength);
+	// printf("ambient = %f, %f, %f\n", ambient.x, ambient.y, ambient.z);
+
+	// t_vec3 pos = data->scene.camera.position;
+	// t_vec3 dir = data->scene.camera.direction;
+	// printf("\ncamera = %f, %f, %f\n", pos.x, pos.y, pos.z);
+	// printf("camera = %f, %f, %f\n", dir.x, dir.y, dir.z);
+	// printf("camera = %f\n", data->scene.camera.vertical_fov);
+
+
+	// exit(0);
 }

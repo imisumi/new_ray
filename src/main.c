@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/30 15:43:04 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/10/30 21:39:57 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -767,7 +767,6 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 		if (closest_hit.hit)
 		{
 			// return vec4_new(closest_hit.material.color.x, closest_hit.material.color.y, closest_hit.material.color.z, 1.0f);
-
 			ray.origin = vec3_add(closest_hit.position, vec3_mulf(closest_hit.normal, 0.00001f));
 			
 			t_vec3 temp = random_direction(rngState);
@@ -778,8 +777,6 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 			
 			ray.direction =  lerp(diffuse_dir, specular_dir, \
 									closest_hit.material.roughness * is_specular);
-			check_nan(ray.direction);
-			
 			t_material material = closest_hit.material;
 			t_vec3 emitted_light = vec3_mulf(material.emission_color, material.emission_strength);
 
@@ -799,18 +796,14 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 			shadow_hit = plane_intersection(shadow_ray, s.planes, shadow_hit);
 			shadow_hit = sphere_intersection(shadow_ray, s.spheres, shadow_hit);
 			
-			// if (shadow_hit.hit == false && shadow_hit.distance >= calculate_distance(shadow_ray.origin, vec3_new(0, 2, 0)))
-			// t_sphere *sp;
-			// t_sphere s;
-
 			// vec_init(&sp, 8, sizeof(t_sphere));
 			
 			// s.position = vec3_new(0, 2, 0);
 			// s.radius = 0.01f;
 			// array_push(&sp, &s);
-			float x = sphere_intersection(shadow_ray, sp, shadow_hit).distance;
-			// if (shadow_hit.hit == false && shadow_hit.hit > sphere_intersection(shadow_ray, sp, shadow_hit).distance)
-			if (x < shadow_hit.distance)
+			// float x = sphere_intersection(shadow_ray, sp, shadow_hit).distance;
+			t_hitinfo l = sphere_intersection(shadow_ray, sp, shadow_hit);
+			if (l.distance < shadow_hit.distance && l.hit)
 				emitted_light = vec3_add(emitted_light, diffuse_contribution);
 			
 			incomming_light = vec3_add(incomming_light, vec3_mul(ray_color, emitted_light));
@@ -833,11 +826,11 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 			// return vec4_new(bg.x, bg.y, bg.z, 1.0f);
 			t_vec3 unit_direction = vec3_normalize(ray.direction);
 			float t = 0.5f * (unit_direction.y + 1.0f);
-			if (t <= 0.0f)
-			{
-				printf("t < 0.0f\n");
-				sleep(5555555);
-			}
+			// if (t <= 0.0f)
+			// {
+			// 	printf("t < 0.0f\n");
+			// 	sleep(5555555);
+			// }
 			t_vec3 sky = vec3_add(vec3_mulf(vec3_new(1.0f, 1.0f, 1.0f), 1.0f - t), vec3_mulf(vec3_new(0.5f, 0.7f, 1.0f), t));
 			incomming_light = vec3_add(incomming_light, vec3_mul(ray_color, sky));
 			// incomming_light = vec3_add(incomming_light, vec3_new(0.5f, 0.7f, 1.0f));
@@ -1121,7 +1114,7 @@ void init_scene(t_scene *s)
 	// exit(0);
 	init_camera(&s->camera);
 	// init_scene_one(s);
-	init_scene_two(s);
+	// init_scene_two(s);
 	// init_scene_three(s);
 	// init_scene_four(s);
 	return ;

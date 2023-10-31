@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.h                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/30 15:45:39 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/10/30 20:16:08 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -298,3 +298,8 @@ float	string_to_float(char *str);
 bool	srgb_to_vec3(char *str, t_vec3 *color);
 int		char_count(char *str, char c);
 int		ft_2d_strlen(char **arr);
+void	free_2d_arr(char **arr);
+
+bool	parse_get_pos(char *str, t_vec3 *pos);
+
+bool	parse_get_normal(char *str, t_vec3 *normal);

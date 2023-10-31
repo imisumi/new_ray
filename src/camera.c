@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   camera.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 02:06:12 by ichiro            #+#    #+#             */
-/*   Updated: 2023/10/27 14:42:09 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/10/30 20:26:21 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,8 +97,8 @@ void anti_aliasing(t_data *d)
 
 void init_camera(t_camera *cam)
 {
-	cam->position = vec3_new(0.0, 1.0, 3.0f);
-	cam->direction = vec3_new(0.0, 0.0, -1.0);
+	// cam->position = vec3_new(0.0, 1.0, 3.0f);
+	// cam->direction = vec3_new(0.0, 0.0, -1.0);
 
 	cam->ray_dir = malloc(sizeof(t_vec3) * WIDTH * HEIGHT);
 
@@ -110,7 +110,7 @@ void init_camera(t_camera *cam)
 	cam->view = mat4_identity();
 	cam->inv_view = mat4_identity();
 
-	cam->vertical_fov = 45.0f;
+	// cam->vertical_fov = 45.0f;
 	cam->aspectRatio = (float)WIDTH / (float)HEIGHT;
 	cam->zNear = 0.1f;
 	cam->zFar = 100.0f;
