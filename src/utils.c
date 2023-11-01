@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 02:06:12 by ichiro            #+#    #+#             */
-/*   Updated: 2023/10/30 20:18:59 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/01 01:34:57 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -182,6 +182,21 @@ bool	parse_get_pos(char *str, t_vec3 *pos)
 	pos->z = string_to_float(split[2]);
 	free_2d_arr(split);
 	return (true);
+}
+
+t_sphere	new_sphere(t_vec3 pos, float radius, t_vec3 color)
+{
+	t_sphere	sphere;
+
+	sphere.radius = radius;
+	sphere.position = pos;
+	sphere.material.color = color;
+	sphere.material.roughness = 1.0f;
+	sphere.material.specular = 0.4f;
+	sphere.material.specular_color = vec3_new(1.0f, 1.0f, 1.0f);
+	sphere.material.emission_color = vec3_new(0.0f, 0.0f, 0.0f);
+	sphere.material.emission_strength = 0.0f;
+	return (sphere);
 }
 
 bool	parse_get_normal(char *str, t_vec3 *normal)

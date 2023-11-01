@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/30 20:16:08 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/10/31 17:32:31 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -303,3 +303,5 @@ void	free_2d_arr(char **arr);
 bool	parse_get_pos(char *str, t_vec3 *pos);
 
 bool	parse_get_normal(char *str, t_vec3 *normal);
+
+t_sphere	new_sphere(t_vec3 pos, float radius, t_vec3 color);

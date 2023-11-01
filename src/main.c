@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/30 21:39:57 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/01 02:52:41 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -782,9 +782,10 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 
 
 			//! manditoy light
-			t_vec3 light_direction = vec3_normalize(vec3_sub(vec3_new(0, 2, 0), closest_hit.position));
+			t_vec3 light_direction = vec3_normalize(vec3_sub(sp->position, closest_hit.position));
 			float diffuse_intensity = fmaxf(vec3_dot(closest_hit.normal, light_direction), 0.0f);
-			t_vec3 diffuse_contribution = vec3_mulf(vec3_new(1, 1, 1), diffuse_intensity * 0.3f);
+			//! light params
+			t_vec3 diffuse_contribution = vec3_mulf(vec3_new(1, 1, 1), diffuse_intensity * 0.0f);
 
 			t_ray shadow_ray;
 			shadow_ray.origin = vec3_add(closest_hit.position, vec3_mulf(closest_hit.normal, 0.00001f)); // Offset the origin slightly to avoid self-intersections
@@ -795,16 +796,11 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 			// shadow_hit = testing_bvh(shadow_ray, bvh_nodes, shadow_hit);
 			shadow_hit = plane_intersection(shadow_ray, s.planes, shadow_hit);
 			shadow_hit = sphere_intersection(shadow_ray, s.spheres, shadow_hit);
-			
-			// vec_init(&sp, 8, sizeof(t_sphere));
-			
-			// s.position = vec3_new(0, 2, 0);
-			// s.radius = 0.01f;
-			// array_push(&sp, &s);
-			// float x = sphere_intersection(shadow_ray, sp, shadow_hit).distance;
 			t_hitinfo l = sphere_intersection(shadow_ray, sp, shadow_hit);
 			if (l.distance < shadow_hit.distance && l.hit)
+			{
 				emitted_light = vec3_add(emitted_light, diffuse_contribution);
+			}
 			
 			incomming_light = vec3_add(incomming_light, vec3_mul(ray_color, emitted_light));
 			// check_nan(incomming_light);
@@ -822,18 +818,21 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 		}
 		else
 		{
+			// t_vec3 ambient = vec3_new(1, 1, 1);
+			// float a_strength = 0.2f;
+
+			// t_vec3 ambient_contribution = vec3_mulf(ambient, a_strength);
+			// incomming_light = vec3_add(incomming_light, vec3_mulf(ray_color, 0.5));
+			// break ;
+			// break ;
 			// t_vec3 bg = background(0.0f, ray.direction);
 			// return vec4_new(bg.x, bg.y, bg.z, 1.0f);
 			t_vec3 unit_direction = vec3_normalize(ray.direction);
 			float t = 0.5f * (unit_direction.y + 1.0f);
-			// if (t <= 0.0f)
-			// {
-			// 	printf("t < 0.0f\n");
-			// 	sleep(5555555);
-			// }
-			t_vec3 sky = vec3_add(vec3_mulf(vec3_new(1.0f, 1.0f, 1.0f), 1.0f - t), vec3_mulf(vec3_new(0.5f, 0.7f, 1.0f), t));
+			t_vec3 top = vec3_new(1.0f, 1.0f, 1.0f);
+			t_vec3	bottom = vec3_new(0.5f, 0.7f, 1.0f);
+			t_vec3 sky = vec3_add(vec3_mulf(top, 1.0f - t), vec3_mulf(bottom, t));
 			incomming_light = vec3_add(incomming_light, vec3_mul(ray_color, sky));
-			// incomming_light = vec3_add(incomming_light, vec3_new(0.5f, 0.7f, 1.0f));
 			break ;
 		}
 
@@ -1126,7 +1125,7 @@ int32_t main(int32_t argc, char* argv[])
 
 	vec_init(&sp, 8, sizeof(t_sphere));
 			
-	s.position = vec3_new(0, 2, 0);
+	s.position = vec3_new(6, 2, -6);
 	s.radius = 0.01f;
 	array_push(&sp, &s);
 

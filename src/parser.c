@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 02:06:12 by ichiro            #+#    #+#             */
-/*   Updated: 2023/10/30 21:40:13 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/01 01:37:01 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,8 @@ const char *table[] = {
 	"sp\t",
 	"cy ",
 	"cy\t"
+	"P",
+	"P\t"
 };
 
 const char *allowed_chars[] = {
@@ -188,6 +190,9 @@ bool	convert_input_to_scene(int argc, char **argv, t_data *data)
 			printf("pos = %f, %f, %f\n", pos.x, pos.y, pos.z);
 			printf("radius = %f\n", radius);
 			printf("color = %f, %f, %f\n", c.x, c.y, c.z);
+			t_sphere sphere;
+			sphere = new_sphere(pos, radius, c);
+			array_push(&data->scene.spheres, &sphere);
 		}
 		free(line);
 	}
@@ -197,7 +202,8 @@ bool	convert_input_to_scene(int argc, char **argv, t_data *data)
 
 bool	parse_input(int argc, char **argv, t_data *data)
 {
-	
+	vec_init(&data->scene.spheres, 16, sizeof(t_sphere));
+	vec_init(&data->scene.planes, 16, sizeof(t_plane));
 	data->scene.ambient.enabled = false;
 	if (input_is_valid(argc, argv, data) == false)
 	{
@@ -208,12 +214,31 @@ bool	parse_input(int argc, char **argv, t_data *data)
 	convert_input_to_scene(argc, argv, data);
 	printf("----------------------\n");
 
+	t_plane	plane;
+	plane.position = vec3_new(0.0f, -1.0f, 0.0f);
+	plane.normal = vec3_new(0.0f, 1.0f, 0.0f);
+	plane.width = 1000.0f;
+	plane.height = 1000.0f;
+	
+	// 140,118,206
+	plane.material.color = vec3_new(0.55f, 0.45f, 0.8f);
+	plane.material.emission_color = vec3_new(0.0f, 0.0f, 0.0f);
+	plane.material.emission_strength = 0.0f;
+	plane.material.roughness = 0.0f;
+	plane.material.specular = 0.0f;
+	plane.material.specular_color = vec3_new(0.0f, 0.0f, 0.0f);
+	array_push(&data->scene.planes, &plane);
+	
 
-	t_sphere	sphere;
-	vec_init(&data->scene.spheres, 16, sizeof(t_sphere));
-	vec_init(&data->scene.planes, 16, sizeof(t_plane));
-	sphere = create_sphere(vec3_new(-1.5f, 1.5f, 0.0f), 0.4f);
+	t_sphere	sphere = new_sphere(vec3_new(6.0f, 3.0f, -6.0f), 0.6f, vec3_new(1.0f, 1.0f, 1.0f));
+	sphere.material.emission_color = vec3_new(1.0f, 1.0f, 1.0f);
+	sphere.material.emission_strength = 50.0f;
 	array_push(&data->scene.spheres, &sphere);
+
+
+	// t_sphere	sphere;
+	// sphere = create_sphere(vec3_new(-1.5f, 1.5f, 0.0f), 0.4f);
+	// array_push(&data->scene.spheres, &sphere);
 
 
 	// printf("ambient = %d\n", data->scene.ambient.enabled);
