@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.h                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/31 17:32:31 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/01 16:42:36 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,10 @@
 
 # define WIDTH 400
 # define HEIGHT 400
-# define PIXEL_SIZE 3
+# define Y_MIN 120
+# define Y_MAX 200
+
+# define PIXEL_SIZE 4
 # define MT 1
 # define THREADS 8
 # define ANTIALIASING 1
@@ -71,7 +74,10 @@ typedef struct s_sphere
 {
 	t_vec3		position;
 	float		radius;
+	uint8_t	material_index;
 	t_material	material;
+	bool	color;
+	t_vec3	col;
 }	t_sphere;
 
 typedef struct s_plane
@@ -81,6 +87,7 @@ typedef struct s_plane
 	float		width;
 	float		height;
 	t_material	material;
+	uint8_t		material_index;
 }	t_plane;
 
 typedef struct s_aabb
@@ -126,6 +133,7 @@ typedef struct s_scene
 
 	t_sphere	*spheres;
 	t_plane		*planes;
+	t_material	*materials;
 	t_camera	camera;
 }				t_scene;
 
@@ -195,8 +203,6 @@ typedef struct s_light
 	float	strength;
 }	t_light;
 
-
-
 typedef struct s_hitinfo
 {
 	bool	hit;
@@ -205,6 +211,7 @@ typedef struct s_hitinfo
 	t_vec3	normal;
 
 	t_material	material;
+	
 }	t_hitinfo;
 
 
@@ -263,8 +270,10 @@ void anti_aliasing(t_data *d);
 
 // t_hitinfo	sphere_intersection(t_ray ray, t_sphere sphere);
 // t_hitinfo	sphere_intersection(t_ray ray, t_sphere *spheres);
-t_hitinfo	sphere_intersection(t_ray ray, t_sphere *spheres, t_hitinfo hitinfo);
-t_hitinfo	plane_intersection(t_ray ray, t_plane *planes, t_hitinfo obj_hit);
+// t_hitinfo	sphere_intersection(t_ray ray, t_sphere *spheres, t_hitinfo hitinfo);
+t_hitinfo		sphere_intersection(t_ray ray, t_scene s, t_hitinfo hitinfo);
+// t_hitinfo	plane_intersection(t_ray ray, t_plane *planes, t_hitinfo obj_hit);
+t_hitinfo	plane_intersection(t_ray ray, t_scene s, t_hitinfo obj_hit);
 
 // scene.c
 t_sphere	create_sphere(t_vec3 center, float radius);
@@ -305,3 +314,4 @@ bool	parse_get_pos(char *str, t_vec3 *pos);
 bool	parse_get_normal(char *str, t_vec3 *normal);
 
 t_sphere	new_sphere(t_vec3 pos, float radius, t_vec3 color);
+uint8_t		parse_get_material_index(t_data *data, char *str);

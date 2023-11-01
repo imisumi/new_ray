@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   utils.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 02:06:12 by ichiro            #+#    #+#             */
-/*   Updated: 2023/11/01 01:34:57 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/01 15:25:47 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -192,7 +192,7 @@ t_sphere	new_sphere(t_vec3 pos, float radius, t_vec3 color)
 	sphere.position = pos;
 	sphere.material.color = color;
 	sphere.material.roughness = 1.0f;
-	sphere.material.specular = 0.4f;
+	sphere.material.specular = 0.0f;
 	sphere.material.specular_color = vec3_new(1.0f, 1.0f, 1.0f);
 	sphere.material.emission_color = vec3_new(0.0f, 0.0f, 0.0f);
 	sphere.material.emission_strength = 0.0f;
@@ -223,3 +223,16 @@ bool	parse_get_normal(char *str, t_vec3 *normal)
 	return (true);
 }
 
+uint8_t	parse_get_material_index(t_data *data, char *str)
+{
+	int	i;
+
+	if (str[ft_strlen(str) - 1] == '\n')
+		str[ft_strlen(str) - 1] = '\0';
+	i = ft_atoi2(str);
+	if (i == -1)
+		return (0);
+	// if (array_length(&data->scene.materials) <= i)
+	// 	return (0);
+	return ((uint8_t)i);
+}

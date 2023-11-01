@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/01 02:52:41 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/01 16:48:03 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -761,8 +761,8 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 
 		// closest_hit = testing_bvh(ray, bvh_nodes, closest_hit);
 
-		closest_hit = plane_intersection(ray, s.planes, closest_hit);
-		closest_hit = sphere_intersection(ray, s.spheres, closest_hit);
+		closest_hit = plane_intersection(ray, s, closest_hit);
+		closest_hit = sphere_intersection(ray, s, closest_hit);
 
 		if (closest_hit.hit)
 		{
@@ -777,35 +777,34 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 			
 			ray.direction =  lerp(diffuse_dir, specular_dir, \
 									closest_hit.material.roughness * is_specular);
-			t_material material = closest_hit.material;
-			t_vec3 emitted_light = vec3_mulf(material.emission_color, material.emission_strength);
+			t_vec3 emitted_light = vec3_mulf(closest_hit.material.emission_color, closest_hit.material.emission_strength);
 
 
-			//! manditoy light
-			t_vec3 light_direction = vec3_normalize(vec3_sub(sp->position, closest_hit.position));
-			float diffuse_intensity = fmaxf(vec3_dot(closest_hit.normal, light_direction), 0.0f);
-			//! light params
-			t_vec3 diffuse_contribution = vec3_mulf(vec3_new(1, 1, 1), diffuse_intensity * 0.0f);
+			// //! manditoy light
+			// t_vec3 light_direction = vec3_normalize(vec3_sub(sp->position, closest_hit.position));
+			// float diffuse_intensity = fmaxf(vec3_dot(closest_hit.normal, light_direction), 0.0f);
+			// //! light params
+			// t_vec3 diffuse_contribution = vec3_mulf(vec3_new(1, 1, 1), diffuse_intensity * 0.0f);
 
-			t_ray shadow_ray;
-			shadow_ray.origin = vec3_add(closest_hit.position, vec3_mulf(closest_hit.normal, 0.00001f)); // Offset the origin slightly to avoid self-intersections
-			shadow_ray.direction = light_direction;
-			t_hitinfo shadow_hit;
-			shadow_hit.hit = false;
-			shadow_hit.distance = FLT_MAX;
-			// shadow_hit = testing_bvh(shadow_ray, bvh_nodes, shadow_hit);
-			shadow_hit = plane_intersection(shadow_ray, s.planes, shadow_hit);
-			shadow_hit = sphere_intersection(shadow_ray, s.spheres, shadow_hit);
-			t_hitinfo l = sphere_intersection(shadow_ray, sp, shadow_hit);
-			if (l.distance < shadow_hit.distance && l.hit)
-			{
-				emitted_light = vec3_add(emitted_light, diffuse_contribution);
-			}
+			// t_ray shadow_ray;
+			// shadow_ray.origin = vec3_add(closest_hit.position, vec3_mulf(closest_hit.normal, 0.00001f)); // Offset the origin slightly to avoid self-intersections
+			// shadow_ray.direction = light_direction;
+			// t_hitinfo shadow_hit;
+			// shadow_hit.hit = false;
+			// shadow_hit.distance = FLT_MAX;
+			// // shadow_hit = testing_bvh(shadow_ray, bvh_nodes, shadow_hit);
+			// shadow_hit = plane_intersection(shadow_ray, s, shadow_hit);
+			// shadow_hit = sphere_intersection(shadow_ray, s, shadow_hit);
+			// t_hitinfo l = sphere_intersection(shadow_ray, sp, shadow_hit);
+			// if (l.distance < shadow_hit.distance && l.hit)
+			// {
+			// 	emitted_light = vec3_add(emitted_light, diffuse_contribution);
+			// }
 			
 			incomming_light = vec3_add(incomming_light, vec3_mul(ray_color, emitted_light));
 			// check_nan(incomming_light);
 
-			ray_color = vec3_mul(ray_color, lerp(material.color, material.specular_color, is_specular));
+			ray_color = vec3_mul(ray_color, lerp(closest_hit.material.color, closest_hit.material.specular_color, is_specular));
 
 			//!russian roullet
 			float p = fmaxf(ray_color.x, fmaxf(ray_color.y, ray_color.z));
@@ -860,6 +859,8 @@ void	*render(void *param)
 		memset(data->utils.accumulated_data, 0, WIDTH * HEIGHT * sizeof(t_vec4));
 	for (int y = data->utils.blocks[index].y_start; y <data->utils.blocks[index].y_end; y++)
 	{
+		// if (y > Y_MAX || y < Y_MIN)
+		// 	continue ;
 		for (int x = data->utils.blocks[index].x_start; x < data->utils.blocks[index].x_end; x++)
 		{
 			t_vec2 coord = {(float)x / (float)(WIDTH), (float)y / (float)(HEIGHT)};

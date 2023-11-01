@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 02:06:12 by ichiro            #+#    #+#             */
-/*   Updated: 2023/11/01 01:37:01 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/01 16:49:30 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,12 @@ const char *table[] = {
 	"sp\t",
 	"cy ",
 	"cy\t"
-	"P",
-	"P\t"
+	"P ",
+	"P\t",
+	"M ",
+	"M\t",
+	"S ",
+	"S\t"
 };
 
 const char *allowed_chars[] = {
@@ -96,7 +100,8 @@ bool	input_is_valid(int argc, char **argv, t_data *data)
 {
 	char	*line;
 
-	int fd = open("test.rt", O_RDONLY);
+	// int fd = open("test.rt", O_RDONLY);
+	int fd = open("map1.rt", O_RDONLY);
 	while (true)
 	{
 		line = get_next_line(fd);
@@ -131,7 +136,8 @@ bool	convert_input_to_scene(int argc, char **argv, t_data *data)
 	char	*line;
 	char	**split;
 
-	int fd = open("test.rt", O_RDONLY);
+	// int fd = open("test.rt", O_RDONLY);
+	int fd = open("map1.rt", O_RDONLY);
 	while (true)
 	{
 		line = get_next_line(fd);
@@ -180,18 +186,57 @@ bool	convert_input_to_scene(int argc, char **argv, t_data *data)
 		{
 			if (ft_2d_strlen(split) != 4)
 				return (printf("Invalid input: Sphere\n"), false);
-			t_vec3 pos;
-			if (parse_get_pos(split[1], &pos) == false)
+			t_sphere	sphere;
+			if (parse_get_pos(split[1], &sphere.position) == false)
 				return (printf("Invalid input: Sphere\n"), free_2d_arr(split), false);
-			float radius = string_to_float(split[2]);
-			t_vec3 c;
-			if (srgb_to_vec3(split[3], &c) == false)
+			sphere.radius = string_to_float(split[2]);
+			if (srgb_to_vec3(split[3], &sphere.col) == false)
 				return (printf("Invalid input: Sphere!\n"), false);
-			printf("pos = %f, %f, %f\n", pos.x, pos.y, pos.z);
-			printf("radius = %f\n", radius);
-			printf("color = %f, %f, %f\n", c.x, c.y, c.z);
-			t_sphere sphere;
-			sphere = new_sphere(pos, radius, c);
+			sphere.color = true;
+			sphere.material_index = 0;
+			array_push(&data->scene.spheres, &sphere);
+		}
+		else if (strcmp(split[0], "M") == 0) //! Sphere
+		{
+			if (ft_2d_strlen(split) != 7)
+				return (printf("Invalid input: Material\n"), false);
+			t_material	m;
+			if (srgb_to_vec3(split[1], &m.color) == false)
+				return (printf("Invalid input: Material!\n"), false);
+			m.roughness = string_to_float(split[2]);
+			m.specular = string_to_float(split[3]);
+			if (srgb_to_vec3(split[4], &m.specular_color) == false)
+				return (printf("Invalid input: Material!\n"), false);
+			m.emission_strength = string_to_float(split[5]);
+			if (srgb_to_vec3(split[6], &m.emission_color) == false)
+				return (printf("Invalid input: Material!\n"), false);
+			array_push(&data->scene.materials, &m);
+		}
+		else if (strcmp(split[0], "P") == 0) //! Sphere
+		{
+			if (ft_2d_strlen(split) != 6)
+				return (printf("Invalid input: Plane\n"), false);
+			t_plane	plane;
+			if (parse_get_pos(split[1], &plane.position) == false)
+				return (printf("Invalid input: Plane\n"), free_2d_arr(split), false);
+			if (parse_get_normal(split[2], &plane.normal) == false)
+				return (printf("Invalid input: Plane\n"), free_2d_arr(split), false);
+			plane.width = string_to_float(split[3]);
+			plane.height = string_to_float(split[4]);
+			plane.material_index = parse_get_material_index(data, split[5]);
+			array_push(&data->scene.planes, &plane);
+			
+		}
+		else if (strcmp(split[0], "S") == 0) //! Sphere
+		{
+			if (ft_2d_strlen(split) != 4)
+				return (printf("Invalid input: Sphere\n"), false);
+			t_sphere	sphere;
+			if (parse_get_pos(split[1], &sphere.position) == false)
+				return (printf("Invalid input: Sphere\n"), free_2d_arr(split), false);
+			sphere.radius= string_to_float(split[2]);
+			sphere.material_index = parse_get_material_index(data, split[3]);
+			sphere.color = false;
 			array_push(&data->scene.spheres, &sphere);
 		}
 		free(line);
@@ -204,6 +249,7 @@ bool	parse_input(int argc, char **argv, t_data *data)
 {
 	vec_init(&data->scene.spheres, 16, sizeof(t_sphere));
 	vec_init(&data->scene.planes, 16, sizeof(t_plane));
+	vec_init(&data->scene.materials, 16, sizeof(t_material));
 	data->scene.ambient.enabled = false;
 	if (input_is_valid(argc, argv, data) == false)
 	{
@@ -214,26 +260,21 @@ bool	parse_input(int argc, char **argv, t_data *data)
 	convert_input_to_scene(argc, argv, data);
 	printf("----------------------\n");
 
-	t_plane	plane;
-	plane.position = vec3_new(0.0f, -1.0f, 0.0f);
-	plane.normal = vec3_new(0.0f, 1.0f, 0.0f);
-	plane.width = 1000.0f;
-	plane.height = 1000.0f;
+	// t_plane	plane;
+	// plane.position = vec3_new(0.0f, -1.0f, 0.0f);
+	// plane.normal = vec3_new(0.0f, 1.0f, 0.0f);
+	// plane.width = 1000.0f;
+	// plane.height = 1000.0f;
+	// plane.material_index = 0;
 	
-	// 140,118,206
-	plane.material.color = vec3_new(0.55f, 0.45f, 0.8f);
-	plane.material.emission_color = vec3_new(0.0f, 0.0f, 0.0f);
-	plane.material.emission_strength = 0.0f;
-	plane.material.roughness = 0.0f;
-	plane.material.specular = 0.0f;
-	plane.material.specular_color = vec3_new(0.0f, 0.0f, 0.0f);
-	array_push(&data->scene.planes, &plane);
+	// // 140,118,206
+	// array_push(&data->scene.planes, &plane);
 	
 
-	t_sphere	sphere = new_sphere(vec3_new(6.0f, 3.0f, -6.0f), 0.6f, vec3_new(1.0f, 1.0f, 1.0f));
-	sphere.material.emission_color = vec3_new(1.0f, 1.0f, 1.0f);
-	sphere.material.emission_strength = 50.0f;
-	array_push(&data->scene.spheres, &sphere);
+	// t_sphere	sphere = new_sphere(vec3_new(6.0f, 3.0f, -6.0f), 0.6f, vec3_new(1.0f, 1.0f, 1.0f));
+	// sphere.material.emission_color = vec3_new(1.0f, 1.0f, 1.0f);
+	// sphere.material.emission_strength = 50.0f;
+	// array_push(&data->scene.spheres, &sphere);
 
 
 	// t_sphere	sphere;

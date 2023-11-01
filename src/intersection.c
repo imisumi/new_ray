@@ -6,7 +6,7 @@
 /*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/10/27 14:41:31 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/11/01 16:51:23 by imisumi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,18 +51,18 @@
 // 	return (hitinfo);
 // }
 
-t_hitinfo	sphere_intersection(t_ray ray, t_sphere *spheres, t_hitinfo hitinfo)
+t_hitinfo	sphere_intersection(t_ray ray, t_scene s, t_hitinfo hitinfo)
 {
 	int	i;
 
 	i = 0;
-	while (i < array_length(&spheres))
+	while (i < array_length(&s.spheres))
 	{
-		t_vec3	offset_origin = vec3_sub(ray.origin, spheres[i].position);
+		t_vec3	offset_origin = vec3_sub(ray.origin, s.spheres[i].position);
 	
 		float	a = vec3_dot(ray.direction, ray.direction);
 		float	b = 2.0f * vec3_dot(offset_origin, ray.direction);
-		float	c = vec3_dot(offset_origin, offset_origin) - spheres[i].radius * spheres[i].radius;
+		float	c = vec3_dot(offset_origin, offset_origin) - s.spheres[i].radius * s.spheres[i].radius;
 	
 		float	discriminant = b * b - 4 * a * c;
 	
@@ -74,8 +74,11 @@ t_hitinfo	sphere_intersection(t_ray ray, t_sphere *spheres, t_hitinfo hitinfo)
 				hitinfo.hit = true;
 				hitinfo.distance = t;
 				hitinfo.position = vec3_add(ray.origin, vec3_mulf(ray.direction, t));
-				hitinfo.normal = vec3_normalize(vec3_sub(hitinfo.position, spheres[i].position));
-				hitinfo.material = spheres[i].material;
+				hitinfo.normal = vec3_normalize(vec3_sub(hitinfo.position, s.spheres[i].position));
+				hitinfo.material = s.materials[s.spheres[i].material_index];
+				if (s.spheres[i].color == true)
+					hitinfo.material.color = s.spheres[i].col;
+				
 			}
 		}
 		i++;
@@ -83,43 +86,44 @@ t_hitinfo	sphere_intersection(t_ray ray, t_sphere *spheres, t_hitinfo hitinfo)
 	return (hitinfo);
 }
 
-t_hitinfo	plane_intersection(t_ray ray, t_plane *planes, t_hitinfo obj_hit)
+t_hitinfo	plane_intersection(t_ray ray, t_scene s, t_hitinfo obj_hit)
 {
 	int	i;
 
 	i = 0;
-	for (int i = 0; i < array_length(&planes); i++)
+	for (int i = 0; i < array_length(&s.planes); i++)
 	{
-		float denom = vec3_dot(ray.direction, planes[i].normal);
+		float denom = vec3_dot(ray.direction, s.planes[i].normal);
 		if (fabs(denom) > 1e-6)
 		{
-			t_vec3 p0l0 = vec3_sub(planes[i].position, ray.origin);
-			float t = vec3_dot(p0l0, planes[i].normal) / denom;
+			t_vec3 p0l0 = vec3_sub(s.planes[i].position, ray.origin);
+			float t = vec3_dot(p0l0, s.planes[i].normal) / denom;
 			if (t >= 0.0f)
 			{
 				if (t < obj_hit.distance)
 				{
 					t_vec3 intersection_point = vec3_add(ray.origin, vec3_mulf(ray.direction, t));
-					float half_width = planes[i].width / 2.0f;
-					float half_height = planes[i].height / 2.0f;
+					float half_width = s.planes[i].width / 2.0f;
+					float half_height = s.planes[i].height / 2.0f;
 					
 					// Check if the intersection point lies within the plane's limits
-					if (intersection_point.x >= (planes[i].position.x - half_width) &&
-						intersection_point.x <= (planes[i].position.x + half_width) &&
-						intersection_point.y >= (planes[i].position.y - half_height) &&
-						intersection_point.y <= (planes[i].position.y + half_height) &&
-						intersection_point.z >= (planes[i].position.z - half_height) &&
-						intersection_point.z <= (planes[i].position.z + half_height))
+					if (intersection_point.x >= (s.planes[i].position.x - half_width) &&
+						intersection_point.x <= (s.planes[i].position.x + half_width) &&
+						intersection_point.y >= (s.planes[i].position.y - half_height) &&
+						intersection_point.y <= (s.planes[i].position.y + half_height) &&
+						intersection_point.z >= (s.planes[i].position.z - half_height) &&
+						intersection_point.z <= (s.planes[i].position.z + half_height))
 					{
-						// if (vec3_dot(ray.direction, planes[i].normal) <= 0.0f)
-						if (vec3_dot(ray.direction, planes[i].normal) < 0.0f)
+						// if (vec3_dot(ray.direction, s.planes[i].normal) <= 0.0f)
+						if (vec3_dot(ray.direction, s.planes[i].normal) < 0.0f)
 						{
 							obj_hit.hit = true;
 							obj_hit.distance = t;
 							obj_hit.position = vec3_add(ray.origin, vec3_mulf(ray.direction, t));
-							// // obj_hit.normal = vec3_normalize(vec3_sub(obj_hit.position, planes[i].position));
-							obj_hit.normal = planes[i].normal;
-							obj_hit.material = planes[i].material;
+							// // obj_hit.normal = vec3_normalize(vec3_sub(obj_hit.position, s.planes[i].position));
+							obj_hit.normal = s.planes[i].normal;
+							// obj_hit.material = s.planes[i].material;
+							obj_hit.material = s.materials[s.planes[i].material_index];
 						}
 					}
 				}
