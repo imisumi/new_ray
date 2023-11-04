@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/28 02:06:12 by ichiro            #+#    #+#             */
-/*   Updated: 2023/11/01 16:49:30 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/11/04 03:19:02 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,8 +100,9 @@ bool	input_is_valid(int argc, char **argv, t_data *data)
 {
 	char	*line;
 
+	int fd = open("skybox.rt", O_RDONLY);
 	// int fd = open("test.rt", O_RDONLY);
-	int fd = open("map1.rt", O_RDONLY);
+	// int fd = open("map1.rt", O_RDONLY);
 	while (true)
 	{
 		line = get_next_line(fd);
@@ -136,8 +137,10 @@ bool	convert_input_to_scene(int argc, char **argv, t_data *data)
 	char	*line;
 	char	**split;
 
+
+	int fd = open("skybox.rt", O_RDONLY);
 	// int fd = open("test.rt", O_RDONLY);
-	int fd = open("map1.rt", O_RDONLY);
+	// int fd = open("map1.rt", O_RDONLY);
 	while (true)
 	{
 		line = get_next_line(fd);

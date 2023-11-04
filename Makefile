@@ -6,7 +6,7 @@
 #    By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/28 00:51:40 by ichiro            #+#    #+#              #
-#    Updated: 2023/10/30 00:44:06 by imisumi-wsl      ###   ########.fr        #
+#    Updated: 2023/11/03 22:49:58 by imisumi-wsl      ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -76,7 +76,7 @@ $(MLX):
 	@echo "$(GREEN)[Completed MLX]$(NC)"
 
 $(NAME): $(LIBFT) $(LIB3D) $(MLX) $(OBJS)
-	$(cc) $(CFLAGS) $(SRCS) $(LIBFT) $(LIB3D) $(MLX) $(LFLAGS) -o $(NAME)
+	$(cc) $(CFLAGS) $(SRCS) ./tinyexr.o ./miniz.o -lstdc++ $(LIBFT) $(LIB3D) $(MLX) $(LFLAGS) -o $(NAME)
 
 run: re
 	./$(NAME)

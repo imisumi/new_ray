@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.h                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/01 16:42:36 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/11/04 02:50:07 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,15 +23,15 @@
 # include "darray.h"
 # include "lib3d.h"
 
-# define WIDTH 400
-# define HEIGHT 400
+# define WIDTH 500
+# define HEIGHT 500
 # define Y_MIN 120
 # define Y_MAX 200
 
-# define PIXEL_SIZE 4
+# define PIXEL_SIZE 2
 # define MT 1
 # define THREADS 8
-# define ANTIALIASING 1
+# define ANTIALIASING 0
 
 # define MAX_BOUNCHES 8
 
@@ -40,7 +40,6 @@
 # define MAX_TRIS_LEAF 4
 
 # define RENDER_BVH 0
-
 
 typedef struct s_render_block
 {
