@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/04 02:50:07 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/09 02:31:51 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,13 +25,15 @@
 
 # define WIDTH 500
 # define HEIGHT 500
+// # define WIDTH 2048
+// # define HEIGHT 1024
 # define Y_MIN 120
 # define Y_MAX 200
 
 # define PIXEL_SIZE 2
-# define MT 1
+# define MT 0
 # define THREADS 8
-# define ANTIALIASING 0
+# define ANTIALIASING 1
 
 # define MAX_BOUNCHES 8
 
@@ -40,6 +42,10 @@
 # define MAX_TRIS_LEAF 4
 
 # define RENDER_BVH 0
+
+# define PI 3.14159265359
+# define HALF_PI 1.57079632679
+# define TWO_PI 6.28318530718
 
 typedef struct s_render_block
 {

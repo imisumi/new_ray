@@ -6,7 +6,7 @@
 /*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/04 04:00:43 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/11/21 20:53:21 by imisumi-wsl      ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,9 +27,10 @@ t_vec3 	*normal_index;
 t_aabb bvh;
 t_bvh_node *bvh_nodes;
 
-
+float *env_blur;
 
 float *rgba;
+float *rgba2;
 const char* err;
 int w;
 int h;
@@ -792,6 +793,39 @@ t_vec3 sampleEXRTexture(float u, float v) {
     color.x = rgba[pixelIndex + 0];
     color.y = rgba[pixelIndex + 1];
     color.z = rgba[pixelIndex + 2];
+	// color.x = env_blur[pixelIndex + 0];
+    // color.y = env_blur[pixelIndex + 1];
+    // color.z = env_blur[pixelIndex + 2];
+	
+	// color = vec3_divf(color, brightness);
+
+    return color;
+}
+
+t_vec3 sampleEXRTexture2(float u, float v) {
+	t_vec3 color;
+    int width = w;
+    int height = h;
+
+    // Clamp texture coordinates to the valid range [0, 1]
+    u = fmax(0.0f, fmin(1.0f, u));
+    v = fmax(0.0f, fmin(1.0f, v));
+
+    // Calculate pixel coordinates in the EXR texture
+    int x = u * (width - 1);
+    int y = v * (height - 1);
+
+    // Get the pixel value from the EXR texture
+    // int pixelIndex = (y * width + x) * 4; // Each pixel has 4 float components (RGBA)
+	int	pixelIndex = (x + (height - 1 - y) * width) * 4;
+	// float brightness = 0.3f * rgba[pixelIndex] + 0.59f * rgba[pixelIndex + 1] + 0.11f * rgba[pixelIndex + 2];
+
+    color.x = rgba2[pixelIndex + 0];
+    color.y = rgba2[pixelIndex + 1];
+    color.z = rgba2[pixelIndex + 2];
+	// color.x = env_blur[pixelIndex + 0];
+    // color.y = env_blur[pixelIndex + 1];
+    // color.z = env_blur[pixelIndex + 2];
 	
 	// color = vec3_divf(color, brightness);
 
@@ -799,7 +833,7 @@ t_vec3 sampleEXRTexture(float u, float v) {
 }
 
 t_vec3 cosine_weighted_direction(uint32_t *rngState, t_vec3 normal) {
-    float r1 = 2.0f * M_PI * randomFloat(rngState);
+    float r1 = TWO_PI * randomFloat(rngState);
     float r2 = randomFloat(rngState);
     float r2s = sqrtf(r2);
     
@@ -812,6 +846,112 @@ t_vec3 cosine_weighted_direction(uint32_t *rngState, t_vec3 normal) {
     
     return vec3_normalize(sampleDir);
 }
+
+t_vec3	texture(t_vec3 normal)
+{
+	t_vec3 color;
+	float u;
+	float v;
+
+	// u = 0.5f + atan2(normal.z, normal.x) / (TWO_PI);
+	// v = 0.5f - asinf(normal.y) / PI;
+
+	float phi = atan2(normal.z, normal.x);
+	float theta = asinf(normal.y);
+	u = 1.0f - (phi + PI) / TWO_PI;
+	v = (theta + PI / 2.0f) / PI;
+	color = sampleEXRTexture(u, v);
+	return (color);
+}
+
+t_vec3	texture2(t_vec3 normal)
+{
+	t_vec3 color;
+	float u;
+	float v;
+
+	// u = 0.5f + atan2(normal.z, normal.x) / (TWO_PI);
+	// v = 0.5f - asinf(normal.y) / PI;
+
+	float phi = atan2(normal.z, normal.x);
+	float theta = asinf(normal.y);
+	u = 1.0f - (phi + PI) / TWO_PI;
+	v = (theta + PI / 2.0f) / PI;
+	color = sampleEXRTexture2(u, v);
+	return (color);
+}
+
+t_vec3	convolute_test(t_vec3 n)
+{
+	t_vec3 normal = vec3_normalize(n);
+	t_vec3 irradiance = vec3_new(0.0f, 0.0f, 0.0f);
+
+	t_vec3 up = vec3_new(0.0f, 1.0f, 0.0f);
+	t_vec3 right = vec3_cross(up, normal);
+	up = vec3_cross(normal, right);
+
+
+	float sampleDelta = 0.025f;
+	sampleDelta = 0.025f;
+	float nrSamples = 0.0f;
+	// return (texture(normal));
+	int i = 0;
+	for (float phi = 0.0f; phi < TWO_PI; phi += sampleDelta)
+	{
+		i = 0;
+		for (float theta = 0.0f; theta < HALF_PI; theta += sampleDelta)
+		{
+			t_vec3 tangentSample = vec3_new(sinf(theta) * cosf(phi), sinf(theta) * sinf(phi), cosf(theta));
+			t_vec3 sampleVec = vec3_add(vec3_add(vec3_mulf(right, tangentSample.x), vec3_mulf(up, tangentSample.y)), vec3_mulf(normal, tangentSample.z));
+
+			irradiance = vec3_add(irradiance, vec3_mulf(texture(sampleVec), cos(theta) * sin(theta)));
+			nrSamples++;
+			i++;
+		}
+	}
+	float t = PI / nrSamples;
+	irradiance = vec3_mulf(irradiance, t);
+	// irradiance = vec3_mulf(irradiance, PI);
+	// irradiance = vec3_mulf(irradiance, 1.0f / nrSamples);
+	return (irradiance);
+}
+
+t_vec3 estimateIrradiance(t_vec3 normal, int numSamples, uint32_t *rngState)
+{
+    t_vec3 irradiance = vec3_new(0.0f, 0.0f, 0.0f);
+
+    for (int i = 0; i < numSamples; ++i)
+    {
+        // Sample a random direction on the hemisphere oriented along the normal
+        t_vec3 sampleDir = random_direction(rngState);
+        sampleDir = vec3_normalize(vec3_add(sampleDir, normal));
+        // Convert the sampled direction to spherical coordinates
+        float phi = atan2(sampleDir.z, sampleDir.x);
+        float theta = asinf(sampleDir.y);
+
+        // Calculate texture coordinates from spherical coordinates
+        float u = 1.0f - (phi + PI) / TWO_PI;
+        float v = (theta + PI / 2.0f) / PI;
+
+        // Sample the HDR environment map at the calculated texture coordinates
+        t_vec3 sampleColor = sampleEXRTexture(u, v);
+
+        // Calculate the cosine term (Lambert's cosine law)
+        float cosTheta = fmaxf(vec3_dot(sampleDir, normal), 0.0f);
+
+        // Accumulate irradiance using Monte Carlo integration
+        // irradiance += sampleColor * cosTheta;
+
+		irradiance = vec3_add(irradiance, vec3_mulf(sampleColor, cosTheta));
+    }
+
+    // Normalize the accumulated irradiance by the number of samples
+    // irradiance /= float(numSamples);
+	irradiance = vec3_divf(irradiance, (float)numSamples);
+
+    return irradiance;
+}
+
 
 t_vec3 random_himisphere_dir(t_vec3 normal, uint32_t *state);
 t_sphere *sp;
@@ -827,6 +967,11 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 	t_vec3 ray_color = vec3_new(1.0f, 1.0f, 1.0f);
 	while (bounces <= MAX_BOUNCHES)
 	{
+		// t_vec3 convoluted_sky = convolute_test(ray.direction);
+		// t_vec3 convoluted_sky = estimateIrradiance(ray.direction, 100, rngState);
+		// incomming_light = vec3_add(incomming_light, vec3_mul(ray_color, convoluted_sky));
+		// break ;
+
 		closest_hit.hit = false;
 		closest_hit.distance = FLT_MAX;
 
@@ -865,6 +1010,13 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 		}
 		else
 		{
+			
+			// t_vec3 convoluted_sky = convolute_test(ray.direction);
+			// t_vec3 convoluted_sky = estimateIrradiance(ray.direction, 1, rngState);
+			
+			// t_vec3 convoluted_sky = vec3_new(2.369719, 2.402366, 2.334979);
+			// incomming_light = vec3_add(incomming_light, vec3_mul(ray_color, convoluted_sky));
+			// break ;
 			t_vec3 unit_direction = vec3_normalize(ray.direction);
 			float phi = atan2(unit_direction.z, unit_direction.x);
 			float theta = asinf(unit_direction.y);
@@ -873,6 +1025,10 @@ t_vec4	per_pixel(t_ray ray, t_scene s, t_vec2 xy, uint32_t *rngState, t_vec2 coo
 			float v = (theta + M_PI / 2.0f) / M_PI;
 			
 			t_vec3	skybox = sampleEXRTexture(u, v);
+			skybox = texture2(vec3_normalize(ray.direction));
+			t_vec3 sky = texture(vec3_normalize(ray.direction));
+			skybox = vec3_add(skybox, sky);
+			skybox = vec3_mulf(skybox, 0.5f);
 			incomming_light = vec3_add(incomming_light, vec3_mul(ray_color, skybox));
 			break ;
 		}
@@ -885,7 +1041,39 @@ float toneMap(float hdrValue, float key, float whitePoint)
 {
     float L = hdrValue / (hdrValue + key);
     L *= (1.0 + L / (whitePoint * whitePoint)) / (1.0 + L);
-    return powf(L, 1.0 / 1.8); // Gamma correction for sRGB
+    return powf(L, 1.0 / 2.2); // Gamma correction for sRGB
+}
+
+
+t_vec4	vec3_tone_map(t_vec3 color)
+{
+	float	gamma = 2.2f;
+	// gamma = 1.0f;
+	float	exposure = 0.5f;
+	// exposure = 1.0f;
+	color = vec3_mulf(color, exposure);
+	t_vec3	result = vec3_div(color, vec3_addf(color, 1.0f));
+	// t_vec3 result;
+
+	// result.x = 1.0f - expf(-color.x * exposure);
+	// result.y = 1.0f - expf(-color.y * exposure);
+	// result.z = 1.0f - expf(-color.z * exposure);
+
+	// result = color;
+	result.x = powf(result.x, 1.0f / gamma);
+	result.y = powf(result.y, 1.0f / gamma);
+	result.z = powf(result.z, 1.0f / gamma);
+	return (vec4_new(result.x, result.y, result.z, 1.0f));
+}
+
+t_vec2	SampleSphericalMap(t_vec3 v)
+{
+	t_vec2	invAtan = vec2_new(0.1591f, 0.3183f);
+
+	t_vec2	uv = vec2_new(atan2(v.z, v.x), asin(v.y));
+	uv = vec2_mul(uv, invAtan);
+	uv = vec2_add(uv, vec2_new(0.5f, 0.5f));
+	return (uv);
 }
 
 void	*render(void *param)
@@ -895,6 +1083,7 @@ void	*render(void *param)
 	int	index = threadData.threadIndex;
 	uint32_t color;
 	uint32_t rngState;
+	t_vec4 col;
 
 	t_ray	ray;
 	ray.origin = data->scene.camera.position;
@@ -919,18 +1108,11 @@ void	*render(void *param)
 			ray.direction = data->scene.camera.ray_dir[x + y * WIDTH];
 			//! anti-aliasing
 
-			t_vec4 col = per_pixel(ray, data->scene, vec2_new(x, y), &rngState, coord);
-			// col.x = toneMap(col.x, key, whitePoint);
-			// col.y = toneMap(col.y, key, whitePoint);
-			// col.z = toneMap(col.z, key, whitePoint);
-			// col.w = 1.0f;
+			col = per_pixel(ray, data->scene, vec2_new(x, y), &rngState, coord);
 
-			// pthread_mutex_lock(&data->utils.mutex);
 			data->utils.accumulated_data[x + y * WIDTH] = vec4_add(data->utils.accumulated_data[x + y * WIDTH], col);
-			// pthread_mutex_unlock(&data->utils.mutex);
 			t_vec4 accumulated_color = data->utils.accumulated_data[x + y * WIDTH];
 			accumulated_color = vec4_divf(accumulated_color, data->utils.accumulated_frames);
-			// accumulated_color = vec4_clamp(accumulated_color, 0.0, 1.0);
 
 			// col = vec4_clamp(accumulated_color, 0.0, 1.0);
 
@@ -938,22 +1120,29 @@ void	*render(void *param)
 			// float key = 3.0;
 
 			
-			col.x = toneMap(accumulated_color.x, key, whitePoint);
-			col.y = toneMap(accumulated_color.y, key, whitePoint);
-			col.z = toneMap(accumulated_color.z, key, whitePoint);
-			col.w = 1.0f;
-			col = vec4_clamp(col, 0.0, 1.0);
+			// col.x = toneMap(accumulated_color.x, key, whitePoint);
+			// col.y = toneMap(accumulated_color.y, key, whitePoint);
+			// col.z = toneMap(accumulated_color.z, key, whitePoint);
+			// col.w = 1.0f;
+
+			col = vec3_tone_map(vec3_new(accumulated_color.x, accumulated_color.y, accumulated_color.z));
+			// col = vec4_clamp(col, 0.0, 1.0);
 
 
 			// float whitePoint = 1.0;
 			// float key = 0.6;
 			// t_vec4 col;
-			// int index = (x + (HEIGHT - 1 - y) * WIDTH) * 4;  // Calculate index for RGBA values, flipping vertically
-			// col.x = toneMap(rgba[index], key, whitePoint); // Red channel
-			// col.y= toneMap(rgba[index + 1], key, whitePoint); // Green channel
-			// col.z = toneMap(rgba[index + 2], key, whitePoint); // Blue channel
+			// int i = (x + (h - 1 - y) * w) * 4;  // Calculate index for RGBA values, flipping vertically
+			// t_vec3 temp = vec3_new(rgba[i], rgba[i + 1], rgba[i + 2]);
+			// col = vec3_tone_map(temp);
+
+			// t_vec2 env_uv = SampleSphericalMap(ray.direction);
+			// col.x = sampleEXRTexture(env_uv.x, env_uv.y).x;
+			// col.y = sampleEXRTexture(env_uv.x, env_uv.y).y;
+			// col.z = sampleEXRTexture(env_uv.x, env_uv.y).z;
 			// col.w = 1.0f;
 			
+			// col = vec3_tone_map(vec3_new(col.x, col.y, col.z));
 			
 			color = vec4_to_color(col);
 
@@ -1156,7 +1345,6 @@ void init_scene(t_scene *s)
 	face.index[2] = 2;
 
 
-
 	for (int i = 0; i < array_length(&faces); i++)
 	{
 		t_tri tri;
@@ -1190,6 +1378,8 @@ void init_scene(t_scene *s)
 	return ;
 }
 
+
+
 int32_t main(int32_t argc, char* argv[])
 {
 	mlx_t* mlx;
@@ -1197,11 +1387,16 @@ int32_t main(int32_t argc, char* argv[])
 	
 	// char *skybox = "modern_buildings_2_2k.exr";
 	char *skybox = "empty_workshop_2k.exr";
+	// char *skybox = "testing3.exr";
 	int ret = LoadEXR(&rgba, &w, &h, skybox, &err);
 	printf("w: %d\n", w);
 	printf("h: %d\n", h);
 	// exit(0);
+	// env_blur = malloc(sizeof(float) * w * h * 4);
+	// blurSphericalEnvMap(rgba, env_blur);
 
+	char *skybox2 = "testing3.exr";
+	ret = LoadEXR(&rgba2, &w, &h, skybox2, &err);
 
 	
 
@@ -1216,6 +1411,8 @@ int32_t main(int32_t argc, char* argv[])
 	// Gotta error check this stuff
 	int width = WIDTH;
 	int height = HEIGHT;
+	// width = w;
+	// height = h;
 	if (PIXEL_SIZE > 1)
 	{
 		width *= PIXEL_SIZE;
