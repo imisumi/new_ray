@@ -3,15 +3,15 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+        */
+/*   By: ichiro <ichiro@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/21 20:53:21 by imisumi-wsl      ###   ########.fr       */
+/*   Updated: 2023/12/05 00:38:23 by ichiro           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/main.h"
-// #include "main.h"
+// #include "../includes/main.h"
+#include "main.h"
 #include <float.h>
 #include <pthread.h>
 static mlx_image_t* image;

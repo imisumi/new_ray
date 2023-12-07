@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   intersection.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: imisumi <imisumi@student.42.fr>            +#+  +:+       +#+        */
+/*   By: ichiro <ichiro@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/08/07 14:31:38 by imisumi           #+#    #+#             */
-/*   Updated: 2023/11/01 16:51:23 by imisumi          ###   ########.fr       */
+/*   Updated: 2023/12/07 14:12:27 by ichiro           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,6 @@ t_hitinfo	sphere_intersection(t_ray ray, t_scene s, t_hitinfo hitinfo)
 				hitinfo.material = s.materials[s.spheres[i].material_index];
 				if (s.spheres[i].color == true)
 					hitinfo.material.color = s.spheres[i].col;
-				
 			}
 		}
 		i++;

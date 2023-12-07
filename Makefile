@@ -1,12 +1,12 @@
 # **************************************************************************** #
 #                                                                              #
 #                                                         :::      ::::::::    #
-#    Makefile                                           :+:      :+:    :+:    #
+#    Makefile backup                                    :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: imisumi-wsl <imisumi-wsl@student.42.fr>    +#+  +:+       +#+         #
+#    By: ichiro <ichiro@student.42.fr>              +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/01/28 00:51:40 by ichiro            #+#    #+#              #
-#    Updated: 2023/11/12 21:32:45 by imisumi-wsl      ###   ########.fr        #
+#    Updated: 2023/12/07 14:22:47 by ichiro           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,15 +14,19 @@ NAME = minirt
 
 # HEADER = lib/MLX42/include/MLX42/MLX42.h
 
-CFLAGS = 
+CFLAGS = -I$(INCDIR)
+CFLAGS += -I./lib/MLX42/include/MLX42
+CFLAGS += -I./lib/libft/includes
+CFLAGS += -I./lib/lib3d/includes
 
-INCLUDES =	includes/main.h			\
-			includes/darray.h		\
-			lib/MLX42/include/MLX42/MLX42.h \
-			lib/libft/includes/libft.h \
-			lib/lib3d/includes/lib3d.h
 
-CFLAGS += $(addprefix -I,$(sort $(dir $(INCLUDES))))
+# INCLUDES =	includes/main.h			\
+# 			includes/darray.h		\
+# 			lib/MLX42/include/MLX42/MLX42.h \
+# 			lib/libft/includes/libft.h \
+# 			lib/lib3d/includes/lib3d.h
+
+# CFLAGS += $(addprefix -I,$(sort $(dir $(INCLUDES))))
 CFLAGS +=
 
 LEAKS = -fsanitize=address
@@ -31,7 +35,8 @@ cc = gcc -msse4.2 -O3 -march=native
 
 # cc += -pg
 
-LFLAGS = -ldl -lglfw -pthread -lm 
+# LFLAGS = -ldl -lglfw -pthread -lm 
+LFLAGS = -ldl -framework Cocoa -framework OpenGl -framework IOKit -lm -lglfw -pthread
 
 MLX = lib/MLX42/build/libmlx42.a
 LIBFT = lib/libft/libft.a
@@ -39,6 +44,7 @@ LIB3D = lib/lib3d/lib3d.a
 
 OBJS_DIR = objs
 SRC_DIR = src
+INCDIR = includes
 
 GREEN := \033[1;32m
 RED := \033[1;31m
@@ -57,6 +63,15 @@ SRCS =	src/main.c						\
 		src/parser.c \
 		src/utils.c
 
+# SRCDIR		:= src
+
+
+# SRCS		:= $(wildcard $(SRCDIR)/**/*.c) $(wildcard $(SRCDIR)/*.c)
+# OBJECTS		:= $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SOURCES))
+
+# CFLAGS = -I$(INCDIR)
+
+# SRCS	= $(wildcard $(SRCDIR)/**/*.c) $(wildcard $(SRCDIR)/*.c)
 
 all: $(LIBFT) $(LIB3D) $(MLX) $(NAME)
 	@echo "$(GREEN)[Completed minirt]$(NC)"
@@ -76,7 +91,8 @@ $(MLX):
 	@echo "$(GREEN)[Completed MLX]$(NC)"
 
 $(NAME): $(LIBFT) $(LIB3D) $(MLX) $(OBJS)
-	$(cc) $(CFLAGS) $(SRCS) ./tinyexr.o ./miniz.o -lstdc++ $(LIBFT) $(LIB3D) $(MLX) $(LFLAGS) -o $(NAME)
+	$(cc) $(CFLAGS) $(SRCS) ./tinyexr.cpp ./miniz.c -lstdc++ $(LIBFT) $(LIB3D) $(MLX) $(LFLAGS) -o $(NAME)
+#	$(cc) $(CFLAGS) $(SRCS) ./tinyexr.o ./miniz.o -lstdc++ $(LIBFT) $(LIB3D) $(MLX) $(LFLAGS) -o $(NAME)
 
 run: re
 	./$(NAME)
